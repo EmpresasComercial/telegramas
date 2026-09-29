@@ -97,8 +97,8 @@ html, body, * {
    ══════════════════════════════════════════════════════════════════ */
 
 /* 1. Botões a nível global (sem arredondamento) */
-button:not([class*="rounded-full"]):not(.rounded-full),
-[role="button"]:not([class*="rounded-full"]):not(.rounded-full),
+button:not([class*="rounded-full"]):not(.rounded-full):not(.btn-auth),
+[role="button"]:not([class*="rounded-full"]):not(.rounded-full):not(.btn-auth),
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
@@ -108,13 +108,21 @@ input[type="reset"],
 }
 
 /* 2. Campos de entrada (Inputs, Textareas, Selects - sem arredondamento) */
-input,
+input:not(.input-auth),
 textarea,
 select,
 .input-field,
-div:has(> input):not([class*="rounded-full"]),
+div:has(> input):not([class*="rounded-full"]):not(.input-auth-wrap),
 div:has(> textarea):not([class*="rounded-full"]) {
   border-radius: 0px !important;
+}
+
+/* ── EXCEÇÃO: Páginas de Login e Cadastro — border-radius 22px ── */
+.btn-auth {
+  border-radius: 22px !important;
+}
+.input-auth-wrap {
+  border-radius: 22px !important;
 }
 
 /* 3. Cards a nível global (sem arredondamento) */

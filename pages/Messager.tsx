@@ -203,10 +203,13 @@ export default function Messager() {
         {/* ── FORMULÁRIO DE CADASTRO ── */}
         <form onSubmit={executeRegistration} className="w-full flex flex-col gap-4">
 
-          {/* Campos divididos apenas por divisores horizontais */}
-          <div className="w-full flex flex-col">
+          {/* Campos com arredondamento de 22px */}
+          <div className="w-full flex flex-col gap-3">
             {/* 1. Telefone com seletor de país */}
-            <div className="flex items-center px-1 h-[52px] border-b border-[#e5e5e5]">
+            <div
+              className="input-auth-wrap"
+              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
+            >
               <button
                 type="button"
                 onClick={() => setShowCountryModal(true)}
@@ -222,7 +225,7 @@ export default function Messager() {
                 inputMode="numeric"
                 autoComplete="tel"
                 placeholder="Por favor, insira o número de telefone."
-                className="flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
+                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
                 value={formData.phone}
                 onChange={handleChange}
                 maxLength={selectedCountry.maxLength}
@@ -230,12 +233,15 @@ export default function Messager() {
             </div>
 
             {/* 2. Senha */}
-            <div className="flex items-center px-1 h-[52px] border-b border-[#e5e5e5]">
+            <div
+              className="input-auth-wrap"
+              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
+            >
               <input
                 name="userPasskey"
                 type={showUserPasskey ? 'text' : 'password'}
                 placeholder="Por favor, insira a sua senha."
-                className="flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
+                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
                 value={userPasskey}
                 onChange={(e) => setUserPasskey(e.target.value)}
                 autoComplete="new-password"
@@ -251,12 +257,15 @@ export default function Messager() {
             </div>
 
             {/* 3. Código de convite */}
-            <div className="flex items-center px-1 h-[52px] border-b border-[#e5e5e5]">
+            <div
+              className="input-auth-wrap"
+              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
+            >
               <input
                 name="inviteCode"
                 type="text"
                 placeholder="Por favor, insira o código de convite."
-                className="flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
+                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
                 value={formData.inviteCode}
                 onChange={handleChange}
                 maxLength={10}
@@ -266,7 +275,8 @@ export default function Messager() {
             {/* 4. Verificação "Não sou um robô" */}
             <div
               onClick={() => setIsRobotVerified(prev => !prev)}
-              className="flex items-center justify-between px-1 h-[52px] border-b border-[#e5e5e5] select-none cursor-pointer transition-colors"
+              className="input-auth-wrap"
+              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: '12px', paddingRight: '12px', userSelect: 'none', cursor: 'pointer' }}
             >
               <div className="flex items-center gap-2.5">
                 <input
@@ -289,7 +299,7 @@ export default function Messager() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[48px] rounded-[12px] bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center shadow-xs cursor-pointer"
+              className="btn-auth w-full h-[48px] bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 text-white" /> : 'Inscrever-se'}
             </button>
@@ -297,7 +307,7 @@ export default function Messager() {
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
+              className="btn-auth w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
             >
               Já tenho conta — Conectar-se
             </button>

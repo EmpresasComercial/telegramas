@@ -130,10 +130,13 @@ export default function Login() {
         {/* ── FORMULÁRIO DE LOGIN ── */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
 
-          {/* Campos divididos apenas por divisores horizontais */}
-          <div className="w-full flex flex-col">
+          {/* Campos com arredondamento de 22px */}
+          <div className="w-full flex flex-col gap-3">
             {/* 1. Telefone com seletor de país */}
-            <div className="flex items-center px-1 h-[52px] border-b border-[#e5e5e5]">
+            <div
+              className="input-auth-wrap"
+              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
+            >
               <button
                 type="button"
                 onClick={() => setShowCountryModal(true)}
@@ -149,7 +152,7 @@ export default function Login() {
                 inputMode="numeric"
                 autoComplete="tel"
                 placeholder="Por favor, insira o número de telefone."
-                className="flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
+                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
                 value={phone}
                 onChange={handlePhoneChange}
                 maxLength={selectedCountry.maxLength}
@@ -157,12 +160,15 @@ export default function Login() {
             </div>
 
             {/* 2. Senha */}
-            <div className="flex items-center px-1 h-[52px] border-b border-[#e5e5e5]">
+            <div
+              className="input-auth-wrap"
+              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
+            >
               <input
                 name="passkey"
                 type={showPasskey ? 'text' : 'password'}
                 placeholder="Por favor, insira a sua senha."
-                className="flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
+                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
                 value={passkey}
                 onChange={(e) => setPasskey(e.target.value)}
                 autoComplete="current-password"
@@ -183,7 +189,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[48px] rounded-[12px] bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center shadow-xs cursor-pointer"
+              className="btn-auth w-full h-[48px] bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 text-white" /> : 'Conectar-se'}
             </button>
@@ -191,7 +197,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => navigate('/messager')}
-              className="w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
+              className="btn-auth w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
             >
               Não tem conta? Inscrever-se
             </button>
