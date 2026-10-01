@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { useToast } from '../components/Toast';
@@ -15,7 +15,6 @@ export default function Login() {
   const [phone, setPhone] = useState('');
   const [passkey, setPasskey] = useState('');
 
-  // Country selector
   const [selectedCountry, setSelectedCountry] = useState<Country>(() => {
     try {
       const savedCode = localStorage.getItem('saved_dial_code');
@@ -28,7 +27,6 @@ export default function Login() {
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [searchCountry, setSearchCountry] = useState('');
 
-  // Auto-fill saved phone if available
   useEffect(() => {
     try {
       const saved = localStorage.getItem('saved_phone');
@@ -50,7 +48,7 @@ export default function Login() {
     const cleanPasskey = passkey.trim();
 
     if (!cleanPhone) {
-      showToast('Por favor, insira o número de telefone.', 'error');
+      showToast('Por favor, insira um número de telefone válido.', 'error');
       return;
     }
     if (!cleanPasskey || cleanPasskey.length < 4) {
@@ -67,7 +65,7 @@ export default function Login() {
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          showToast('Ops! Número ou senha incorrectos. Tente novamente.', 'error');
+          showToast('Por favor, verifique as credenciais de acesso inválidas.', 'error');
         } else {
           throw error;
         }
@@ -102,19 +100,19 @@ export default function Login() {
     <div className="w-full min-h-screen bg-white pb-12 font-sans antialiased text-black select-none flex flex-col items-center justify-center p-4">
       <main className="w-full max-w-[340px] sm:max-w-[360px] flex flex-col items-center">
 
-        {/* ── LOGO OFICIAL TELEGRAM ── */}
+        {/* ── LOGO ── */}
         <div className="mb-3.5 flex items-center justify-center">
           <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" className="w-[58px] h-[58px]">
             <defs>
               <linearGradient id="tgLoginGrad" x1=".667" x2=".417" y1=".167" y2=".75">
-                <stop offset="0" stopColor="#37aee2"/>
-                <stop offset="1" stopColor="#1e96c8"/>
+                <stop offset="0" stopColor="#37aee2" />
+                <stop offset="1" stopColor="#1e96c8" />
               </linearGradient>
             </defs>
-            <circle cx="120" cy="120" r="120" fill="url(#tgLoginGrad)"/>
-            <path fill="#c8daea" d="m98 175c-3.888 0-3.227-1.468-4.568-5.17l-11.433-37.594 88.022-52.232"/>
-            <path fill="#a9c9dd" d="m98 175c3 0 4.325-1.372 6-3l16-15.558-19.958-12.035"/>
-            <path fill="#fff" d="m100.04 144.41 48.36 35.729c5.519 3.045 9.501 1.468 10.876-5.123l19.685-92.763c2.015-8.08-3.08-11.746-8.36-9.349l-115.59 44.571c-7.89 3.165-7.843 7.567-1.438 9.528l29.663 9.259 68.673-43.325c3.242-1.966 6.218-.91 3.776 1.258"/>
+            <circle cx="120" cy="120" r="120" fill="url(#tgLoginGrad)" />
+            <path fill="#c8daea" d="m98 175c-3.888 0-3.227-1.468-4.568-5.17l-11.433-37.594 88.022-52.232" />
+            <path fill="#a9c9dd" d="m98 175c3 0 4.325-1.372 6-3l16-15.558-19.958-12.035" />
+            <path fill="#fff" d="m100.04 144.41 48.36 35.729c5.519 3.045 9.501 1.468 10.876-5.123l19.685-92.763c2.015-8.08-3.08-11.746-8.36-9.349l-115.59 44.571c-7.89 3.165-7.843 7.567-1.438 9.528l29.663 9.259 68.673-43.325c3.242-1.966 6.218-.91 3.776 1.258" />
           </svg>
         </div>
 
@@ -122,74 +120,84 @@ export default function Login() {
         <h1 className="text-[26px] font-bold text-center mb-1.5 tracking-tight text-[#1c1c1e]">
           Telegram
         </h1>
-
         <p className="text-[13px] text-[#8e8e93] text-center mb-6 leading-snug max-w-[280px]">
           Introduza o seu número de telefone e chave de acesso para entrar.
         </p>
 
-        {/* ── FORMULÁRIO DE LOGIN ── */}
+        {/* ── FORMULÁRIO ── */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
 
-          {/* Campos com arredondamento de 22px */}
-          <div className="w-full flex flex-col gap-3">
-            {/* 1. Telefone com seletor de país */}
-            <div
-              className="input-auth-wrap"
-              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
-            >
+          <div className="w-full flex flex-col gap-5 mt-2">
+
+            {/* 1. Country */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Country</label>
+              </div>
               <button
                 type="button"
                 onClick={() => setShowCountryModal(true)}
-                className="flex items-center gap-1 text-[15px] font-medium text-black border-r border-[#e5e5e5] pr-2.5 mr-3 shrink-0 cursor-pointer hover:opacity-70"
+                className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center justify-between px-3.5 hover:border-[#3390ec] focus:border-[#3390ec] focus:outline-none transition-colors cursor-pointer"
                 title="Mudar país"
               >
-                <span>{selectedCountry.dial_code}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-[#8e8e93] stroke-[2.2]" />
+                <span className="text-[16px] text-black font-normal">{selectedCountry.name}</span>
+                <ChevronDown className="w-5 h-5 text-[#a2a6aa]" strokeWidth={2} />
               </button>
-              <input
-                name="phone"
-                type="tel"
-                inputMode="numeric"
-                autoComplete="tel"
-                placeholder="Por favor, insira o número de telefone."
-                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
-                value={phone}
-                onChange={handlePhoneChange}
-                maxLength={selectedCountry.maxLength}
-              />
             </div>
 
-            {/* 2. Senha */}
-            <div
-              className="input-auth-wrap"
-              style={{ border: '1px solid #e5e5e5', background: '#f8f8f8', height: '52px', display: 'flex', alignItems: 'center', paddingLeft: '12px', paddingRight: '12px' }}
-            >
-              <input
-                name="passkey"
-                type={showPasskey ? 'text' : 'password'}
-                placeholder="Por favor, insira a sua senha."
-                className="input-auth flex-1 bg-transparent outline-none text-[15px] text-black placeholder:text-[#c7c7cc] font-normal"
-                value={passkey}
-                onChange={(e) => setPasskey(e.target.value)}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={togglePasskey}
-                className="ml-2 text-[#c7c7cc] hover:text-[#3390ec] active:opacity-50 transition-colors p-1 cursor-pointer shrink-0"
-                aria-label={showPasskey ? 'Ocultar senha' : 'Ver senha'}
-              >
-                {showPasskey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
+            {/* 2. Phone Number */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Your phone number</label>
+              </div>
+              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+                <span className="text-[16px] text-black mr-1.5 shrink-0">{selectedCountry.dial_code}</span>
+                <input
+                  name="phone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  className="flex-1 bg-transparent outline-none text-[16px] text-black font-normal h-full w-full"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  maxLength={selectedCountry.maxLength}
+                />
+              </div>
             </div>
+
+            {/* 3. Password */}
+            <div className="relative w-full">
+              <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
+                <label className="text-[14px] text-[#707579] font-medium leading-none">Password</label>
+              </div>
+              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+                <input
+                  name="passkey"
+                  type={showPasskey ? 'text' : 'password'}
+                  className="flex-1 bg-transparent outline-none text-[16px] text-black font-normal h-full w-full"
+                  value={passkey}
+                  onChange={(e) => setPasskey(e.target.value)}
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={togglePasskey}
+                  className="ml-2 text-[#a2a6aa] hover:text-[#3390ec] transition-colors shrink-0 cursor-pointer"
+                  aria-label={showPasskey ? 'Ocultar senha' : 'Ver senha'}
+                >
+                  {showPasskey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
           </div>
 
-          {/* 3. BOTÕES DE AÇÃO */}
+          {/* Botões */}
           <div className="w-full pt-1 space-y-2.5">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="btn-auth w-full h-[48px] bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
+              className="w-full h-[48px] rounded-xl bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 text-white" /> : 'Conectar-se'}
             </button>
@@ -197,7 +205,7 @@ export default function Login() {
             <button
               type="button"
               onClick={() => navigate('/messager')}
-              className="btn-auth w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
+              className="w-full text-center text-[#3390ec] hover:text-[#2881dc] font-medium text-[14.5px] transition-colors py-2 cursor-pointer hover:underline"
             >
               Não tem conta? Inscrever-se
             </button>
@@ -205,9 +213,7 @@ export default function Login() {
         </form>
       </main>
 
-      {/* ════════════════════════════════════════════════════════
-          MODAL — Seleção de Países
-      ════════════════════════════════════════════════════════ */}
+      {/* ── MODAL Países ── */}
       <AnimatePresence>
         {showCountryModal && (
           <motion.div
@@ -225,7 +231,7 @@ export default function Login() {
               <div className="w-[40px]" />
             </div>
             <div className="p-2 bg-[#f8f8f8] border-b border-[#c8c7cc] shrink-0">
-              <div className="bg-[#e3e3e8] h-[36px] rounded-[20px] flex items-center px-3">
+              <div className="bg-[#e3e3e8] h-[36px] rounded-full flex items-center px-3">
                 <Search className="w-5 h-5 text-[#8e8e93] mr-2" />
                 <input
                   type="text"
