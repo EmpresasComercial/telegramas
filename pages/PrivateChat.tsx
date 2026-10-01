@@ -449,7 +449,11 @@ export default function PrivateChat() {
         </div>
 
         {messages.map((m) => {
-          const isMe = m.remetente_id === user?.id;
+          // Primary: remetente_id matches session user
+          // Fallback: destinatario_id matches the contact (means I sent it)
+          const isMe =
+            m.remetente_id === user?.id ||
+            (m.destinatario_id === contactId && m.remetente_id !== contactId);
           return (
             <div
               key={m.id}
