@@ -75,6 +75,9 @@ export default function ChatsList() {
     return p;
   };
 
+  const previewText = (text: string, max = 60) =>
+    text && text.length > max ? text.slice(0, max) + '\u2026' : (text || '');
+
   const formatTelegramTime = (dateInput: Date | string | number): string => {
     if (!dateInput) return '';
     const d = new Date(dateInput);
@@ -786,11 +789,11 @@ export default function ChatsList() {
                   </div>
 
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[13.5px] text-[#707579] dark:text-[#9eaab6] truncate leading-snug">
+                    <p className="text-[13.5px] text-[#707579] dark:text-[#9eaab6] truncate leading-snug overflow-hidden whitespace-nowrap">
                       {chat.senderPrefix && (
                         <span className="text-[#2481cc] font-medium">{chat.senderPrefix}</span>
                       )}
-                      {chat.lastMessage}
+                      {previewText(chat.lastMessage || '')}
                     </p>
                     {chat.actionBtn}
                   </div>
