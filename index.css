@@ -97,8 +97,8 @@ html, body, * {
    ══════════════════════════════════════════════════════════════════ */
 
 /* 1. Botões a nível global (sem arredondamento) */
-button:not([class*="rounded-full"]):not(.rounded-full):not(.btn-auth),
-[role="button"]:not([class*="rounded-full"]):not(.rounded-full):not(.btn-auth),
+button:not([class*="rounded-full"]):not(.rounded-full):not(.btn-auth):not(.auth-input-btn),
+[role="button"]:not([class*="rounded-full"]):not(.rounded-full):not(.btn-auth):not(.auth-input-btn),
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
@@ -108,21 +108,38 @@ input[type="reset"],
 }
 
 /* 2. Campos de entrada (Inputs, Textareas, Selects - sem arredondamento) */
-input:not(.input-auth),
+input:not(.input-auth):not(.auth-field),
 textarea,
 select,
 .input-field,
-div:has(> input):not([class*="rounded-full"]):not(.input-auth-wrap),
+div:has(> input):not([class*="rounded-full"]):not(.input-auth-wrap):not(.auth-input-wrap),
 div:has(> textarea):not([class*="rounded-full"]) {
   border-radius: 0px !important;
 }
 
-/* ── EXCEÇÃO: Páginas de Login e Cadastro — border-radius 22px ── */
+/* ── EXCEÇÃO: Páginas de Login e Cadastro — border-radius correto ── */
 .btn-auth {
   border-radius: 22px !important;
 }
 .input-auth-wrap {
   border-radius: 22px !important;
+}
+
+/* Inputs e wrappers com arredondamento nas páginas de auth */
+.auth-input-wrap {
+  border-radius: 12px !important;
+}
+.auth-input-wrap input {
+  border-radius: 0 !important;
+}
+.auth-input-btn {
+  border-radius: 12px !important;
+}
+
+/* Override para divs com rounded-xl nas páginas de auth (Login/Messager) */
+div[class*="rounded-xl"].auth-input-wrap,
+button[class*="rounded-xl"].auth-input-btn {
+  border-radius: 12px !important;
 }
 
 /* 3. Cards a nível global (sem arredondamento) */
@@ -147,7 +164,7 @@ aside[class*="rounded"],
 section[class*="rounded"],
 main[class*="rounded"],
 form[class*="rounded"],
-div[class*="rounded-xl"]:not([class*="w-"]):not([class*="h-"]):not(.tg-bubble),
+div[class*="rounded-xl"]:not([class*="w-"]):not([class*="h-"]):not(.tg-bubble):not(.auth-input-wrap),
 div[class*="rounded-2xl"]:not([class*="w-"]):not([class*="h-"]):not(.tg-bubble),
 div[class*="rounded-[20px]"]:not(.tg-bubble),
 div[class*="rounded-[24px]"]:not(.tg-bubble) {
