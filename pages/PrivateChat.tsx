@@ -475,32 +475,50 @@ export default function PrivateChat() {
                   onClick={(e) => { e.stopPropagation(); openContextMenu(e, m, isMe); }}
                   onTouchStart={handleTouchStart}
                   onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
-                  className={`tg-bubble max-w-[85%] sm:max-w-[70%] md:max-w-[580px] px-3.5 py-2 text-[#111827] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none rounded-[18px] ${
+                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} min-w-[60px] max-w-[82%] px-3.5 py-2 text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(0,0,0,0.06)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
                     isMe
-                      ? 'bg-[#effdde] dark:bg-[#2b5278]'
+                      ? 'bg-[#dcf8c6] dark:bg-[#2b5278]'
                       : 'bg-white dark:bg-[#182533]'
                   } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
                   style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                 >
+                  {/* Ponta de agulha (Speech bubble tail Telegram) */}
+                  {isMe ? (
+                    <svg
+                      className="absolute bottom-0 -right-[8px] w-[9px] h-[16px] text-[#dcf8c6] dark:text-[#2b5278] fill-current pointer-events-none"
+                      viewBox="0 0 9 16"
+                    >
+                      <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="absolute bottom-0 -left-[8px] w-[9px] h-[16px] text-white dark:text-[#182533] fill-current pointer-events-none"
+                      viewBox="0 0 9 16"
+                      style={{ transform: 'scaleX(-1)' }}
+                    >
+                      <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                    </svg>
+                  )}
+
                   <div className="relative pointer-events-none">
                     {!isMe && (
-                      <span
-                        className="text-[12px] font-bold block mb-0.5"
+                      <p
+                        className="text-[13px] font-bold mb-0.5 cursor-pointer truncate"
                         style={{ color: isPavel ? '#2481cc' : contactColor }}
                       >
                         {isPavel ? 'Pavel Durov Fundador' : contactDisplayName}
-                      </span>
+                      </p>
                     )}
 
-                    <p className="text-[14.5px] leading-relaxed break-words whitespace-pre-wrap pr-12 font-normal">
+                    <p className="text-[14.5px] leading-relaxed break-words whitespace-pre-wrap text-[#202020] dark:text-[#f3f4f6] font-normal pr-12" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                       {m.mensagem}
                     </p>
 
-                    <div className="absolute right-0 bottom-[-2px] flex items-center gap-0.5 select-none">
-                      <span className={`text-[10px] font-normal ${isMe ? 'text-[#2481cc] dark:text-white/70' : 'text-[#707579] dark:text-[#8e9aa5]'}`}>
+                    <div className="absolute right-0 bottom-[-2px] flex items-center gap-1 select-none">
+                      <span className={`text-[10.5px] font-normal ${isMe ? 'text-[#55864e] dark:text-white/70' : 'text-[#8e8e93] dark:text-[#8e9aa5]'}`}>
                         {formatTime(m.created_at)}
                       </span>
-                      {isMe && <CheckCheck className="w-3.5 h-3.5 stroke-[2.4] text-[#2481cc] dark:text-[#5288c1]" />}
+                      {isMe && <CheckCheck className="w-3.5 h-3.5 text-[#4fae4e] dark:text-[#5288c1] stroke-[2.4]" />}
                     </div>
                   </div>
                 </div>

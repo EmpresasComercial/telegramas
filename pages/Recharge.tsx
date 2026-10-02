@@ -1442,6 +1442,8 @@ export default function Recharge() {
             );
           }
 
+          const hasKeyboard = ['welcome', 'deposit_instructions', 'deposit_summary', 'proof_success'].includes(msg.type);
+
           return (
             <React.Fragment key={msg.id}>
             <div
@@ -1458,84 +1460,16 @@ export default function Recharge() {
                   <path d="M9 0H0C4.5 0 8 4 9 12V0Z" />
                 </svg>
                 <div
-                  className="bg-white rounded-[16px] rounded-tl-none px-3.5 py-2.5 text-gray-900 w-full relative select-text"
+                  className={`bg-white text-gray-900 w-full relative select-text px-3.5 py-2.5 ${
+                    hasKeyboard ? 'rounded-tr-[16px] rounded-tl-none rounded-b-none' : 'rounded-[16px] rounded-tl-none'
+                  }`}
                   style={{ boxShadow: '0 1px 2px rgba(16,35,47,0.15)' }}
                 >
                 {/* APRESENTAÇÃO INICIAL / BOAS-VINDAS */}
                 {msg.type === 'welcome' && (
                   <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    <p className="mb-2">
-                      Olá! Seja muito bem-vindo! Sou o <strong>DepositBot</strong> 💳, seu assistente oficial de depósitos e recargas 😊
-                    </p>
-                    <p className="mb-2.5 text-gray-800">
-                      Estou aqui para tornar suas recargas super rápidas, fáceis e descontraídas! Você pode me perguntar:
-                    </p>
-                    <p className="mb-2.5">
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/depositar')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /depositar
-                      </span>{' '}
-                      — Fazer uma recarga agora
-                      <br />
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/saldo')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /saldo
-                      </span>{' '}
-                      — Ver seu saldo disponível
-                      <br />
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/bancos')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /bancos
-                      </span>{' '}
-                      — Bancos disponíveis para depósito
-                      <br />
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/horario')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /horario
-                      </span>{' '}
-                      — Horários de atendimento (24/24!)
-                      <br />
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/limites')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /limites
-                      </span>{' '}
-                      — Valor mínimo e máximo
-                      <br />
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/historico')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /historico
-                      </span>{' '}
-                      — Acompanhar seus depósitos
-                      <br />
-                      •{' '}
-                      <span
-                        onClick={() => handleSendMessage('/total_deposito')}
-                        className="text-[#25ae60] font-semibold cursor-pointer hover:underline"
-                      >
-                        /total_deposito
-                      </span>{' '}
-                      — Relatório e total de depósitos
-                    </p>
-                    <p className="text-[#707579] text-[13px] pt-1.5 border-t border-gray-100">
-                      🟢 Depósitos abertos 24 horas por dia (24/24)! Clique em /depositar para começar 😊
+                    <p>
+                      Olá! Bem-vindo ao <strong>DepositBot</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
                     </p>
                   </div>
                 )}
@@ -1783,56 +1717,73 @@ export default function Recharge() {
                   <span>{msg.time}</span>
                 </div>
               </div>
-            </div>
-            </div>
 
-              {/* BOTÕES DE AÇÃO: APÓS INSTRUÇÕES DE DEPÓSITO — estilo inline keyboard Telegram */}
+              {/* TECLADO DE BOTÕES ANEXADO AO BALÃO (INLINE KEYBOARD UNIFICADO TELEGRAM) */}
+              {msg.type === 'welcome' && (
+                <div className="w-full flex flex-col items-center justify-center gap-[2px] mt-[2px] select-none">
+                  <button onClick={() => handleSendMessage('/depositar')} className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-none">
+                    💳 Fazer Depósito
+                  </button>
+                  <div className="w-full flex items-center gap-[2px]">
+                    <button onClick={() => handleSendMessage('/bancos')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                      🏦 Bancos
+                    </button>
+                    <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                      💰 Saldo
+                    </button>
+                  </div>
+                  <div className="w-full flex items-center gap-[2px]">
+                    <button onClick={() => handleSendMessage('/horario')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                      ⏰ Horários
+                    </button>
+                    <button onClick={() => handleSendMessage('/limites')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                      📐 Limites
+                    </button>
+                  </div>
+                  <div className="w-full flex items-center gap-[2px]">
+                    <button onClick={() => handleSendMessage('/total_deposito')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">
+                      📊 Relatório
+                    </button>
+                    <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">
+                      📋 Histórico
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {msg.type === 'deposit_instructions' && msg.payload && (
-                <div className="w-full max-w-[80%] flex flex-col items-center justify-center gap-1 -mt-1.5 mb-2 pl-2">
+                <div className="w-full flex flex-col items-center justify-center gap-[2px] mt-[2px] select-none">
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-4 py-2 text-[14px] font-medium active:bg-opacity-90 transition-colors disabled:opacity-50 w-full flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all disabled:opacity-50 w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-none"
                   >
                     {isUploading ? '⏳ Enviando...' : '📷 Enviar Comprovativo'}
                   </button>
                   <button
                     onClick={() => handleSendMessage('/cancelar')}
-                    className="bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-4 py-2 text-[14px] font-medium active:bg-opacity-90 transition-colors w-full flex items-center justify-center gap-1.5 cursor-pointer"
+                    className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-b-[16px] rounded-t-none"
                   >
                     ✕ Cancelar Depósito
                   </button>
                 </div>
               )}
 
-              {/* INLINE KEYBOARD WELCOME */}
-              {msg.type === 'welcome' && (
-                <div className="w-full max-w-[80%] flex flex-col items-center justify-center gap-1 -mt-1.5 mb-2 pl-2">
-                  <button onClick={() => handleSendMessage('/depositar')} className="bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-4 py-2 text-[14px] font-medium active:bg-opacity-90 transition-colors w-full flex items-center justify-center gap-1.5 cursor-pointer">💳 Fazer Depósito</button>
-                  <div className="w-full flex items-center gap-1">
-                    <button onClick={() => handleSendMessage('/bancos')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">🏦 Bancos</button>
-                    <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">💰 Saldo</button>
-                  </div>
-                  <div className="w-full flex items-center gap-1">
-                    <button onClick={() => handleSendMessage('/total_deposito')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">📊 Relatório</button>
-                    <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">📋 Histórico</button>
-                  </div>
-                </div>
-              )}
-
               {msg.type === 'deposit_summary' && (
-                <div className="w-full max-w-[80%] flex items-center justify-center gap-1 -mt-1.5 mb-2 pl-2">
-                  <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">💳 Fazer Depósito</button>
-                  <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">💰 Ver Saldo</button>
+                <div className="w-full flex items-center gap-[2px] mt-[2px] select-none">
+                  <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">💳 Fazer Depósito</button>
+                  <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">💰 Ver Saldo</button>
                 </div>
               )}
 
               {msg.type === 'proof_success' && (
-                <div className="w-full max-w-[80%] flex items-center justify-center gap-1 -mt-1.5 mb-2 pl-2">
-                  <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">💳 Novo Depósito</button>
-                  <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 text-white rounded-lg px-2 py-2 text-[13px] font-medium active:bg-opacity-90 transition-colors cursor-pointer">📋 Histórico</button>
+                <div className="w-full flex items-center gap-[2px] mt-[2px] select-none">
+                  <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">💳 Novo Depósito</button>
+                  <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">📋 Histórico</button>
                 </div>
               )}
+            </div>
+            </div>
             </React.Fragment>
           );
         })}
