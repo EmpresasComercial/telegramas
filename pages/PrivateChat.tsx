@@ -370,11 +370,11 @@ export default function PrivateChat() {
     >
 
       {/* ── HEADER ── */}
-      <header className="w-full bg-[#517da2] dark:bg-[#242f3d] text-white px-3 sm:px-6 py-2 sticky top-0 z-40 flex items-center justify-between shadow-xs select-none">
+      <header className="w-full bg-white dark:bg-[#242f3d] px-3 py-2 z-40 flex items-center justify-between shrink-0 select-none" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <button
             onClick={() => navigate('/telegramBussiness')}
-            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer shrink-0"
+            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#2481cc] hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer shrink-0"
             aria-label="Voltar aos chats"
           >
             <ChevronLeft className="w-6 h-6 stroke-[2.2]" />
@@ -385,30 +385,30 @@ export default function PrivateChat() {
               <img
                 src="/pavel_durov.jpg"
                 alt="Pavel Durov"
-                className="w-10 h-10 rounded-full object-cover border border-white/40"
+                className="w-10 h-10 rounded-full object-cover"
                 onError={(e) => { (e.target as any).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'; }}
               />
             ) : (
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-xs text-sm border border-white/30"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
                 style={{ backgroundColor: contactColor }}
               >
                 {contactDisplayName.slice(0, 2).toUpperCase() || '?'}
               </div>
             )}
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-[#517da2] dark:border-[#242f3d]" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-[#242f3d]" />
           </div>
 
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1">
-              <h1 className="text-[15.5px] font-semibold text-white tracking-tight truncate leading-tight">
+              <h1 className="text-[15.5px] font-semibold text-[#222] dark:text-white tracking-tight truncate leading-tight">
                 {isPavel ? 'Pavel Durov Fundador' : contactDisplayName}
               </h1>
               {isPavel && (
-                <span className="w-3.5 h-3.5 rounded-full bg-white text-[#2481cc] flex items-center justify-center text-[8px] font-black shrink-0">✓</span>
+                <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0">✓</span>
               )}
             </div>
-            <span className="text-[12px] text-white/80 font-normal leading-tight">
+            <span className="text-[12px] text-[#6b7280] dark:text-white/60 font-normal leading-tight">
               {contactLevel ? `online • Subordinado Nível ${contactLevel}` : 'online'}
             </span>
           </div>
@@ -417,13 +417,13 @@ export default function PrivateChat() {
         <div className="flex items-center gap-1">
           <button
             onClick={() => showToast('Iniciando chamada de voz segura...', 'info')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#2481cc] hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer"
           >
             <Phone className="w-5 h-5" />
           </button>
           <button
             onClick={() => showToast('Opções do chat Telegram', 'info')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer"
+            className="w-9 h-9 rounded-full flex items-center justify-center text-[#2481cc] hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer"
           >
             <MoreVertical className="w-5 h-5" />
           </button>
@@ -477,7 +477,7 @@ export default function PrivateChat() {
                     height="20"
                     viewBox="0 0 11 20"
                     className="absolute pointer-events-none z-[1]"
-                    style={{ bottom: 0, right: -9, fill: '#E1FFC7' }}
+                    style={{ bottom: 0, right: -9, fill: 'white' }}
                   >
                     <path d="M1 17V0H0V20C2 20 5 18 7 14C9 10 10 6 11 0H10C9 5 7 10 5 14C3 17 2 18 1 17Z" />
                   </svg>
@@ -498,11 +498,7 @@ export default function PrivateChat() {
                   onClick={(e) => { e.stopPropagation(); openContextMenu(e, m, isMe); }}
                   onTouchStart={handleTouchStart}
                   onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
-                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
-                    isMe
-                      ? 'bg-[#E1FFC7] dark:bg-[#2b5278]'
-                      : 'bg-white dark:bg-[#182533]'
-                  } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
+                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none bg-white dark:bg-[#182533] ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
                   style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                 >
 
@@ -516,7 +512,7 @@ export default function PrivateChat() {
                       </p>
                     )}
 
-                    <span className="text-[16px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    <span className="text-[14px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                       {m.mensagem}
                     </span>
                     
@@ -524,14 +520,14 @@ export default function PrivateChat() {
                     <span
                       aria-hidden="true"
                       className="inline-block h-[1px]"
-                      style={{ width: isMe ? '52px' : '38px' }}
+                      style={{ width: isMe ? '56px' : '38px' }}
                     />
 
-                    <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[12px]">
-                      <span className={`font-normal leading-none mt-[1px] ${isMe ? 'text-[#55864e] dark:text-white/70' : 'text-[#8e8e93] dark:text-[#8e9aa5]'}`}>
+                    <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[11px]">
+                      <span className="font-normal leading-none mt-[1px] text-[#8e8e93] dark:text-[#8e9aa5]">
                         {formatTime(m.created_at)}
                       </span>
-                      {isMe && <CheckCheck className="w-[14px] h-[14px] text-[#4fae4e] dark:text-[#5288c1] stroke-[2.5] ml-[2px]" />}
+                      {isMe && <CheckCheck className="w-[13px] h-[13px] text-[#4fae4e] dark:text-[#5288c1] stroke-[2.5] ml-[1px]" />}
                     </div>
                   </div>
                 </div>
