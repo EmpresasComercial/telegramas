@@ -360,7 +360,7 @@ export default function PrivateChat() {
   // ── Render ─────────────────────────────────────────────────────────────
   return (
     <div 
-      className="w-full h-[100dvh] font-sans antialiased text-[#202020] select-none tg-chat-no-select flex flex-col items-stretch overflow-hidden relative tg-wallpaper transition-colors"
+      className="w-full h-[100dvh] font-sans antialiased text-[#202020] select-none tg-chat-no-select overflow-hidden relative tg-wallpaper transition-colors"
       onContextMenu={(e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
         if (target?.tagName !== 'INPUT' && target?.tagName !== 'TEXTAREA') {
@@ -370,7 +370,7 @@ export default function PrivateChat() {
     >
 
       {/* ── HEADER ── */}
-      <header className="w-full bg-white dark:bg-[#242f3d] px-3 py-2 z-40 flex items-center justify-between shrink-0 select-none" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.12)' }}>
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-[#242f3d] px-3 py-2 z-50 flex items-center justify-between select-none" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <button
             onClick={() => navigate('/telegramBussiness')}
@@ -433,7 +433,7 @@ export default function PrivateChat() {
       {/* ── ÁREA DE MENSAGENS TELEGRAM (LARGURA TOTAL FLUIDA) ── */}
       <main
         ref={scrollRef}
-        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-4 pb-24 space-y-1.5 relative scroll-smooth"
+        className="absolute inset-0 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-[60px] pb-24 space-y-1.5 scroll-smooth"
         onClick={() => contextMenu && closeContextMenu()}
       >
         {isLoading && messages.length === 0 && (
