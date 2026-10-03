@@ -1269,12 +1269,12 @@ export default function Recharge() {
 
           {/* Avatar Moderno DepositBot */}
           <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200/80 bg-white">
-            <img src="/BotDeposit.jpg" alt="DepositBot" className="w-full h-full object-cover" />
+            <img src="/logo-tb.jpg" alt="Bot de deposito" className="w-full h-full object-cover" />
           </div>
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[16px] font-bold text-black leading-tight">DepositBot</span>
+              <span className="text-[16px] font-bold text-black leading-tight">Bot de deposito</span>
               <svg className="w-4 h-4 text-[#3390ec]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>
@@ -1469,7 +1469,7 @@ export default function Recharge() {
                 {msg.type === 'welcome' && (
                   <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
                     <p>
-                      Olá! Bem-vindo ao <strong>DepositBot</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
+                      Olá! Bem-vindo ao <strong>Bot de deposito</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
                     </p>
                   </div>
                 )}
@@ -1805,7 +1805,7 @@ export default function Recharge() {
                 className="w-1.5 h-1.5 rounded-full bg-[#707579] animate-bounce"
                 style={{ animationDelay: '300ms' }}
               />
-              <span className="text-[11.5px] text-[#707579] ml-1">DepositBot está digitando...</span>
+              <span className="text-[11.5px] text-[#707579] ml-1">Bot de deposito está digitando...</span>
             </div>
           </div>
         )}

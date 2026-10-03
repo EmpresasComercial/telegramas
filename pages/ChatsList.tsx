@@ -358,7 +358,7 @@ export default function ChatsList() {
       {
         id: 'community-chat',
         folder: 'groups' as ChatFolder,
-        name: 'Telegram Business Oficial',
+        name: 'Telegram Bussiness Grupo',
         isVerified: true,
         lastMessage: communityLastMessage.text,
         senderPrefix: `${communityLastMessage.sender}: `,
@@ -407,7 +407,7 @@ export default function ChatsList() {
       {
         id: 'deposit-bot',
         folder: 'bots' as ChatFolder,
-        name: 'DepositBot',
+        name: 'Bot de deposito',
         isVerified: true,
         tag: 'BOT',
         lastMessage: '⚡ Recargas e depósitos automáticos via Multicaixa Express e IBAN.',
@@ -421,8 +421,8 @@ export default function ChatsList() {
         avatar: (
           <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs border border-gray-200/80 bg-white">
             <img 
-              src="/BotDeposit.jpg" 
-              alt="DepositBot" 
+              src="/logo-tb.jpg" 
+              alt="Bot de deposito" 
               className="w-full h-full object-cover"
             />
           </div>
@@ -432,7 +432,7 @@ export default function ChatsList() {
       {
         id: 'withdrawal-bot',
         folder: 'bots' as ChatFolder,
-        name: 'BotWithdrawal',
+        name: 'Bot de retirada',
         isVerified: true,
         tag: 'BOT',
         lastMessage: '🏦 Solicitações de saque e levantamentos rápidos para conta bancária.',
@@ -446,8 +446,8 @@ export default function ChatsList() {
         avatar: (
           <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs border border-gray-200/80 bg-white">
             <img 
-              src="/botRetirada.jpg" 
-              alt="BotWithdrawal" 
+              src="/logo-tb.jpg" 
+              alt="Bot de retirada" 
               className="w-full h-full object-cover"
             />
           </div>

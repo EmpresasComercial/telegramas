@@ -1133,12 +1133,12 @@ export default function Withdraw() {
 
           {/* Avatar BotWithdrawal */}
           <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200/80 bg-white">
-            <img src="/botRetirada.jpg" alt="BotWithdrawal" className="w-full h-full object-cover" />
+            <img src="/logo-tb.jpg" alt="Bot de retirada" className="w-full h-full object-cover" />
           </div>
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-[16px] font-bold text-black leading-tight">BotWithdrawal</span>
+              <span className="text-[16px] font-bold text-black leading-tight">Bot de retirada</span>
               <svg className="w-4 h-4 text-[#3390ec]" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
               </svg>

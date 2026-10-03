@@ -24,6 +24,9 @@ import {
   ChevronLeft,
   Edit3,
   Download,
+  Phone,
+  AtSign,
+  Settings,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useLanguage } from "../../contexts/LanguageContext";
@@ -169,14 +172,7 @@ export default function Profile() {
             className="p-1.5 rounded-full hover:bg-white/15 active:bg-white/25 transition-colors cursor-pointer text-white" 
             title="Editar Perfil"
           >
-            <Edit3 className="w-5 h-5" />
-          </button>
-          <button 
-            onClick={handleQrCodeClick}
-            className="p-1.5 rounded-full hover:bg-white/15 active:bg-white/25 transition-colors cursor-pointer text-white" 
-            title="QR Code / Convite VIP"
-          >
-            <QrCode className="w-5 h-5" />
+            <Settings className="w-5 h-5" />
           </button>
         </div>
       </header>
@@ -197,10 +193,10 @@ export default function Profile() {
           )}
           <button
             onClick={(e) => { e.stopPropagation(); setShowEditProfile(true); }}
-            className="absolute bottom-0 right-0 w-[30px] h-[30px] bg-[#2481cc] rounded-full flex items-center justify-center border-2 border-white shadow-xs active:scale-90 transition-transform cursor-pointer"
+            className="absolute bottom-0 right-0 w-[34px] h-[34px] bg-[#3390ec] rounded-full flex items-center justify-center border-[2.5px] border-white shadow-sm hover:scale-105 active:scale-95 transition-transform cursor-pointer"
             aria-label="Editar perfil"
           >
-            <Camera className="w-[14px] h-[14px] text-white fill-white" />
+            <Camera className="w-[16px] h-[16px] text-white" strokeWidth={2.5} />
           </button>
         </div>
         <h2 className="text-[20px] font-bold tracking-tight text-black dark:text-white mb-0.5 text-center">{userName}</h2>
@@ -215,36 +211,74 @@ export default function Profile() {
 
       <main className="px-3 flex flex-col gap-3.5 max-w-2xl mx-auto">
 
-        {/* 4 BOTÕES DE AÇÃO RÁPIDA */}
-        <div className="grid grid-cols-4 gap-2 w-full">
-          <button
+        {/* CARD DE CONTATO */}
+        <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
+          <div className="flex items-center px-4 py-3 hover:bg-gray-50/80 active:bg-gray-100 cursor-pointer transition-colors border-b border-gray-100">
+            <div className="w-[32px] h-[32px] rounded-[10px] bg-[#34c759] flex items-center justify-center shrink-0 mr-3.5 shadow-2xs">
+              <Phone className="w-5 h-5 text-white fill-white" />
+            </div>
+            <div className="flex-1 flex flex-col justify-center py-0.5">
+              <span className="text-[15px] font-medium text-black leading-tight mb-0.5">
+                {phone || "+244 941 465 064"}
+              </span>
+              <span className="text-[13px] font-normal text-[#8e8e93] leading-tight truncate">
+                Phone
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex items-center px-4 py-3 hover:bg-gray-50/80 active:bg-gray-100 cursor-pointer transition-colors">
+            <div className="w-[32px] h-[32px] rounded-[10px] bg-[#3390ec] flex items-center justify-center shrink-0 mr-3.5 shadow-2xs">
+              <AtSign className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1 flex flex-col justify-center py-0.5">
+              <span className="text-[15px] font-medium text-black leading-tight mb-0.5">
+                {userName ? `@${userName.replace(/\s+/g, '').toLowerCase()}` : "@asiarymoto"}
+              </span>
+              <span className="text-[13px] font-normal text-[#8e8e93] leading-tight truncate">
+                Username
+              </span>
+            </div>
+            <div 
+              className="ml-2 flex-shrink-0 cursor-pointer p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+              onClick={(e) => { e.stopPropagation(); handleQrCodeClick(); }}
+            >
+              <QrCode className="w-[20px] h-[20px] text-black" />
+            </div>
+          </div>
+        </div>
+
+        {/* ACÇÕES RÁPIDAS (Estilo Lista) */}
+        <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
+          <SettingsItem
+            icon={<Wallet className="w-5 h-5 text-white" />}
+            iconBg="bg-[#0284c7]"
+            title="Retirar"
+            subtitle="Solicite o levantamento dos seus fundos"
             onClick={() => navigate("/retirada")}
-            className="bg-white rounded-[16px] py-3.5 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs border border-gray-100 hover:bg-gray-50 active:scale-[0.98] transition-all cursor-pointer"
-          >
-            <Wallet className="w-[22px] h-[22px] text-black" strokeWidth={1.8} />
-            <span className="text-[11px] font-semibold text-black leading-tight text-center">Retirar</span>
-          </button>
-          <button
+          />
+          <SettingsItem
+            icon={<PlusCircle className="w-5 h-5 text-white" />}
+            iconBg="bg-[#10b981]"
+            title="Carregar"
+            subtitle="Faça um depósito na sua conta"
             onClick={() => navigate("/recarregar")}
-            className="bg-white rounded-[16px] py-3.5 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs border border-gray-100 hover:bg-gray-50 active:scale-[0.98] transition-all cursor-pointer"
-          >
-            <PlusCircle className="w-[22px] h-[22px] text-black" strokeWidth={1.8} />
-            <span className="text-[11px] font-semibold text-black leading-tight text-center">Carregar</span>
-          </button>
-          <button
+          />
+          <SettingsItem
+            icon={<Store className="w-5 h-5 text-white" />}
+            iconBg="bg-[#f2a93b]"
+            title="Meus Bots"
+            subtitle="Faça a gestão dos seus robôs"
             onClick={() => navigate("/minhas-compras")}
-            className="bg-white rounded-[16px] py-3.5 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs border border-gray-100 hover:bg-gray-50 active:scale-[0.98] transition-all cursor-pointer"
-          >
-            <Store className="w-[22px] h-[22px] text-black" strokeWidth={1.8} />
-            <span className="text-[11px] font-semibold text-black leading-tight text-center">Meus Bots</span>
-          </button>
-          <button
+          />
+          <SettingsItem
+            icon={<Gift className="w-5 h-5 text-white" />}
+            iconBg="bg-[#e95171]"
+            title="Prémios"
+            subtitle="Consulte as suas recompensas e bónus"
+            isLast={true}
             onClick={scrollToSettings}
-            className="bg-white rounded-[16px] py-3.5 px-1 flex flex-col items-center justify-center gap-1 shadow-2xs border border-gray-100 hover:bg-gray-50 active:scale-[0.98] transition-all cursor-pointer"
-          >
-            <Gift className="w-[22px] h-[22px] text-black" strokeWidth={1.8} />
-            <span className="text-[11px] font-semibold text-black leading-tight text-center">Prémios</span>
-          </button>
+          />
         </div>
 
 
@@ -252,14 +286,14 @@ export default function Profile() {
         {/* ═══ SEÇÃO DE SETTINGS UNIFICADA ═══ */}
         <div ref={settingsSectionRef} className="flex flex-col gap-3.5 pt-1">
 
-          {/* CARD 1: CONTA & PREFERÊNCIAS */}
+          {/* CARD 1: PRINCIPAL */}
           <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
             <SettingsItem
-              icon={<CreditCard className="w-5 h-5 text-white" />}
-              iconBg="bg-[#3390ec]"
-              title="Conta"
-              subtitle="Adicionar cartão bancário"
-              onClick={() => navigate("/adicionar-banco")}
+              icon={<Lightbulb className="w-5 h-5 text-white fill-white" />}
+              iconBg="bg-[#b375d6]"
+              title="Introdução ao Telegram"
+              subtitle="Descubra novas funcionalidades"
+              onClick={() => navigate("/sobre-telegram business")}
             />
 
             <SettingsItem
@@ -284,27 +318,61 @@ export default function Profile() {
             />
 
             <SettingsItem
-              icon={<Building2 className="w-5 h-5 text-white" />}
-              iconBg="bg-[#3390ec]"
-              title="Informações Bancárias"
-              subtitle="Ver conta bancária adicionada"
-              onClick={() => navigate("/informacao-bancaria")}
+              icon={<Download className="w-5 h-5 text-white" />}
+              iconBg="bg-[#e95171]"
+              title="Download Telegram Business"
+              subtitle="Página comercial e ferramentas"
+              onClick={() => {
+                const promptEvent = (window as any).deferredPwaPrompt;
+                if (promptEvent) {
+                  promptEvent.prompt();
+                  promptEvent.userChoice.then(() => {
+                    (window as any).deferredPwaPrompt = null;
+                  });
+                } else {
+                  showToast("A instalação não está disponível no momento ou o app já está instalado.", "info");
+                }
+              }}
             />
 
             <SettingsItem
               icon={<MessagesSquare className="w-5 h-5 text-white" />}
               iconBg="bg-[#3390ec]"
-              title="Anúncios Telegram e provas de retirada"
+              title="Anúncio telegram postes"
               subtitle="Aceder aos anúncios do Telegram e às provas de retirada"
               onClick={() => navigate("/canal-oficial")}
             />
 
             <SettingsItem
-              icon={<Smartphone className="w-5 h-5 text-white" />}
-              iconBg="bg-[#46c2ca]"
-              title="Termos de uso e privacidade"
-              subtitle="Ver versão e actualizar a aplicação"
-              onClick={() => navigate("/devices")}
+              icon={<CreditCard className="w-5 h-5 text-white" />}
+              iconBg="bg-[#3390ec]"
+              title="Conta"
+              subtitle="Adicionar cartão bancário"
+              onClick={() => navigate("/adicionar-banco")}
+            />
+
+            <SettingsItem
+              icon={<Building2 className="w-5 h-5 text-white" />}
+              iconBg="bg-[#3390ec]"
+              title="Informações Bancárias"
+              subtitle="Ver conta bancária adicionada"
+              isLast={true}
+              onClick={() => navigate("/informacao-bancaria")}
+            />
+          </div>
+
+          {/* CARD 2: AJUDA & SUPORTE */}
+          <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
+            <div className="px-4 py-2 pt-3">
+              <span className="text-[13px] font-semibold text-[#2481cc] tracking-wide">Ajuda</span>
+            </div>
+
+            <SettingsItem
+              icon={<HelpCircle className="w-5 h-5 text-white" />}
+              iconBg="bg-[#3390ec]"
+              title="Perguntas Frequentes"
+              subtitle="Tire as suas dúvidas"
+              onClick={() => navigate("/help-faq")}
             />
 
             <SettingsItem
@@ -320,62 +388,16 @@ export default function Profile() {
               iconBg="bg-[#2481cc]"
               title="Redefinir Senha"
               subtitle="Altere a sua senha de acesso"
-              isLast={true}
               onClick={() => navigate("/alterar-senha")}
             />
-          </div>
-
-          {/* CARD 2: PRODUTOS & RECURSOS */}
-          <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
-            <SettingsItem
-              icon={<Star className="w-5 h-5 text-white fill-white" />}
-              iconBg="bg-[#f2a93b]"
-              title="Telegram Stars"
-              subtitle="Saldo, pacotes e conversão de estrelas"
-              onClick={() => navigate("/stars")}
-            />
 
             <SettingsItem
-              icon={<Download className="w-5 h-5 text-white" />}
-              iconBg="bg-[#e95171]"
-              title="Download Telegram Business"
-              subtitle="Página comercial e ferramentas"
+              icon={<Smartphone className="w-5 h-5 text-white" />}
+              iconBg="bg-[#46c2ca]"
+              title="Termos de uso e privacidade"
+              subtitle="Ver versão e actualizar a aplicação"
               isLast={true}
-              onClick={() => {
-                const promptEvent = (window as any).deferredPwaPrompt;
-                if (promptEvent) {
-                  promptEvent.prompt();
-                  promptEvent.userChoice.then(() => {
-                    (window as any).deferredPwaPrompt = null;
-                  });
-                } else {
-                  showToast("A instalação não está disponível no momento ou o app já está instalado.", "info");
-                }
-              }}
-            />
-          </div>
-
-          {/* CARD 3: AJUDA & SUPORTE */}
-          <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
-            <div className="px-4 py-2 pt-3">
-              <span className="text-[13px] font-semibold text-[#2481cc] tracking-wide">Ajuda</span>
-            </div>
-
-            <SettingsItem
-              icon={<HelpCircle className="w-5 h-5 text-white" />}
-              iconBg="bg-[#3390ec]"
-              title="Perguntas Frequentes"
-              subtitle="Tire as suas dúvidas"
-              onClick={() => navigate("/help-faq")}
-            />
-
-            <SettingsItem
-              icon={<Lightbulb className="w-5 h-5 text-white fill-white" />}
-              iconBg="bg-[#b375d6]"
-              title="Introdução ao Telegram"
-              subtitle="Descubra novas funcionalidades"
-              isLast={true}
-              onClick={() => navigate("/sobre-telegram business")}
+              onClick={() => navigate("/devices")}
             />
           </div>
 

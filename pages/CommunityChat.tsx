@@ -33,41 +33,41 @@ import {
 
 const FORBIDDEN_WORDS = Array.from(new Set([
   "burla", "burlas", "fraude", "fraudes", "scam", "scams", "golpe", "golpes", 
-  "ladrão", "ladrao", "ladrões", "ladroes", "roubo", "roubos", "bosta", "bostas", 
+  "ladrÃ£o", "ladrao", "ladrÃµes", "ladroes", "roubo", "roubos", "bosta", "bostas", 
   "merda", "merdas", "caralho", "caralhos", "foda", "fodas", "fodase", "foda-se", 
   "porra", "porras", "puta", "putas", "puta que pariu", "filho da puta", "fdp", 
-  "cabrao", "cabrão", "cabroes", "cabrões", "corno", "cornos", "vagabundo", "vagabundos", 
-  "desgraçado", "desgracado", "desgraçados", "animal", "animais", "idiota", "idiotas", 
-  "imbecil", "imbecis", "otario", "otário", "otarios", "otários", "retardado", "retardados", 
-  "estupido", "estúpido", "estupidos", "estúpidos", "palhaço", "palhaco", "palhaços", "palhacos", 
-  "lixo", "lixos", "nojento", "nojentos", "maldito", "malditos", "cão", "cao", "macaco", "macacos", 
+  "cabrao", "cabrÃ£o", "cabroes", "cabrÃµes", "corno", "cornos", "vagabundo", "vagabundos", 
+  "desgraÃ§ado", "desgracado", "desgraÃ§ados", "animal", "animais", "idiota", "idiotas", 
+  "imbecil", "imbecis", "otario", "otÃ¡rio", "otarios", "otÃ¡rios", "retardado", "retardados", 
+  "estupido", "estÃºpido", "estupidos", "estÃºpidos", "palhaÃ§o", "palhaco", "palhaÃ§os", "palhacos", 
+  "lixo", "lixos", "nojento", "nojentos", "maldito", "malditos", "cÃ£o", "cao", "macaco", "macacos", 
   "burro", "burros", "cala boca", "vai se ferrar", "vai te ferrar", "vai morrer", 
-  "sexo", "nude", "nudes", "porn", "porno", "pornografia", "pênis", "penis", 
+  "sexo", "nude", "nudes", "porn", "porno", "pornografia", "pÃªnis", "penis", 
   "piroca", "pirocas", "cona", "conas", "vagina", "buceta", "bucetas", "cu", "cus", 
   "rabeta", "mamar", "chupar", "mata", "morrer", "suicida", "suicidio", "terrorista", "nazista", "racista", 
-  "vou denunciar", "vou processar", "processo", "crime", "polícia", "policia", 
-  "tribunal", "interpol", "cadeia", "prisão", "prisao", "fbi", "investigação", "investigacao", 
-  "viado", "viados", "gayzinho", "bicha", "bichas", "boiola", "sapatão", "sapatao", 
+  "vou denunciar", "vou processar", "processo", "crime", "polÃ­cia", "policia", 
+  "tribunal", "interpol", "cadeia", "prisÃ£o", "prisao", "fbi", "investigaÃ§Ã£o", "investigacao", 
+  "viado", "viados", "gayzinho", "bicha", "bichas", "boiola", "sapatÃ£o", "sapatao", 
   "golpista", "golpistas", "burlador", "burladores", "fraudador", "fraudadores", 
-  "scammer", "scammers", "pirâmide", "piramide", "esquema ponzi", "ponzi", 
+  "scammer", "scammers", "pirÃ¢mide", "piramide", "esquema ponzi", "ponzi", 
   "roubaram", "roubaste", "roubado", "roubando", "empresa falsa", "site falso", 
   "aplicativo falso", "app falso", "fake", "farsa", "enganador", "enganadora", 
-  "trapaceiro", "vigarista", "171", "mafioso", "máfia", "mafia", 
-  "admin ladrão", "admin ladrao", "suporte lixo", "suporte inútil", "suporte inutil", 
-  "admin inútil", "admin inutil", "adm corrupto", "admin corrupto", "moderador corrupto", 
-  "staff lixo", "staff incompetente", "empresa corrupta", "empresa de ladrões", "empresa de ladroes", 
-  "dono ladrão", "dono ladrao", "vocês roubam", "voces roubam", "estão roubando", "estao roubando", 
-  "vocês são burlões", "voces sao burloes", 
-  "não paga", "nao paga", "não pagam", "nao pagam", "perdi dinheiro", "perdi tudo", 
-  "não recebi", "nao recebi", "sumiram com dinheiro", "bloquearam saque", "não consigo sacar", 
+  "trapaceiro", "vigarista", "171", "mafioso", "mÃ¡fia", "mafia", 
+  "admin ladrÃ£o", "admin ladrao", "suporte lixo", "suporte inÃºtil", "suporte inutil", 
+  "admin inÃºtil", "admin inutil", "adm corrupto", "admin corrupto", "moderador corrupto", 
+  "staff lixo", "staff incompetente", "empresa corrupta", "empresa de ladrÃµes", "empresa de ladroes", 
+  "dono ladrÃ£o", "dono ladrao", "vocÃªs roubam", "voces roubam", "estÃ£o roubando", "estao roubando", 
+  "vocÃªs sÃ£o burlÃµes", "voces sao burloes", 
+  "nÃ£o paga", "nao paga", "nÃ£o pagam", "nao pagam", "perdi dinheiro", "perdi tudo", 
+  "nÃ£o recebi", "nao recebi", "sumiram com dinheiro", "bloquearam saque", "nÃ£o consigo sacar", 
   "nao consigo sacar", "site caiu", "empresa faliu", "empresa vai fechar", "vai fechar", 
-  "quebrou", "falida", "falido", "sistema roubando", "dinheiro preso", "não vale nada", "nao vale nada", 
+  "quebrou", "falida", "falido", "sistema roubando", "dinheiro preso", "nÃ£o vale nada", "nao vale nada", 
   "ganha dinheiro rapido", "dinheiro facil", "hack", "hacker", "clonar", 
-  "cartão roubado", "cartao roubado", "bitcoin gratis", "investimento falso", 
+  "cartÃ£o roubado", "cartao roubado", "bitcoin gratis", "investimento falso", 
   "entra no meu link", "usa meu link", "me chama no privado", "grupo fake", "grupo falso", 
-  "tenho hack", "hack saque", "hack sistema", "bug de saque", "método secreto", "metodo secreto", 
-  "ganhar sem investir", "dinheiro fácil", "lucro garantido", "100% garantido", 
-  "não confiem", "nao confiem", "não invistam", "nao invistam", "isso é golpe", "isso e golpe", 
+  "tenho hack", "hack saque", "hack sistema", "bug de saque", "mÃ©todo secreto", "metodo secreto", 
+  "ganhar sem investir", "dinheiro fÃ¡cil", "lucro garantido", "100% garantido", 
+  "nÃ£o confiem", "nao confiem", "nÃ£o invistam", "nao invistam", "isso Ã© golpe", "isso e golpe", 
   "empresa scam", "site scam", "app scam", "plataforma scam", "plataforma falsa", "empresa fake", 
   "saque falso", "pagamento falso"
 ]));
@@ -76,12 +76,12 @@ const ESCAPED_FORBIDDEN = FORBIDDEN_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]
 const FORBIDDEN_REGEX = new RegExp(`(?:^|[^\\p{L}\\p{N}])(?:${ESCAPED_FORBIDDEN.join('|')})(?:[^\\p{L}\\p{N}]|$)`, 'iu');
 
 const CONTEXT_GROUPS: Record<string, { path: string, keywords: string[] }> = {
-  TelegramBusiness: { path: "/telegramBussiness", keywords: ["telegram business", "negócios", "conversas", "chats", "painel", "início", "inicio"] },
+  TelegramBusiness: { path: "/telegramBussiness", keywords: ["telegram business", "negÃ³cios", "conversas", "chats", "painel", "inÃ­cio", "inicio"] },
   Withdraw: { path: "/retirada", keywords: ["saque", "sacar", "retirada", "retirar", "levantamento", "levantar dinheiro", "withdraw", "withdrawal", "retrait", "retirer"] },
-  Recharge: { path: "/recarregar", keywords: ["recarga", "recarregar", "depósito", "depositar", "recharge"] },
+  Recharge: { path: "/recarregar", keywords: ["recarga", "recarregar", "depÃ³sito", "depositar", "recharge"] },
   Invite: { path: "/convite", keywords: ["convite", "convidar", "amigo", "afiliado", "indicar"] },
   Support: { path: "/telegramBussiness", keywords: ["suporte", "ajuda", "atendimento", "help"] },
-  Operations: { path: "/operacoes", keywords: ["operações", "operacoes", "trabalho", "tarefa", "tarefas"] },
+  Operations: { path: "/operacoes", keywords: ["operaÃ§Ãµes", "operacoes", "trabalho", "tarefa", "tarefas"] },
   ProductDetails: { path: "/bot-pay", keywords: ["produto", "investimento", "plano", "lucro"] }
 };
 
@@ -184,14 +184,14 @@ const GROUP_MEMBERS = [
   },
   {
     id: 'm2',
-    name: 'Lauren Gabriella 🥰',
-    status: 'visto às 20:31',
+    name: 'Lauren Gabriella ðŸ¥°',
+    status: 'visto Ã s 20:31',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'
   },
   {
     id: 'm3',
-    name: 'Brilson Edlézio',
-    status: 'visto às 20:13',
+    name: 'Brilson EdlÃ©zio',
+    status: 'visto Ã s 20:13',
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop'
   },
   {
@@ -199,53 +199,53 @@ const GROUP_MEMBERS = [
     name: 'ID 4700',
     badge: 'Dono',
     badgeType: 'owner',
-    status: 'visto às 20:13',
+    status: 'visto Ã s 20:13',
     avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop'
   },
   {
     id: 'm5',
     name: 'Chrina Manual',
-    status: 'visto às 19:57',
+    status: 'visto Ã s 19:57',
     avatar: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=100&h=100&fit=crop'
   },
   {
     id: 'm6',
     name: 'PATRICIA',
-    status: 'visto às 19:42',
+    status: 'visto Ã s 19:42',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
   },
   {
     id: 'm7',
     name: 'Carlos Manuel',
-    status: 'visto às 19:15',
+    status: 'visto Ã s 19:15',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop'
   },
   {
     id: 'm8',
     name: 'Mariana Santos',
-    status: 'visto às 18:50',
+    status: 'visto Ã s 18:50',
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop'
   },
   {
     id: 'm9',
-    name: 'João Pedro',
-    status: 'visto às 18:22',
+    name: 'JoÃ£o Pedro',
+    status: 'visto Ã s 18:22',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop'
   },
   {
     id: 'm10',
     name: 'Nelson Mandela Neto',
-    status: 'visto às 17:40',
+    status: 'visto Ã s 17:40',
     avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=100&h=100&fit=crop'
   }
 ];
 
-const COMMUNITY_QUICK_REACTIONS = ['❤️', '🤷‍♂️', '👍', '👎', '🔥', '🥰', '🎉', '👏', '😂', '😮', '😢'];
+const COMMUNITY_QUICK_REACTIONS = ['â¤ï¸', 'ðŸ¤·â€â™‚ï¸', 'ðŸ‘', 'ðŸ‘Ž', 'ðŸ”¥', 'ðŸ¥°', 'ðŸŽ‰', 'ðŸ‘', 'ðŸ˜‚', 'ðŸ˜®', 'ðŸ˜¢'];
 
 type GroupTab = 'members' | 'media' | 'files' | 'links';
 const GROUP_TABS: { id: GroupTab; label: string }[] = [
   { id: 'members', label: 'Membros' },
-  { id: 'media', label: 'Mídia' },
+  { id: 'media', label: 'MÃ­dia' },
   { id: 'files', label: 'Ficheiros' },
   { id: 'links', label: 'Links' },
 ];
@@ -273,7 +273,7 @@ export default function CommunityChat() {
   const [reactionMenuId, setReactionMenuId] = useState<number | null>(null);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
 
-  // ── Context Menu Telegram ──
+  // â”€â”€ Context Menu Telegram â”€â”€
   const [contextMenu, setContextMenu] = useState<{ message: any; isMe: boolean } | null>(null);
   const [showAllReactions, setShowAllReactions] = useState(false);
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
@@ -320,7 +320,7 @@ export default function CommunityChat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
-  // IDs de mensagens com reações em voo (impede o realtime de sobrescrever estado otimista)
+  // IDs de mensagens com reaÃ§Ãµes em voo (impede o realtime de sobrescrever estado otimista)
   const pendingReactionIds = useRef<Set<number>>(new Set());
 
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
@@ -442,7 +442,7 @@ export default function CommunityChat() {
         if (isInitial) scrollToBottom("auto");
       }
     } catch (err) {
-      console.error("Não foi possivél carregar mensagens, por favor atualize a pagina", err);
+      console.error("NÃ£o foi possivÃ©l carregar mensagens, por favor atualize a pagina", err);
     } finally {
       isFetchingRef.current = false;
       if (isInitial) setIsLoading(false);
@@ -498,7 +498,7 @@ export default function CommunityChat() {
                 m.mensagem === data.mensagem
               ));
               const msgMap = new Map(withoutTemp.map(m => [m.id, m]));
-              // Se a mensagem tem reação pendente, mesclar reacoes locais
+              // Se a mensagem tem reaÃ§Ã£o pendente, mesclar reacoes locais
               // para evitar que o realtime sobrescreva o estado otimista
               if (pendingReactionIds.current.has(data.id)) {
                 const localMsg = c.find(m => m.id === data.id);
@@ -522,14 +522,14 @@ export default function CommunityChat() {
   }, [user]);
 
   const validateMessage = (text: string) => {
-    if (text.length > 2000) return "A mensagem é muito longa.";
+    if (text.length > 2000) return "A mensagem Ã© muito longa.";
     if (FORBIDDEN_REGEX.test(text)) return "Por favor, evite termos ofensivos.";
     const urlRegex = /(https?:\/\/[^\s]+)|(www\.[^\s]+)/gi;
     const matches = text.match(urlRegex);
     if (matches) {
       const allowed = ['azure', 'mcn', 'telegram business', 't.me'];
       if (matches.some(m => !allowed.some(d => m.toLowerCase().includes(d))))
-        return "Não são permitidos links externos.";
+        return "NÃ£o sÃ£o permitidos links externos.";
     }
     return null;
   };
@@ -537,7 +537,7 @@ export default function CommunityChat() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { showToast("Máximo 5MB.", "error"); return; }
+    if (file.size > 5 * 1024 * 1024) { showToast("MÃ¡ximo 5MB.", "error"); return; }
     const reader = new FileReader();
     reader.onload = (ev) => setImagePreview(ev.target?.result as string);
     reader.readAsDataURL(file);
@@ -552,7 +552,7 @@ export default function CommunityChat() {
     }
     const tempMsg = publicInput.trim();
 
-    // ── Fluxo de Edição de Mensagem Existente ──
+    // â”€â”€ Fluxo de EdiÃ§Ã£o de Mensagem Existente â”€â”€
     if (editingMessage) {
       const msgIdToEdit = editingMessage.id;
       const prevDetalhes = (editingMessage.detalhes && typeof editingMessage.detalhes === 'object')
@@ -571,7 +571,7 @@ export default function CommunityChat() {
         inputRef.current.style.height = "auto";
       }
 
-      // Atualização otimista local imediata
+      // AtualizaÃ§Ã£o otimista local imediata
       setPublicMessages(prev => prev.map(m => {
         if (m.id === msgIdToEdit) {
           return {
@@ -600,7 +600,7 @@ export default function CommunityChat() {
           showToast('Mensagem editada', 'success');
         }
       } catch (err) {
-        console.error('[CommunityChat] Falha na edição:', err);
+        console.error('[CommunityChat] Falha na ediÃ§Ã£o:', err);
         showToast('Erro ao atualizar a mensagem', 'error');
       } finally {
         setIsSending(false);
@@ -665,9 +665,9 @@ export default function CommunityChat() {
       console.log('[CommunityChat] Mensagem inserida com sucesso');
       scrollToBottom();
     } catch (err: any) { 
-      console.error("Ops! mensagem não enviada", err);
+      console.error("Ops! mensagem nÃ£o enviada", err);
       setPublicMessages(prev => prev.filter(m => m.id !== tempId));
-      const errorMsg = err?.message || err?.error_description || "Ops! mensagem não enviada";
+      const errorMsg = err?.message || err?.error_description || "Ops! mensagem nÃ£o enviada";
       showToast(`Erro ao enviar: ${errorMsg}`, "error"); 
     } finally { 
       setIsSending(false); 
@@ -708,10 +708,10 @@ export default function CommunityChat() {
       reacoes: currentReactions
     };
 
-    // 1. Marcar como pendente para o realtime não sobrescrever
+    // 1. Marcar como pendente para o realtime nÃ£o sobrescrever
     pendingReactionIds.current.add(messageId);
 
-    // 2. Atualização otimista imediata no estado local
+    // 2. AtualizaÃ§Ã£o otimista imediata no estado local
     setPublicMessages(prev => prev.map(m => m.id === messageId ? { ...m, detalhes: updatedDetalhes } : m));
 
     // 3. Persistir no Supabase chat_gruop
@@ -722,12 +722,12 @@ export default function CommunityChat() {
         .eq('id', messageId);
 
       if (error) {
-        console.error('[CommunityChat] Erro ao salvar reação:', error);
+        console.error('[CommunityChat] Erro ao salvar reaÃ§Ã£o:', error);
       }
     } catch (err) {
-      console.error('[CommunityChat] Falha ao persistir reação:', err);
+      console.error('[CommunityChat] Falha ao persistir reaÃ§Ã£o:', err);
     } finally {
-      // 4. Remover da lista de pendentes após 3s (tempo suficiente para o realtime processar)
+      // 4. Remover da lista de pendentes apÃ³s 3s (tempo suficiente para o realtime processar)
       setTimeout(() => pendingReactionIds.current.delete(messageId), 3000);
     }
   };
@@ -775,7 +775,7 @@ export default function CommunityChat() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      showToast('Download concluído!', 'success');
+      showToast('Download concluÃ­do!', 'success');
     } catch {
       const link = document.createElement('a');
       link.href = imageUrl;
@@ -787,7 +787,7 @@ export default function CommunityChat() {
     }
   };
 
-  // ── Ações do Menu de Contexto Telegram ──
+  // â”€â”€ AÃ§Ãµes do Menu de Contexto Telegram â”€â”€
   const menuActions = contextMenu ? [
     { 
       icon: Reply, 
@@ -835,7 +835,7 @@ export default function CommunityChat() {
       label: 'Apagar', 
       onClick: () => handleDeleteMessage(contextMenu.message.id), 
       color: '#e53e3e',
-      subLabel: 'Autoexcluirá em 31 dias'
+      subLabel: 'AutoexcluirÃ¡ em 31 dias'
     }] : [])
   ] : [];
 
@@ -870,14 +870,14 @@ export default function CommunityChat() {
             <div className="flex flex-col min-w-0 flex-1">
               <div className="flex items-center gap-1">
                 <h1 className="text-[15.5px] font-semibold text-white tracking-tight truncate leading-tight">
-                  Telegram Business Oficial
+                  Telegram Bussiness Grupo
                 </h1>
                 <span className="w-4 h-4 rounded-full bg-[#25D366] flex items-center justify-center shrink-0 shadow-2xs">
                   <Check className="w-2.5 h-2.5 text-white stroke-[3.5]" />
                 </span>
               </div>
               <span className="text-[12px] text-white/80 font-normal leading-tight">
-                54 281 membros, 1 420 online
+                2 membros
               </span>
             </div>
           </div>
@@ -887,7 +887,7 @@ export default function CommunityChat() {
           <button 
             onClick={() => setShowInfo(true)} 
             className="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer"
-            aria-label="Mais informações"
+            aria-label="Mais informaÃ§Ãµes"
           >
             <MoreVertical className="w-5 h-5" />
           </button>
@@ -936,7 +936,7 @@ export default function CommunityChat() {
                   </div>
                 )}
 
-                {/* ── Mensagem só com imagem (sem balão) ── */}
+                {/* â”€â”€ Mensagem sÃ³ com imagem (sem balÃ£o) â”€â”€ */}
                 {parsedData.imagem_url && !m.mensagem?.trim() ? (
                   <div
                     className="relative cursor-pointer rounded-[18px] overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.18)] max-w-[72vw] sm:max-w-[320px]"
@@ -962,7 +962,7 @@ export default function CommunityChat() {
                       <span className="text-[10px] font-normal text-white">{formatTime(m.data_registrada)}</span>
                       {isMe && <CheckCheck className="w-3 h-3 text-white stroke-[2.4]" />}
                     </div>
-                    {/* Reações */}
+                    {/* ReaÃ§Ãµes */}
                     {Object.keys(reactions).length > 0 && (
                       <div className="absolute -bottom-5 left-0 flex flex-wrap gap-1">
                         {Object.entries(reactions).map(([emoji, users]: [string, any]) => (
@@ -980,7 +980,7 @@ export default function CommunityChat() {
                     )}
                   </div>
                 ) : (
-                  /* ── Mensagem normal (texto ± imagem) ── */
+                  /* â”€â”€ Mensagem normal (texto Â± imagem) â”€â”€ */
                   <div
                     onClick={(e) => { e.stopPropagation(); setContextMenu({ message: m, isMe }); setShowAllReactions(false); }}
                     onTouchStart={handleTouchStart}
@@ -1024,7 +1024,7 @@ export default function CommunityChat() {
                         isMe ? "border-[#25D366] text-[#444444]" : "border-[#2b82c9] text-[#555555]"
                       )}>
                         <p className="font-bold text-[11px] text-[#2b82c9] truncate">{reply.sender}</p>
-                        <p className="truncate italic text-[11px] text-[#666666]">{reply.text || "📷 Foto"}</p>
+                        <p className="truncate italic text-[11px] text-[#666666]">{reply.text || "ðŸ“· Foto"}</p>
                       </div>
                     )}
 
@@ -1131,7 +1131,7 @@ export default function CommunityChat() {
                     }
                   }} 
                   className="text-gray-400 hover:text-black p-1 cursor-pointer shrink-0"
-                  title="Cancelar edição"
+                  title="Cancelar ediÃ§Ã£o"
                 >
                   <X className="w-4 h-4 stroke-[2]" />
                 </button>
@@ -1238,7 +1238,7 @@ export default function CommunityChat() {
               disabled={isSending}
               style={{ borderRadius: '9999px' }}
               className="w-[46px] h-[46px] !rounded-full rounded-full bg-[#2481cc] hover:bg-[#1f72b5] text-white flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_2px_10px_rgba(36,129,204,0.4)] cursor-pointer"
-              title={editingMessage ? "Salvar alterações" : "Enviar"}
+              title={editingMessage ? "Salvar alteraÃ§Ãµes" : "Enviar"}
             >
               {editingMessage ? (
                 <Check className="w-5 h-5 text-white stroke-[2.5]" />
@@ -1260,119 +1260,111 @@ export default function CommunityChat() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            className="fixed inset-0 z-[250] bg-[#f0f0f0] dark:bg-[#17212b] overflow-y-auto flex flex-col select-none"
+            className="fixed inset-0 z-[250] flex flex-col select-none"
+            style={{ backgroundColor: '#efeff4' }}
           >
-            <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col">
+            {/* â”€â”€ Header: Ã— Group Info [icon] â”€â”€ */}
+            <div
+              className="w-full flex items-center justify-between px-4 pt-3 pb-3 sticky top-0 z-10"
+              style={{ backgroundColor: '#efeff4' }}
+            >
+              <button
+                type="button"
+                onClick={() => setShowInfo(false)}
+                className="w-9 h-9 flex items-center justify-center text-[#8e8e93] active:opacity-50 transition-opacity cursor-pointer"
+                aria-label="Fechar"
+              >
+                <X className="w-5 h-5 stroke-[2.5]" />
+              </button>
+              <span className="text-[17px] font-semibold text-[#111] dark:text-white tracking-tight">
+                Group Info
+              </span>
+              <div className="w-9 h-9"></div>
+            </div>
 
-              {/* ── Cabeçalho: ← Group Info ── */}
-              <div className="w-full flex items-center justify-between px-2 pt-3 pb-2 bg-white dark:bg-[#1c2733] sticky top-0 z-10 shadow-[0_1px_0_rgba(0,0,0,0.08)]">
-                <button
-                  type="button"
-                  onClick={() => setShowInfo(false)}
-                  className="flex items-center gap-1 text-[#2AABEE] font-medium px-2 py-2 rounded-xl active:bg-[#2AABEE]/10 transition-colors cursor-pointer"
-                >
-                  <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
-                </button>
-                <h2 className="text-[17px] font-semibold text-[#111] dark:text-white tracking-tight">
-                  Informações do Grupo
-                </h2>
-                <button
-                  type="button"
-                  onClick={() => showToast('Apenas administradores podem editar', 'info')}
-                  className="px-3 py-2 text-[#2AABEE] text-[15px] font-medium active:opacity-60 transition-opacity cursor-pointer"
-                >
-                  Editar
-                </button>
-              </div>
+            {/* â”€â”€ Scrollable content â”€â”€ */}
+            <div className="flex-1 overflow-y-auto">
 
-              {/* ── Foto + Nome + Membros ── */}
-              <div className="flex flex-col items-center bg-white dark:bg-[#1c2733] pt-6 pb-5 px-4">
-                <div
-                  className="w-[90px] h-[90px] rounded-full overflow-hidden shadow-md mb-3 cursor-pointer active:opacity-80"
-                  onClick={() => setZoomedImage('/logo-tb.jpg')}
-                >
+              {/* â”€â”€ Avatar + Nome + Membros â”€â”€ */}
+              <div className="flex flex-col items-center pt-6 pb-5 px-4">
+                <div className="w-[80px] h-[80px] rounded-full overflow-hidden mb-4">
                   <img src="/logo-tb.jpg" alt="Telegram" className="w-full h-full object-cover" />
                 </div>
-                <h1 className="text-[20px] font-bold text-[#111] dark:text-white text-center leading-tight mb-0.5">
-                  Telegram Business Oficial
+                <h1 className="text-[18px] font-bold text-[#111] text-center leading-tight">
+                  Telegram Bussiness Grupo
                 </h1>
-                <p className="text-[14px] text-gray-500 dark:text-gray-400">
-                  54 281 membros
+                <p className="text-[13px] mt-1" style={{ color: '#8e8e93' }}>
+                  2 members
                 </p>
               </div>
 
-              {/* ── Separador ── */}
-              <div className="h-[6px] bg-[#f0f0f0] dark:bg-[#17212b]" />
-
-              {/* ── Bloco: Link + Notificações ── */}
-              <div className="bg-white dark:bg-[#1c2733]">
-                {/* Link */}
+              {/* â”€â”€ Card branco: Link + Notifications â”€â”€ */}
+              <div className="mx-4 mb-4 rounded-[12px] bg-white overflow-hidden shadow-xs">
+                {/* Link row */}
                 <div
-                  className="flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-gray-100 dark:active:bg-[#243040] transition-colors"
+                  className="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 transition-colors"
                   onClick={() => {
-                    navigator.clipboard.writeText('https://t.me/TelegramBusinessOficial');
+                    navigator.clipboard.writeText(window.location.href);
                     setIsCopiedLink(true);
                     showToast('Link copiado!', 'success');
                     setTimeout(() => setIsCopiedLink(false), 2000);
                   }}
                 >
-                  <div className="w-[34px] h-[34px] rounded-full bg-[#FF9500] flex items-center justify-center shrink-0">
-                    <QrCode className="w-[18px] h-[18px] text-white stroke-[2]" />
+                  <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center shrink-0" style={{ backgroundColor: '#ff9500' }}>
+                    <QrCode className="w-[17px] h-[17px] text-white stroke-[2]" />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[15px] text-[#2AABEE] font-normal leading-tight truncate">
-                      {isCopiedLink ? 'Copiado!' : 'https://t.me/TelegramBusinessOficial'}
+                    <span className="text-[14px] truncate" style={{ color: '#007aff' }}>
+                      {isCopiedLink ? 'Copiado!' : window.location.href}
                     </span>
-                    <span className="text-[12px] text-gray-400 mt-0.5">Link</span>
+                    <span className="text-[12px]" style={{ color: '#8e8e93' }}>Link</span>
                   </div>
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-gray-100 dark:bg-white/8 ml-[60px]" />
+                <div className="h-px ml-[56px]" style={{ backgroundColor: '#c8c7cc' }} />
 
-                {/* Notificações */}
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <div className="w-[34px] h-[34px] rounded-full bg-[#FF3B30] flex items-center justify-center shrink-0">
-                    <Bell className="w-[18px] h-[18px] text-white stroke-[2]" />
+                {/* Notifications row */}
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <div className="w-[32px] h-[32px] rounded-[8px] flex items-center justify-center shrink-0" style={{ backgroundColor: '#ff3b30' }}>
+                    <Bell className="w-[17px] h-[17px] text-white stroke-[2]" />
                   </div>
-                  <span className="flex-1 text-[15px] text-[#111] dark:text-white font-normal">
-                    Notificações
-                  </span>
-                  {/* Switch toggle estilo iOS/Telegram */}
+                  <span className="flex-1 text-[14px] text-[#111]">Notifications</span>
                   <button
                     type="button"
                     onClick={() => {
                       setIsGroupMuted(!isGroupMuted);
-                      showToast(isGroupMuted ? 'Notificações ativadas' : 'Notificações silenciadas', 'info');
+                      showToast(isGroupMuted ? 'Notifications on' : 'Notifications off', 'info');
                     }}
-                    className="relative w-[51px] h-[31px] rounded-full transition-colors duration-200 cursor-pointer focus:outline-none shrink-0"
-                    style={{ backgroundColor: isGroupMuted ? '#E5E5EA' : '#34C759' }}
-                    aria-label="Toggle notificações"
+                    className="relative w-[34px] h-[14px] rounded-full cursor-pointer focus:outline-none shrink-0 transition-colors duration-200"
+                    style={{ backgroundColor: isGroupMuted ? '#d1d1d6' : '#007aff' }}
+                    aria-label="Toggle notifications"
                   >
                     <span
-                      className="absolute top-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-md transition-transform duration-200"
-                      style={{ transform: isGroupMuted ? 'translateX(2px)' : 'translateX(22px)' }}
+                      className="absolute top-[-3px] left-[-1px] w-[20px] h-[20px] bg-white rounded-full transition-transform duration-200"
+                      style={{ 
+                        transform: isGroupMuted ? 'translateX(0px)' : 'translateX(16px)',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                        border: isGroupMuted ? '1px solid #d1d1d6' : '1px solid #007aff'
+                      }}
                     />
                   </button>
                 </div>
               </div>
 
-              {/* ── Separador ── */}
-              <div className="h-[6px] bg-[#f0f0f0] dark:bg-[#17212b]" />
-
-              {/* ── Abas: Members / Media / Files / Links ── */}
-              <div className="bg-white dark:bg-[#1c2733] sticky top-[52px] z-[9]">
-                <div className="flex border-b border-gray-200 dark:border-white/10">
+              {/* â”€â”€ Abas: Members | Media | Files | Links â”€â”€ */}
+              <div className="bg-white border-b border-gray-200 sticky top-[56px] z-[5]">
+                <div className="flex">
                   {GROUP_TABS.map((tab) => (
                     <button
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveGroupTab(tab.id)}
-                      className={`flex-1 py-3 text-[13px] font-semibold transition-colors cursor-pointer ${
-                        activeGroupTab === tab.id
-                          ? 'text-[#2AABEE] border-b-2 border-[#2AABEE]'
-                          : 'text-gray-400 dark:text-gray-500'
-                      }`}
+                      className="flex-1 py-3 text-[13px] font-medium transition-colors cursor-pointer relative"
+                      style={{
+                        color: activeGroupTab === tab.id ? '#007aff' : '#8e8e93',
+                        borderBottom: activeGroupTab === tab.id ? '2px solid #007aff' : '2px solid transparent',
+                      }}
                     >
                       {tab.label}
                     </button>
@@ -1380,35 +1372,23 @@ export default function CommunityChat() {
                 </div>
               </div>
 
-              {/* ── Conteúdo das Abas ── */}
-              <div className="flex-1 bg-white dark:bg-[#1c2733]">
+              {/* â”€â”€ ConteÃºdo das Abas â”€â”€ */}
+              <div className="min-h-[200px]">
                 {activeGroupTab === 'members' && (
-                  <div className="divide-y divide-gray-100 dark:divide-white/8">
-                    {/* Adicionar Membro */}
-                    <div
-                      className="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 dark:active:bg-[#243040] transition-colors"
-                      onClick={() => showToast('Apenas administradores podem adicionar membros', 'info')}
-                    >
-                      <div className="w-[46px] h-[46px] rounded-full bg-[#2AABEE]/15 flex items-center justify-center shrink-0">
-                        <UserPlus className="w-5 h-5 text-[#2AABEE] stroke-[2]" />
-                      </div>
-                      <span className="text-[15px] text-[#2AABEE] font-medium">Adicionar Membro</span>
-                    </div>
-                    {/* Membros fictícios */}
+                  <div className="divide-y divide-gray-100">
                     {[
-                      { name: 'Pavel Durov', role: 'Fundador', avatar: '/pavel_durov.jpg' },
-                      { name: 'Telegram Business', role: 'Administrador', avatar: '/logo-tb.jpg' },
-                      { name: 'BotFather', role: 'Bot', avatar: '/BotFather.jpg' },
+                      { name: 'Pavel Durov', role: 'Founder', avatar: '/pavel_durov.jpg' },
+                      { name: 'Telegram Business', role: 'Administrator', avatar: '/logo-tb.jpg' },
                     ].map((member) => (
-                      <div key={member.name} className="flex items-center gap-3 px-4 py-3">
-                        <div className="w-[46px] h-[46px] rounded-full overflow-hidden shrink-0 bg-gray-200">
+                      <div key={member.name} className="flex items-center gap-3 px-4 py-3 bg-white">
+                        <div className="w-[42px] h-[42px] rounded-full overflow-hidden shrink-0 bg-gray-200">
                           <img src={member.avatar} alt={member.name} className="w-full h-full object-cover"
                             onError={(e: any) => { e.target.src = '/logo-tb.jpg'; }}
                           />
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span className="text-[15px] font-medium text-[#111] dark:text-white truncate">{member.name}</span>
-                          <span className="text-[13px] text-gray-400">{member.role}</span>
+                          <span className="text-[15px] font-medium text-[#111] truncate">{member.name}</span>
+                          <span className="text-[12px]" style={{ color: '#8e8e93' }}>{member.role}</span>
                         </div>
                       </div>
                     ))}
@@ -1416,47 +1396,49 @@ export default function CommunityChat() {
                 )}
 
                 {activeGroupTab === 'media' && (
-                  <div className="p-4 text-center text-gray-400 text-[14px] pt-12">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#242f3d] flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    Nenhuma mídia partilhada ainda
+                  <div className="flex items-center justify-center pt-16 pb-8">
+                    <span className="text-[14px]" style={{ color: '#8e8e93' }}>No media files yet</span>
                   </div>
                 )}
 
                 {activeGroupTab === 'files' && (
-                  <div className="p-4 text-center text-gray-400 text-[14px] pt-12">
-                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#242f3d] flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    Nenhum ficheiro partilhado ainda
+                  <div className="flex items-center justify-center pt-16 pb-8">
+                    <span className="text-[14px]" style={{ color: '#8e8e93' }}>No files yet</span>
                   </div>
                 )}
 
                 {activeGroupTab === 'links' && (
                   <div
-                    className="flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-gray-50 dark:active:bg-[#243040] transition-colors"
+                    className="flex items-center gap-3 px-4 py-3.5 bg-white cursor-pointer active:bg-gray-50 transition-colors"
                     onClick={() => {
-                      navigator.clipboard.writeText('https://t.me/TelegramBusinessOficial');
+                      navigator.clipboard.writeText(window.location.href);
                       showToast('Link copiado!', 'success');
                     }}
                   >
-                    <div className="w-[46px] h-[46px] rounded-xl bg-[#2AABEE]/15 flex items-center justify-center shrink-0">
-                      <QrCode className="w-5 h-5 text-[#2AABEE] stroke-[2]" />
+                    <div className="w-[42px] h-[42px] rounded-[10px] flex items-center justify-center shrink-0" style={{ backgroundColor: '#007aff20' }}>
+                      <QrCode className="w-5 h-5 stroke-[2]" style={{ color: '#007aff' }} />
                     </div>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-[15px] text-[#2AABEE] truncate">https://t.me/TelegramBusinessOficial</span>
-                      <span className="text-[12px] text-gray-400 mt-0.5">Link de convite</span>
+                      <span className="text-[14px] truncate" style={{ color: '#007aff' }}>{window.location.href}</span>
+                      <span className="text-[12px]" style={{ color: '#8e8e93' }}>Invite link</span>
                     </div>
                   </div>
                 )}
               </div>
 
             </div>
+
+            {/* â”€â”€ FAB azul canto inferior direito â”€â”€ */}
+            <button
+              type="button"
+              onClick={() => showToast('Apenas administradores podem adicionar membros', 'info')}
+              className="absolute bottom-6 right-6 w-[56px] h-[56px] rounded-full shadow-lg flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
+              style={{ backgroundColor: '#007aff' }}
+              aria-label="Adicionar membro"
+            >
+              <UserPlus className="w-6 h-6 text-white stroke-[2]" />
+            </button>
+
           </motion.div>
         )}
       </AnimatePresence>
@@ -1493,7 +1475,7 @@ export default function CommunityChat() {
         )}
       </AnimatePresence>
 
-      {/* ── CONTEXT MENU — TOPO DA TELA (slide-down) ── */}
+      {/* â”€â”€ CONTEXT MENU â€” TOPO DA TELA (slide-down) â”€â”€ */}
       {contextMenu && (
         <div
           className="fixed inset-0 z-[200] bg-black/40"
@@ -1511,7 +1493,7 @@ export default function CommunityChat() {
               borderBottomRightRadius: '20px',
             }}
           >
-            {/* ── Barra de Reações ── */}
+            {/* â”€â”€ Barra de ReaÃ§Ãµes â”€â”€ */}
             <div className="flex items-center justify-between px-3 py-3 border-b border-gray-100 dark:border-white/8">
               {(showAllReactions ? COMMUNITY_QUICK_REACTIONS : COMMUNITY_QUICK_REACTIONS.slice(0, 7)).map((emoji) => (
                 <button
@@ -1519,7 +1501,7 @@ export default function CommunityChat() {
                   type="button"
                   onClick={() => {
                     handleToggleReaction(contextMenu.message.id, emoji);
-                    showToast(`Reação ${emoji} adicionada!`, 'success');
+                    showToast(`ReaÃ§Ã£o ${emoji} adicionada!`, 'success');
                     closeContextMenu();
                   }}
                   className="w-10 h-10 flex items-center justify-center text-[26px] leading-none active:scale-125 transition-transform rounded-full cursor-pointer"
@@ -1534,13 +1516,13 @@ export default function CommunityChat() {
                 onClick={() => setShowAllReactions(!showAllReactions)}
                 className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#3a3a3a] flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-200 active:scale-90 transition-transform cursor-pointer"
                 style={{ touchAction: 'manipulation' }}
-                title="Mais reações"
+                title="Mais reaÃ§Ãµes"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
 
-            {/* ── Lista de Ações Verticais ── */}
+            {/* â”€â”€ Lista de AÃ§Ãµes Verticais â”€â”€ */}
             {menuActions.map((action, idx) => (
               <React.Fragment key={action.label}>
                 <button
@@ -1571,7 +1553,7 @@ export default function CommunityChat() {
               </React.Fragment>
             ))}
 
-            {/* ── Fechar / handle ── */}
+            {/* â”€â”€ Fechar / handle â”€â”€ */}
             <div className="flex justify-center py-3">
               <button
                 type="button"
@@ -1587,7 +1569,7 @@ export default function CommunityChat() {
         </div>
       )}
 
-      {/* ── Animações CSS injetadas ── */}
+      {/* â”€â”€ AnimaÃ§Ãµes CSS injetadas â”€â”€ */}
       <style>{`
         @keyframes slideDownMenu {
           from { opacity: 0; transform: translateY(-100%); }
