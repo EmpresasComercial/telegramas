@@ -473,25 +473,23 @@ export default function PrivateChat() {
                 {/* Ponta de agulha — fora do bubble para não ser cortada pelo transform */}
                 {isMe ? (
                   <svg
-                    width="9"
+                    width="11"
                     height="20"
-                    viewBox="0 0 9 20"
+                    viewBox="0 0 11 20"
                     className="absolute pointer-events-none z-[1]"
-                    style={{ bottom: 0, right: -8, fill: 'currentColor' }}
-                    stroke="none"
-                    color="inherit"
+                    style={{ bottom: 0, right: -9, fill: '#E1FFC7' }}
                   >
-                    <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-[#eeffde] dark:fill-[#2b5278]" />
+                    <path d="M1 17V0H0V20C2 20 5 18 7 14C9 10 10 6 11 0H10C9 5 7 10 5 14C3 17 2 18 1 17Z" />
                   </svg>
                 ) : (
                   <svg
-                    width="9"
+                    width="11"
                     height="20"
-                    viewBox="0 0 9 20"
+                    viewBox="0 0 11 20"
                     className="absolute pointer-events-none z-[1]"
-                    style={{ bottom: 0, left: -8, transform: 'scaleX(-1)', fill: 'currentColor' }}
+                    style={{ bottom: 0, left: -9, fill: 'white' }}
                   >
-                    <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-white dark:fill-[#182533]" />
+                    <path d="M10 17V0H11V20C9 20 6 18 4 14C2 10 1 6 0 0H1C2 5 4 10 6 14C8 17 9 18 10 17Z" />
                   </svg>
                 )}
 
@@ -502,7 +500,7 @@ export default function PrivateChat() {
                   onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
                   className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
                     isMe
-                      ? 'bg-[#eeffde] dark:bg-[#2b5278]'
+                      ? 'bg-[#E1FFC7] dark:bg-[#2b5278]'
                       : 'bg-white dark:bg-[#182533]'
                   } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
                   style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}

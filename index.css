@@ -22,10 +22,11 @@
   
   /* Conversas / Chat */
   --tg-chat-bg: #8cb0c9;
-  --tg-bubble-out: #effdde;
+  --tg-bubble-out: #E1FFC7;
   --tg-bubble-out-dark: #2b5278;
   --tg-bubble-in: #ffffff;
   --tg-bubble-in-dark: #182533;
+
   --tg-ticks: #2481cc;
   
   /* Textos e Badges */
@@ -173,13 +174,13 @@ div[class*="rounded-[24px]"]:not(.tg-bubble) {
 
 /* BALÕES DE CHAT — cantos curvos sempre preservados + ponta de agulha afiada */
 .tg-bubble {
-  border-radius: 16px;
+  border-radius: 18px;
 }
 .tg-bubble.is-me {
-  border-radius: 16px 16px 0px 16px !important;
+  border-radius: 18px 18px 4px 18px !important;
 }
 .tg-bubble.is-other {
-  border-radius: 16px 16px 16px 0px !important;
+  border-radius: 18px 18px 18px 4px !important;
 }
 
 /* 5. AVATARES E BOTÕES REDONDOS DEVEM SER 100% REDONDOS (Regra explícita prioritária) */

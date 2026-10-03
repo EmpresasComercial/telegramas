@@ -196,16 +196,16 @@ interface ChatMessage {
   time: string;
   text?: string;
   imageUrl?: string;
-  type: 
-    | 'welcome' 
-    | 'text' 
-    | 'amount_selector' 
-    | 'bank_selector' 
-    | 'deposit_instructions' 
-    | 'proof_success' 
-    | 'history_list'
-    | 'banks_list'
-    | 'deposit_summary';
+  type:
+  | 'welcome'
+  | 'text'
+  | 'amount_selector'
+  | 'bank_selector'
+  | 'deposit_instructions'
+  | 'proof_success'
+  | 'history_list'
+  | 'banks_list'
+  | 'deposit_summary';
   payload?: any;
 }
 
@@ -359,7 +359,7 @@ export default function Recharge() {
     if (messages.length > 0) {
       try {
         localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages));
-      } catch (e) {}
+      } catch (e) { }
     }
   }, [messages]);
 
@@ -424,7 +424,7 @@ export default function Recharge() {
             return;
           }
         }
-      } catch (e) {}
+      } catch (e) { }
 
       setIsTyping(true);
       setTimeout(() => {
@@ -505,7 +505,7 @@ export default function Recharge() {
             localStorage.setItem('deposit_bot_recharge_id', recId);
             localStorage.setItem('deposit_bot_current_amount', String(amount));
             localStorage.setItem('deposit_bot_current_bank', JSON.stringify(bank));
-          } catch (e) {}
+          } catch (e) { }
         }
 
         setSelectedBank(bank);
@@ -562,7 +562,7 @@ export default function Recharge() {
       if (!targetRechargeId) {
         try {
           targetRechargeId = localStorage.getItem('deposit_bot_recharge_id');
-        } catch (e) {}
+        } catch (e) { }
       }
 
       if (!targetRechargeId) {
@@ -652,7 +652,7 @@ export default function Recharge() {
         localStorage.removeItem('deposit_bot_recharge_id');
         localStorage.removeItem('deposit_bot_current_amount');
         localStorage.removeItem('deposit_bot_current_bank');
-      } catch (e) {}
+      } catch (e) { }
     } catch (err: any) {
       setIsTyping(false);
       showToast(err.message || 'Erro ao enviar comprovativo.', 'error');
@@ -792,7 +792,7 @@ export default function Recharge() {
         setLastIntent(null);
         try {
           localStorage.removeItem('deposit_bot_recharge_id');
-        } catch (e) {}
+        } catch (e) { }
         botReply(() => ({
           id: 'bot-' + Date.now(),
           sender: 'bot',
@@ -965,8 +965,8 @@ export default function Recharge() {
             const statusLabel = (st === 'aprovado' || st === 'concluido' || st === 'approved')
               ? 'Aprovado'
               : (st === 'rejeitado' || st === 'cancelado' || st === 'failed')
-              ? 'Recusado'
-              : 'Pendente';
+                ? 'Recusado'
+                : 'Pendente';
             const dateStr = item.created_at
               ? new Date(item.created_at).toLocaleDateString('pt-AO', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' })
               : 'Recente';
@@ -994,7 +994,7 @@ export default function Recharge() {
         try {
           localStorage.removeItem(CHAT_STORAGE_KEY);
           localStorage.removeItem('deposit_bot_recharge_id');
-        } catch (e) {}
+        } catch (e) { }
         setDepositAmount(null);
         setSelectedBank(null);
         setActiveRechargeId(null);
@@ -1406,26 +1406,28 @@ export default function Recharge() {
               <div key={msg.id} className="flex flex-col items-end mb-1.5 pr-2">
                 <div className="relative max-w-[80%]">
                   <div
-                    className="bg-[#eeffde] rounded-[16px] rounded-br-none px-3.5 py-2 select-text flex flex-col gap-1"
+                    className="bg-[#eeffde] rounded-[16px] rounded-br-none px-[10px] pt-[6px] pb-[6px] select-text relative"
                     style={{ boxShadow: '0 1px 2px rgba(16,35,47,0.15)' }}
                   >
                     {msg.imageUrl && (
                       <img
                         src={msg.imageUrl}
                         alt="Comprovativo"
-                        className="rounded-lg max-h-48 w-auto object-cover mt-1"
+                        className="rounded-lg max-h-48 w-auto object-cover mt-1 mb-1 block"
                       />
                     )}
-                    <p
-                      className={`text-[15px] leading-snug whitespace-pre-line ${
-                        isValid ? 'text-[#1a7ac7] font-medium' : 'text-black font-normal'
-                      }`}
-                    >
-                      {msg.text}
-                    </p>
-                    <div className="flex justify-end items-center gap-1 mt-0.5 shrink-0 text-[11px] text-[#6a9a6a] select-none">
-                      <span>{msg.time}</span>
-                      <span className="text-[#4fae4e] font-bold text-[11px] leading-none">✓✓</span>
+                    <div className="relative leading-[1.3] pointer-events-none">
+                      <span
+                        className={`text-[16px] whitespace-pre-wrap break-words font-normal ${isValid ? 'text-[#1a7ac7]' : 'text-black'}`}
+                        style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                      >
+                        {msg.text}
+                      </span>
+                      <span aria-hidden="true" className="inline-block h-[1px]" style={{ width: '56px' }} />
+                      <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[12px]">
+                        <span className="font-normal leading-none text-[#55864e]">{msg.time}</span>
+                        <span className="text-[#4fae4e] font-bold text-[11px] leading-none">✓✓</span>
+                      </div>
                     </div>
                   </div>
                   <svg
@@ -1446,344 +1448,342 @@ export default function Recharge() {
 
           return (
             <React.Fragment key={msg.id}>
-            <div
-              className="flex flex-col items-start mb-2 max-w-[88%] sm:max-w-[80%] pl-2"
-            >
-              <div className="relative w-full">
-                <svg
-                  width="9"
-                  height="20"
-                  viewBox="0 0 9 20"
-                  className="absolute"
-                  style={{ top: 0, left: -8, fill: 'white' }}
-                >
-                  <path d="M9 0H0C4.5 0 8 4 9 12V0Z" />
-                </svg>
-                <div
-                  className={`bg-white text-gray-900 w-full relative select-text px-3.5 py-2.5 ${
-                    hasKeyboard ? 'rounded-tr-[16px] rounded-tl-none rounded-b-none' : 'rounded-[16px] rounded-tl-none'
-                  }`}
-                  style={{ boxShadow: '0 1px 2px rgba(16,35,47,0.15)' }}
-                >
-                {/* APRESENTAÇÃO INICIAL / BOAS-VINDAS */}
-                {msg.type === 'welcome' && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    <p>
-                      Olá! Bem-vindo ao <strong>Bot de deposito</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
-                    </p>
-                  </div>
-                )}
-
-                {/* TEXTO BOT PADRÃO */}
-                {msg.type === 'text' && msg.text && (
-                  <div className="text-[14px] text-black leading-relaxed font-normal">
-                    {renderBotText(msg.text)}
-                  </div>
-                )}
-
-                {/* SELETOR DE VALORES RÁPIDOS */}
-                {msg.type === 'amount_selector' && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    {msg.text && renderBotText(msg.text)}
-                    <div className="mt-3 flex flex-wrap gap-1.5 select-none">
-                      {[3000, 5000, 10000, 20000, 50000, 100000].map((val) => (
-                        <button
-                          key={val}
-                          onClick={() => handleSendMessage(String(val))}
-                          className="px-2.5 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-[#2481cc] text-[13px] font-semibold hover:bg-blue-50 active:scale-95 transition-all cursor-pointer"
-                        >
-                          {formatCurrency(val, 'KZ')}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* SELETOR DE BANCOS DISPONÍVEIS */}
-                {msg.type === 'bank_selector' && msg.payload && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    {msg.text && renderBotText(msg.text)}
-                    <div className="mt-3 flex flex-col gap-1.5 select-none">
-                      {msg.payload.banks && msg.payload.banks.length > 0 ? (
-                        msg.payload.banks.map((b: CollectionBank) => (
-                          <button
-                            key={b.id}
-                            onClick={() => createRechargeOrder(msg.payload.amount, b)}
-                            className="w-full text-left p-2.5 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-200 flex items-center justify-between text-[#2481cc] active:scale-[0.99] transition-all cursor-pointer"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Building2 className="w-4 h-4 text-[#3390ec] shrink-0" />
-                              <span className="font-bold text-[14px] text-black">{b.nome_banco}</span>
-                            </div>
-                            <span className="text-[12px] font-medium text-[#3390ec] flex items-center gap-1">
-                              Escolher <ArrowRight className="w-3.5 h-3.5" />
-                            </span>
-                          </button>
-                        ))
-                      ) : (
-                        <p className="text-[13px] text-gray-600">Nenhum banco carregado no momento.</p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* INSTRUÇÕES FINAIS DE DEPÓSITO COM BOTÃO DE COPIAR VALOR E IBAN */}
-                {msg.type === 'deposit_instructions' && msg.payload && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    <p className="font-bold text-[15px] text-[#2481cc] mb-2">
-                      Tudo pronto! Aqui estão os dados oficiais para você realizar o seu depósito: 🏦✨
-                    </p>
-                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-[13.5px] space-y-2 my-2">
-                      {/* VALOR COM BOTÃO DE COPIAR */}
-                      <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60">
-                        <div>
-                          <span className="text-[12px] text-gray-500 block">Valor a depositar:</span>
-                          <span className="text-[#25ae60] font-bold text-[15px]">
-                            {formatCurrency(msg.payload.amount, 'KZ')}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => copyToClipboard(String(msg.payload.amount), true)}
-                          className="px-2.5 py-1 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 active:scale-95 transition-all text-[12px] font-semibold shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs"
-                        >
-                          {copiedAmount ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-green-600" />
-                              <span className="text-green-700">Copiado</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5 text-gray-600" />
-                              <span>Copiar Valor</span>
-                            </>
-                          )}
-                        </button>
+              <div
+                className="flex flex-col items-start mb-2 max-w-[88%] sm:max-w-[80%] pl-2"
+              >
+                <div className="relative w-full">
+                  <svg
+                    width="9"
+                    height="20"
+                    viewBox="0 0 9 20"
+                    className="absolute"
+                    style={{ top: 0, left: -8, fill: 'white' }}
+                  >
+                    <path d="M9 0H0C4.5 0 8 4 9 12V0Z" />
+                  </svg>
+                  <div
+                    className={`bg-white text-gray-900 w-full relative select-text px-3.5 py-2.5 ${hasKeyboard ? 'rounded-tr-[16px] rounded-tl-none rounded-b-none' : 'rounded-[16px] rounded-tl-none'
+                      }`}
+                    style={{ boxShadow: '0 1px 2px rgba(16,35,47,0.15)' }}
+                  >
+                    {/* APRESENTAÇÃO INICIAL / BOAS-VINDAS */}
+                    {msg.type === 'welcome' && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        <p>
+                          Olá! Bem-vindo ao <strong>Bot de deposito</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
+                        </p>
                       </div>
-
-                      <p>
-                        • <strong>Banco Destinatário:</strong> {msg.payload.bank?.nome_banco}
-                      </p>
-                      <p>
-                        • <strong>Titular da Conta:</strong>{' '}
-                        {msg.payload.bank?.nome_proprietario || 'Conta Oficial'}
-                      </p>
-
-                      {/* IBAN COM BOTÃO DE COPIAR */}
-                      <div className="pt-1 flex items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <span className="text-[12px] text-gray-500 block">IBAN:</span>
-                          <code className="font-mono text-[13px] text-[#2481cc] font-bold select-all break-all">
-                            {msg.payload.bank?.iban}
-                          </code>
-                        </div>
-                        <button
-                          onClick={() => copyToClipboard(msg.payload.bank?.iban, false)}
-                          className="px-2.5 py-1 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 active:scale-95 transition-all text-[12px] font-semibold shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs"
-                        >
-                          {copiedIban ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-green-600" />
-                              <span className="text-green-700">Copiado</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5 text-gray-600" />
-                              <span>Copiar IBAN</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                    <p className="mt-2 text-[13px] text-gray-800 leading-normal">
-                      📝 <strong>Instruções simples:</strong>
-                      <br />
-                      Por favor, dirija-se a um <strong>ATM (Multicaixa)</strong>, use o aplicativo do seu banco ou vá a um <strong>Kiosk</strong> e faça a transferência ou depósito desse valor exato.
-                      <br /><br />
-                      Após fazer o depósito, clique no botão verde abaixo para enviar a captura do comprovativo! Estarei aqui te aguardando ansiosamente para liberar o seu saldo, tá bom? 😊
-                    </p>
-                  </div>
-                )}
-
-                {/* SUCESSO NO ENVIO DO COMPROVATIVO */}
-                {msg.type === 'proof_success' && msg.payload && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    <p className="font-bold text-[15px] text-[#25ae60] mb-1.5">
-                      Recebido com muito sucesso! 🎉🥳
-                    </p>
-                    <p className="text-[13.5px] text-gray-800 leading-normal">
-                      Já encaminhei o seu comprovativo para conferência da nossa equipe. O seu saldo no valor de{' '}
-                      <strong>{formatCurrency(msg.payload.amount || 0, 'KZ')}</strong> será creditado na sua conta em instantes!
-                      <br /><br />
-                      Muito obrigado pela preferência e confiança! Estarei sempre por aqui para o que precisar 😊
-                    </p>
-                  </div>
-                )}
-
-                {/* LISTA DE BANCOS */}
-                {msg.type === 'banks_list' && msg.payload && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    <p className="font-bold text-[15px] text-[#2481cc] mb-2">
-                      🏦 Nossos Bancos Disponíveis para Recarga:
-                    </p>
-                    <div className="space-y-2 my-2">
-                      {msg.payload.banks && msg.payload.banks.length > 0 ? (
-                        msg.payload.banks.map((b: CollectionBank) => (
-                          <div key={b.id} className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-[13px]">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="font-bold text-black text-[14px]">{b.nome_banco}</span>
-                              <span className="text-[11px] text-[#25ae60] font-semibold bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
-                                Disponível 24h
-                              </span>
-                            </div>
-                            <p className="text-gray-600 text-[12.5px]">Titular: {b.nome_proprietario}</p>
-                            <p className="text-[#2481cc] font-mono text-[12px] mt-0.5 select-all break-all">
-                              IBAN: {b.iban}
-                            </p>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-[13px] text-gray-600">Nenhum banco cadastrado no momento.</p>
-                      )}
-                    </div>
-                    <p className="text-[13px] text-gray-700">
-                      Quando quiser iniciar seu depósito, envie /depositar 😊
-                    </p>
-                  </div>
-                )}
-
-                {/* LISTA DE HISTÓRICO DE RECARGAS */}
-                {msg.type === 'history_list' && msg.payload && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    <p className="font-bold text-[15px] text-[#2481cc] mb-1.5">
-                      📑 Seus Últimos Depósitos:
-                    </p>
-                    {msg.payload.list && msg.payload.list.length > 0 ? (
-                      <div className="space-y-1.5 mt-2">
-                        {msg.payload.list.map((item: any, idx: number) => {
-                          const status = (item.status || 'pendente').toLowerCase();
-                          const isApproved = status === 'aprovado' || status === 'concluido';
-                          const isRejected = status === 'rejeitado' || status === 'cancelado';
-                          return (
-                            <div
-                              key={idx}
-                              className="p-2 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-[13px]"
-                            >
-                              <div>
-                                <span className="font-semibold text-black">
-                                  {formatCurrency(Number(item.amount) || Number(item.valor) || 0, 'KZ')}
-                                </span>
-                                <span className="text-[11px] text-gray-500 block">
-                                  {item.created_at
-                                    ? new Date(item.created_at).toLocaleDateString('pt-AO', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                      })
-                                    : 'Recente'}
-                                </span>
-                              </div>
-                              <span
-                                className={`text-[11.5px] font-bold px-2 py-0.5 rounded-full ${
-                                  isApproved
-                                    ? 'bg-green-100 text-green-700'
-                                    : isRejected
-                                    ? 'bg-red-100 text-red-700'
-                                    : 'bg-yellow-100 text-yellow-800'
-                                }`}
-                              >
-                                {isApproved ? 'Aprovado' : isRejected ? 'Rejeitado' : 'Pendente'}
-                              </span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <p className="text-[13px] text-gray-600">
-                        Você ainda não possui nenhum depósito registrado 😊
-                      </p>
                     )}
-                  </div>
-                )}
 
-                {/* RELATÓRIO DE TOTAL DE DEPÓSITOS */}
-                {msg.type === 'deposit_summary' && (
-                  <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
-                    {msg.text && renderBotText(msg.text)}
-                  </div>
-                )}
+                    {/* TEXTO BOT PADRÃO */}
+                    {msg.type === 'text' && msg.text && (
+                      <div className="text-[14px] text-black leading-relaxed font-normal">
+                        {renderBotText(msg.text)}
+                      </div>
+                    )}
 
-                <div className="flex justify-end mt-1 text-[11px] text-[#8a8a8a] font-normal select-none">
-                  <span>{msg.time}</span>
+                    {/* SELETOR DE VALORES RÁPIDOS */}
+                    {msg.type === 'amount_selector' && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        {msg.text && renderBotText(msg.text)}
+                        <div className="mt-3 flex flex-wrap gap-1.5 select-none">
+                          {[3000, 5000, 10000, 20000, 50000, 100000].map((val) => (
+                            <button
+                              key={val}
+                              onClick={() => handleSendMessage(String(val))}
+                              className="px-2.5 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-[#2481cc] text-[13px] font-semibold hover:bg-blue-50 active:scale-95 transition-all cursor-pointer"
+                            >
+                              {formatCurrency(val, 'KZ')}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* SELETOR DE BANCOS DISPONÍVEIS */}
+                    {msg.type === 'bank_selector' && msg.payload && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        {msg.text && renderBotText(msg.text)}
+                        <div className="mt-3 flex flex-col gap-1.5 select-none">
+                          {msg.payload.banks && msg.payload.banks.length > 0 ? (
+                            msg.payload.banks.map((b: CollectionBank) => (
+                              <button
+                                key={b.id}
+                                onClick={() => createRechargeOrder(msg.payload.amount, b)}
+                                className="w-full text-left p-2.5 rounded-lg bg-gray-50 hover:bg-blue-50 border border-gray-200 flex items-center justify-between text-[#2481cc] active:scale-[0.99] transition-all cursor-pointer"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <Building2 className="w-4 h-4 text-[#3390ec] shrink-0" />
+                                  <span className="font-bold text-[14px] text-black">{b.nome_banco}</span>
+                                </div>
+                                <span className="text-[12px] font-medium text-[#3390ec] flex items-center gap-1">
+                                  Escolher <ArrowRight className="w-3.5 h-3.5" />
+                                </span>
+                              </button>
+                            ))
+                          ) : (
+                            <p className="text-[13px] text-gray-600">Nenhum banco carregado no momento.</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* INSTRUÇÕES FINAIS DE DEPÓSITO COM BOTÃO DE COPIAR VALOR E IBAN */}
+                    {msg.type === 'deposit_instructions' && msg.payload && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        <p className="font-bold text-[15px] text-[#2481cc] mb-2">
+                          Tudo pronto! Aqui estão os dados oficiais para você realizar o seu depósito: 🏦✨
+                        </p>
+                        <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-200 text-[13.5px] space-y-2 my-2">
+                          {/* VALOR COM BOTÃO DE COPIAR */}
+                          <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-gray-200/60">
+                            <div>
+                              <span className="text-[12px] text-gray-500 block">Valor a depositar:</span>
+                              <span className="text-[#25ae60] font-bold text-[15px]">
+                                {formatCurrency(msg.payload.amount, 'KZ')}
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => copyToClipboard(String(msg.payload.amount), true)}
+                              className="px-2.5 py-1 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 active:scale-95 transition-all text-[12px] font-semibold shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs"
+                            >
+                              {copiedAmount ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-green-600" />
+                                  <span className="text-green-700">Copiado</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5 text-gray-600" />
+                                  <span>Copiar Valor</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+
+                          <p>
+                            • <strong>Banco Destinatário:</strong> {msg.payload.bank?.nome_banco}
+                          </p>
+                          <p>
+                            • <strong>Titular da Conta:</strong>{' '}
+                            {msg.payload.bank?.nome_proprietario || 'Conta Oficial'}
+                          </p>
+
+                          {/* IBAN COM BOTÃO DE COPIAR */}
+                          <div className="pt-1 flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <span className="text-[12px] text-gray-500 block">IBAN:</span>
+                              <code className="font-mono text-[13px] text-[#2481cc] font-bold select-all break-all">
+                                {msg.payload.bank?.iban}
+                              </code>
+                            </div>
+                            <button
+                              onClick={() => copyToClipboard(msg.payload.bank?.iban, false)}
+                              className="px-2.5 py-1 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 active:scale-95 transition-all text-[12px] font-semibold shrink-0 flex items-center gap-1 cursor-pointer shadow-2xs"
+                            >
+                              {copiedIban ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5 text-green-600" />
+                                  <span className="text-green-700">Copiado</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5 text-gray-600" />
+                                  <span>Copiar IBAN</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                        <p className="mt-2 text-[13px] text-gray-800 leading-normal">
+                          📝 <strong>Instruções simples:</strong>
+                          <br />
+                          Por favor, dirija-se a um <strong>ATM (Multicaixa)</strong>, use o aplicativo do seu banco ou vá a um <strong>Kiosk</strong> e faça a transferência ou depósito desse valor exato.
+                          <br /><br />
+                          Após fazer o depósito, clique no botão verde abaixo para enviar a captura do comprovativo! Estarei aqui te aguardando ansiosamente para liberar o seu saldo, tá bom? 😊
+                        </p>
+                      </div>
+                    )}
+
+                    {/* SUCESSO NO ENVIO DO COMPROVATIVO */}
+                    {msg.type === 'proof_success' && msg.payload && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        <p className="font-bold text-[15px] text-[#25ae60] mb-1.5">
+                          Recebido com muito sucesso! 🎉🥳
+                        </p>
+                        <p className="text-[13.5px] text-gray-800 leading-normal">
+                          Já encaminhei o seu comprovativo para conferência da nossa equipe. O seu saldo no valor de{' '}
+                          <strong>{formatCurrency(msg.payload.amount || 0, 'KZ')}</strong> será creditado na sua conta em instantes!
+                          <br /><br />
+                          Muito obrigado pela preferência e confiança! Estarei sempre por aqui para o que precisar 😊
+                        </p>
+                      </div>
+                    )}
+
+                    {/* LISTA DE BANCOS */}
+                    {msg.type === 'banks_list' && msg.payload && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        <p className="font-bold text-[15px] text-[#2481cc] mb-2">
+                          🏦 Nossos Bancos Disponíveis para Recarga:
+                        </p>
+                        <div className="space-y-2 my-2">
+                          {msg.payload.banks && msg.payload.banks.length > 0 ? (
+                            msg.payload.banks.map((b: CollectionBank) => (
+                              <div key={b.id} className="p-2.5 rounded-lg bg-gray-50 border border-gray-200 text-[13px]">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="font-bold text-black text-[14px]">{b.nome_banco}</span>
+                                  <span className="text-[11px] text-[#25ae60] font-semibold bg-green-50 px-2 py-0.5 rounded-full border border-green-200">
+                                    Disponível 24h
+                                  </span>
+                                </div>
+                                <p className="text-gray-600 text-[12.5px]">Titular: {b.nome_proprietario}</p>
+                                <p className="text-[#2481cc] font-mono text-[12px] mt-0.5 select-all break-all">
+                                  IBAN: {b.iban}
+                                </p>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-[13px] text-gray-600">Nenhum banco cadastrado no momento.</p>
+                          )}
+                        </div>
+                        <p className="text-[13px] text-gray-700">
+                          Quando quiser iniciar seu depósito, envie /depositar 😊
+                        </p>
+                      </div>
+                    )}
+
+                    {/* LISTA DE HISTÓRICO DE RECARGAS */}
+                    {msg.type === 'history_list' && msg.payload && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        <p className="font-bold text-[15px] text-[#2481cc] mb-1.5">
+                          📑 Seus Últimos Depósitos:
+                        </p>
+                        {msg.payload.list && msg.payload.list.length > 0 ? (
+                          <div className="space-y-1.5 mt-2">
+                            {msg.payload.list.map((item: any, idx: number) => {
+                              const status = (item.status || 'pendente').toLowerCase();
+                              const isApproved = status === 'aprovado' || status === 'concluido';
+                              const isRejected = status === 'rejeitado' || status === 'cancelado';
+                              return (
+                                <div
+                                  key={idx}
+                                  className="p-2 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-between text-[13px]"
+                                >
+                                  <div>
+                                    <span className="font-semibold text-black">
+                                      {formatCurrency(Number(item.amount) || Number(item.valor) || 0, 'KZ')}
+                                    </span>
+                                    <span className="text-[11px] text-gray-500 block">
+                                      {item.created_at
+                                        ? new Date(item.created_at).toLocaleDateString('pt-AO', {
+                                          day: '2-digit',
+                                          month: '2-digit',
+                                          hour: '2-digit',
+                                          minute: '2-digit',
+                                        })
+                                        : 'Recente'}
+                                    </span>
+                                  </div>
+                                  <span
+                                    className={`text-[11.5px] font-bold px-2 py-0.5 rounded-full ${isApproved
+                                        ? 'bg-green-100 text-green-700'
+                                        : isRejected
+                                          ? 'bg-red-100 text-red-700'
+                                          : 'bg-yellow-100 text-yellow-800'
+                                      }`}
+                                  >
+                                    {isApproved ? 'Aprovado' : isRejected ? 'Rejeitado' : 'Pendente'}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="text-[13px] text-gray-600">
+                            Você ainda não possui nenhum depósito registrado 😊
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* RELATÓRIO DE TOTAL DE DEPÓSITOS */}
+                    {msg.type === 'deposit_summary' && (
+                      <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
+                        {msg.text && renderBotText(msg.text)}
+                      </div>
+                    )}
+
+                    <div className="flex justify-end mt-1 text-[11px] text-[#8a8a8a] font-normal select-none">
+                      <span>{msg.time}</span>
+                    </div>
+                  </div>
+
+                  {/* TECLADO DE BOTÕES ANEXADO AO BALÃO (INLINE KEYBOARD UNIFICADO TELEGRAM) */}
+                  {msg.type === 'welcome' && (
+                    <div className="w-full flex flex-col items-center justify-center gap-[2px] mt-[2px] select-none">
+                      <button onClick={() => handleSendMessage('/depositar')} className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-none">
+                        💳 Fazer Depósito
+                      </button>
+                      <div className="w-full flex items-center gap-[2px]">
+                        <button onClick={() => handleSendMessage('/bancos')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                          🏦 Bancos
+                        </button>
+                        <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                          💰 Saldo
+                        </button>
+                      </div>
+                      <div className="w-full flex items-center gap-[2px]">
+                        <button onClick={() => handleSendMessage('/horario')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                          ⏰ Horários
+                        </button>
+                        <button onClick={() => handleSendMessage('/limites')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
+                          📐 Limites
+                        </button>
+                      </div>
+                      <div className="w-full flex items-center gap-[2px]">
+                        <button onClick={() => handleSendMessage('/total_deposito')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">
+                          📊 Relatório
+                        </button>
+                        <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">
+                          📋 Histórico
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {msg.type === 'deposit_instructions' && msg.payload && (
+                    <div className="w-full flex flex-col items-center justify-center gap-[2px] mt-[2px] select-none">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all disabled:opacity-50 w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-none"
+                      >
+                        {isUploading ? '⏳ Enviando...' : '📷 Enviar Comprovativo'}
+                      </button>
+                      <button
+                        onClick={() => handleSendMessage('/cancelar')}
+                        className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-b-[16px] rounded-t-none"
+                      >
+                        ✕ Cancelar Depósito
+                      </button>
+                    </div>
+                  )}
+
+                  {msg.type === 'deposit_summary' && (
+                    <div className="w-full flex items-center gap-[2px] mt-[2px] select-none">
+                      <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">💳 Fazer Depósito</button>
+                      <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">💰 Ver Saldo</button>
+                    </div>
+                  )}
+
+                  {msg.type === 'proof_success' && (
+                    <div className="w-full flex items-center gap-[2px] mt-[2px] select-none">
+                      <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">💳 Novo Depósito</button>
+                      <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">📋 Histórico</button>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {/* TECLADO DE BOTÕES ANEXADO AO BALÃO (INLINE KEYBOARD UNIFICADO TELEGRAM) */}
-              {msg.type === 'welcome' && (
-                <div className="w-full flex flex-col items-center justify-center gap-[2px] mt-[2px] select-none">
-                  <button onClick={() => handleSendMessage('/depositar')} className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-none">
-                    💳 Fazer Depósito
-                  </button>
-                  <div className="w-full flex items-center gap-[2px]">
-                    <button onClick={() => handleSendMessage('/bancos')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
-                      🏦 Bancos
-                    </button>
-                    <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
-                      💰 Saldo
-                    </button>
-                  </div>
-                  <div className="w-full flex items-center gap-[2px]">
-                    <button onClick={() => handleSendMessage('/horario')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
-                      ⏰ Horários
-                    </button>
-                    <button onClick={() => handleSendMessage('/limites')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-none">
-                      📐 Limites
-                    </button>
-                  </div>
-                  <div className="w-full flex items-center gap-[2px]">
-                    <button onClick={() => handleSendMessage('/total_deposito')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">
-                      📊 Relatório
-                    </button>
-                    <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">
-                      📋 Histórico
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {msg.type === 'deposit_instructions' && msg.payload && (
-                <div className="w-full flex flex-col items-center justify-center gap-[2px] mt-[2px] select-none">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                    className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all disabled:opacity-50 w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-none"
-                  >
-                    {isUploading ? '⏳ Enviando...' : '📷 Enviar Comprovativo'}
-                  </button>
-                  <button
-                    onClick={() => handleSendMessage('/cancelar')}
-                    className="bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-4 py-2.5 text-[14px] font-medium active:scale-[0.99] transition-all w-full flex items-center justify-center gap-1.5 cursor-pointer rounded-b-[16px] rounded-t-none"
-                  >
-                    ✕ Cancelar Depósito
-                  </button>
-                </div>
-              )}
-
-              {msg.type === 'deposit_summary' && (
-                <div className="w-full flex items-center gap-[2px] mt-[2px] select-none">
-                  <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">💳 Fazer Depósito</button>
-                  <button onClick={() => handleSendMessage('/saldo')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">💰 Ver Saldo</button>
-                </div>
-              )}
-
-              {msg.type === 'proof_success' && (
-                <div className="w-full flex items-center gap-[2px] mt-[2px] select-none">
-                  <button onClick={() => handleSendMessage('/depositar')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-bl-[16px] rounded-br-none rounded-t-none">💳 Novo Depósito</button>
-                  <button onClick={() => handleSendMessage('/historico')} className="flex-1 bg-[#6b7b8a] bg-opacity-70 hover:bg-opacity-85 text-white px-2 py-2.5 text-[13px] font-medium active:scale-[0.99] transition-all cursor-pointer rounded-br-[16px] rounded-bl-none rounded-t-none">📋 Histórico</button>
-                </div>
-              )}
-            </div>
-            </div>
             </React.Fragment>
           );
         })}

@@ -1260,19 +1260,21 @@ export default function Withdraw() {
               <div key={msg.id} className="flex flex-col items-end mb-1.5 pr-2">
                 <div className="relative max-w-[80%]">
                   <div
-                    className="bg-[#eeffde] rounded-[16px] rounded-br-none px-3.5 py-2 select-text flex flex-col gap-1"
+                    className="bg-[#eeffde] rounded-[16px] rounded-br-none px-[10px] pt-[6px] pb-[6px] select-text relative"
                     style={{ boxShadow: '0 1px 2px rgba(16,35,47,0.15)' }}
                   >
-                    <p
-                      className={`text-[15px] leading-snug whitespace-pre-line ${
-                        isValid ? 'text-[#1a7ac7] font-medium' : 'text-black font-normal'
-                      }`}
-                    >
-                      {msg.text}
-                    </p>
-                    <div className="flex justify-end items-center gap-1 mt-0.5 shrink-0 text-[11px] text-[#6a9a6a] select-none">
-                      <span>{msg.time}</span>
-                      <span className="text-[#4fae4e] font-bold text-[11px] leading-none">✓✓</span>
+                    <div className="relative leading-[1.3] pointer-events-none">
+                      <span
+                        className={`text-[16px] whitespace-pre-wrap break-words font-normal ${isValid ? 'text-[#1a7ac7]' : 'text-black'}`}
+                        style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}
+                      >
+                        {msg.text}
+                      </span>
+                      <span aria-hidden="true" className="inline-block h-[1px]" style={{ width: '56px' }} />
+                      <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[12px]">
+                        <span className="font-normal leading-none text-[#55864e]">{msg.time}</span>
+                        <span className="text-[#4fae4e] font-bold text-[11px] leading-none">✓✓</span>
+                      </div>
                     </div>
                   </div>
                   <svg
@@ -1305,7 +1307,7 @@ export default function Withdraw() {
                   <path d="M9 0H0C4.5 0 8 4 9 12V0Z" />
                 </svg>
                 <div
-                  className="bg-white rounded-[16px] rounded-tl-none px-3.5 py-2.5 text-gray-900 w-full relative select-text"
+                  className="bg-white rounded-[16px] rounded-tl-none px-[10px] pt-[8px] pb-[8px] text-gray-900 w-full relative select-text"
                   style={{ boxShadow: '0 1px 2px rgba(16,35,47,0.15)' }}
                 >
                 {/* APRESENTAÇÃO / BOAS-VINDAS */}
