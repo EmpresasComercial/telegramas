@@ -199,9 +199,6 @@ export default function Invite() {
               Contatos & Convite
             </h1>
           </div>
-          <div className="text-xs font-semibold text-[#8e8e93] dark:text-[#7e8b99] bg-black/5 dark:bg-white/5 px-2.5 py-1 rounded-full">
-            Oficial
-          </div>
         </div>
       </header>
 
@@ -305,7 +302,7 @@ export default function Invite() {
         <div className="bg-white dark:bg-[#17212b] rounded-[18px] p-4 shadow-2xs border border-gray-100 dark:border-[#242f3d] flex flex-col gap-3">
           <h2 className="text-[14px] font-bold text-black dark:text-white flex items-center gap-2">
             <Zap className="w-4 h-4 text-[#f59e0b]" />
-            3 Passos do Funcionamento
+            2 Passos do Funcionamento
           </h2>
 
           <div className="flex flex-col gap-2.5">
@@ -319,11 +316,6 @@ export default function Invite() {
                 num: '2',
                 title: 'O amigo cadastra-se e ativa um Bot',
                 desc: 'Ao ativar qualquer Bot disponível na plataforma.',
-              },
-              {
-                num: '3',
-                title: 'Receba até 18% de comissão instantânea',
-                desc: 'O valor cai diretamente no seu saldo disponível para saque imediato.',
               },
             ].map((step, idx) => (
               <div key={idx} className="flex items-start gap-3 p-3 rounded-[14px] bg-[#f8f8f9] dark:bg-[#0e1621]/60 border border-gray-100 dark:border-white/5">

@@ -470,35 +470,37 @@ export default function PrivateChat() {
                   </div>
                 )}
 
+                {/* Ponta de agulha — fora do bubble para não ser cortada pelo transform */}
+                {isMe ? (
+                  <svg
+                    className="absolute bottom-0 -right-[8px] w-[9px] h-[16px] text-[#dcf8c6] dark:text-[#2b5278] fill-current pointer-events-none z-[1]"
+                    viewBox="0 0 9 16"
+                  >
+                    <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="absolute bottom-0 -left-[8px] w-[9px] h-[16px] text-white dark:text-[#182533] fill-current pointer-events-none z-[1]"
+                    viewBox="0 0 9 16"
+                    style={{ transform: 'scaleX(-1)' }}
+                  >
+                    <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                  </svg>
+                )}
+
                 {/* Balão da mensagem com detecção de toque instantânea */}
                 <div
                   onClick={(e) => { e.stopPropagation(); openContextMenu(e, m, isMe); }}
                   onTouchStart={handleTouchStart}
                   onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
-                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} min-w-[60px] max-w-[82%] px-3.5 py-2 text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(0,0,0,0.06)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
+                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[82%] px-3.5 py-2 text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(0,0,0,0.06)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
                     isMe
                       ? 'bg-[#dcf8c6] dark:bg-[#2b5278]'
                       : 'bg-white dark:bg-[#182533]'
                   } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
                   style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                 >
-                  {/* Ponta de agulha (Speech bubble tail Telegram) */}
-                  {isMe ? (
-                    <svg
-                      className="absolute bottom-0 -right-[8px] w-[9px] h-[16px] text-[#dcf8c6] dark:text-[#2b5278] fill-current pointer-events-none"
-                      viewBox="0 0 9 16"
-                    >
-                      <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="absolute bottom-0 -left-[8px] w-[9px] h-[16px] text-white dark:text-[#182533] fill-current pointer-events-none"
-                      viewBox="0 0 9 16"
-                      style={{ transform: 'scaleX(-1)' }}
-                    >
-                      <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
-                    </svg>
-                  )}
+
 
                   <div className="relative pointer-events-none">
                     {!isMe && (
@@ -510,8 +512,14 @@ export default function PrivateChat() {
                       </p>
                     )}
 
-                    <p className="text-[14.5px] leading-relaxed break-words whitespace-pre-wrap text-[#202020] dark:text-[#f3f4f6] font-normal pr-12" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    <p className="text-[14.5px] leading-relaxed break-words whitespace-pre-wrap text-[#202020] dark:text-[#f3f4f6] font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                       {m.mensagem}
+                      {/* Spacer invisível inline — dá espaço ao timestamp sem forçar largura mínima */}
+                      <span
+                        aria-hidden="true"
+                        className="inline-block align-bottom pointer-events-none opacity-0 select-none"
+                        style={{ width: isMe ? '54px' : '38px', height: '1px', marginLeft: '4px' }}
+                      />
                     </p>
 
                     <div className="absolute right-0 bottom-[-2px] flex items-center gap-1 select-none">

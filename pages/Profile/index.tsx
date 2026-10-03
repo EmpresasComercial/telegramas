@@ -4,7 +4,6 @@ import {
   QrCode,
   Wallet,
   PlusCircle,
-  Settings as SettingsIcon,
   CreditCard,
   MessageSquare,
   ShieldAlert,
@@ -22,16 +21,15 @@ import {
   Lock,
   LogOut,
   Camera,
-  Briefcase,
   ChevronLeft,
   Edit3,
+  Download,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useLanguage } from "../../contexts/LanguageContext";
 import { formatCurrency } from "../../lib/currency";
 import { useToast } from "../../components/Toast";
 import EditProfileModal from "./components/EditProfileModal";
-import AutoMessagesModal from "../../components/AutoMessagesModal";
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -40,13 +38,10 @@ export default function Profile() {
 
   const [showLanguage, setShowLanguage] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [showAutoMessages, setShowAutoMessages] = useState(false);
   const [balance, setBalance] = useState<number>(0);
-  const [dailyIncome, setDailyIncome] = useState<number>(0);
   const [totalDeposits, setTotalDeposits] = useState<number>(0);
   const [totalWithdrawals, setTotalWithdrawals] = useState<number>(0);
   const [comissaoEquipe, setComissaoEquipe] = useState<number>(0);
-  const [tarefasHoje, setTarefasHoje] = useState<number>(0);
   const [refCode, setRefCode] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [userName, setUserName] = useState<string>("");
@@ -77,8 +72,6 @@ export default function Profile() {
         setTotalDeposits(Number(d.total_recarregado ?? 0));
         setTotalWithdrawals(Number(d.total_retirado ?? 0));
         setComissaoEquipe(Number(d.total_comissao_equipe ?? 0));
-        setDailyIncome(Number(d.lucro_acumulado ?? 0));
-        setTarefasHoje(Number(d.tarefas_hoje ?? 0));
         if (d.telefone) setPhone(d.telefone);
         if (d.nome_exibicao) setUserName(d.nome_exibicao);
         if (d.codigo_meu_refferal) setRefCode(d.codigo_meu_refferal);
@@ -272,17 +265,9 @@ export default function Profile() {
             <SettingsItem
               icon={<MessageSquare className="w-5 h-5 text-white" />}
               iconBg="bg-[#f2a93b]"
-              title="Chat Settings"
-              subtitle="Wallpaper, Night Mode, Animations"
+              title="Chat da comunidade"
+              subtitle="Converse com membros da comunidade"
               onClick={() => navigate("/telegramBussiness")}
-            />
-
-            <SettingsItem
-              icon={<ShieldAlert className="w-5 h-5 text-white" />}
-              iconBg="bg-[#2481cc]"
-              title="Redefinir Senha de Segurança"
-              subtitle="Altere a sua senha de acesso"
-              onClick={() => navigate("/alterar-senha")}
             />
 
             <SettingsItem
@@ -309,9 +294,9 @@ export default function Profile() {
             <SettingsItem
               icon={<MessagesSquare className="w-5 h-5 text-white" />}
               iconBg="bg-[#3390ec]"
-              title="Pastas de Chat"
-              subtitle="Aceder ao chat da comunidade"
-              onClick={() => navigate("/telegramBussiness")}
+              title="Anúncios Telegram e provas de retirada"
+              subtitle="Aceder aos anúncios do Telegram e às provas de retirada"
+              onClick={() => navigate("/canal-oficial")}
             />
 
             <SettingsItem
@@ -327,21 +312,21 @@ export default function Profile() {
               iconBg="bg-[#b375d6]"
               title="Idioma"
               subtitle="Português (Brasil)"
-              isLast={true}
               onClick={() => setShowLanguage(true)}
+            />
+
+            <SettingsItem
+              icon={<ShieldAlert className="w-5 h-5 text-white" />}
+              iconBg="bg-[#2481cc]"
+              title="Redefinir Senha"
+              subtitle="Altere a sua senha de acesso"
+              isLast={true}
+              onClick={() => navigate("/alterar-senha")}
             />
           </div>
 
           {/* CARD 2: PRODUTOS & RECURSOS */}
           <div className="bg-white rounded-[18px] overflow-hidden shadow-2xs border border-gray-100">
-            <SettingsItem
-              icon={<Star className="w-5 h-5 text-white fill-white" />}
-              iconBg="bg-[#8d54d9]"
-              title="Telegram Premium"
-              subtitle="Sistema de convites e benefícios de afiliados"
-              onClick={() => navigate("/telegram-premium")}
-            />
-
             <SettingsItem
               icon={<Star className="w-5 h-5 text-white fill-white" />}
               iconBg="bg-[#f2a93b]"
@@ -351,28 +336,22 @@ export default function Profile() {
             />
 
             <SettingsItem
-              icon={<Briefcase className="w-5 h-5 text-white" />}
-              iconBg="bg-[#2481cc]"
-              title="Mensagens Automáticas"
-              subtitle="Saudação, ausência e respostas rápidas"
-              onClick={() => setShowAutoMessages(true)}
-            />
-
-            <SettingsItem
-              icon={<Store className="w-5 h-5 text-white" />}
+              icon={<Download className="w-5 h-5 text-white" />}
               iconBg="bg-[#e95171]"
-              title="Telegram Business"
+              title="Download Telegram Business"
               subtitle="Página comercial e ferramentas"
-              onClick={() => navigate("/bot-pay")}
-            />
-
-            <SettingsItem
-              icon={<Gift className="w-5 h-5 text-white" />}
-              iconBg="bg-[#f2a93b]"
-              title="Send a Gift"
-              subtitle="Oferecer estrelas a amigos"
               isLast={true}
-              onClick={() => navigate("/bot-pay")}
+              onClick={() => {
+                const promptEvent = (window as any).deferredPwaPrompt;
+                if (promptEvent) {
+                  promptEvent.prompt();
+                  promptEvent.userChoice.then(() => {
+                    (window as any).deferredPwaPrompt = null;
+                  });
+                } else {
+                  showToast("A instalação não está disponível no momento ou o app já está instalado.", "info");
+                }
+              }}
             />
           </div>
 
@@ -381,14 +360,6 @@ export default function Profile() {
             <div className="px-4 py-2 pt-3">
               <span className="text-[13px] font-semibold text-[#2481cc] tracking-wide">Ajuda</span>
             </div>
-
-            <SettingsItem
-              icon={<MessageSquare className="w-5 h-5 text-white" />}
-              iconBg="bg-[#f2a93b]"
-              title="Fazer uma Pergunta"
-              subtitle="Fale com o suporte no Telegram"
-              onClick={() => navigate("/telegramBussiness")}
-            />
 
             <SettingsItem
               icon={<HelpCircle className="w-5 h-5 text-white" />}
@@ -401,7 +372,7 @@ export default function Profile() {
             <SettingsItem
               icon={<Lightbulb className="w-5 h-5 text-white fill-white" />}
               iconBg="bg-[#b375d6]"
-              title="Recursos do Telegram"
+              title="Introdução ao Telegram"
               subtitle="Descubra novas funcionalidades"
               isLast={true}
               onClick={() => navigate("/sobre-telegram business")}
@@ -485,12 +456,6 @@ export default function Profile() {
           setUserBio(b);
           setAvatarUrl(av);
         }}
-      />
-
-      {/* MODAL MENSAGENS AUTOMÁTICAS TELEGRAM BUSINESS */}
-      <AutoMessagesModal
-        isOpen={showAutoMessages}
-        onClose={() => setShowAutoMessages(false)}
       />
 
     </div>

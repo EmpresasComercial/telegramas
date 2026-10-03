@@ -242,6 +242,14 @@ const GROUP_MEMBERS = [
 
 const COMMUNITY_QUICK_REACTIONS = ['❤️', '🤷‍♂️', '👍', '👎', '🔥', '🥰', '🎉', '👏', '😂', '😮', '😢'];
 
+type GroupTab = 'members' | 'media' | 'files' | 'links';
+const GROUP_TABS: { id: GroupTab; label: string }[] = [
+  { id: 'members', label: 'Membros' },
+  { id: 'media', label: 'Mídia' },
+  { id: 'files', label: 'Ficheiros' },
+  { id: 'links', label: 'Links' },
+];
+
 export default function CommunityChat() {
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -258,7 +266,7 @@ export default function CommunityChat() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
-  const [activeGroupTab, setActiveGroupTab] = useState<'members' | 'media'>('members');
+  const [activeGroupTab, setActiveGroupTab] = useState<GroupTab>('members');
   const [isGroupMuted, setIsGroupMuted] = useState(false);
   const [isCopiedLink, setIsCopiedLink] = useState(false);
   const [showScrollDown, setShowScrollDown] = useState(false);
@@ -855,12 +863,8 @@ export default function CommunityChat() {
             onClick={() => setShowInfo(true)} 
             className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#1e96c8] to-[#37aee2] flex items-center justify-center shadow-xs overflow-hidden shrink-0 border border-white/30">
-              <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" className="w-[20px] h-[20px]">
-                <path fill="#c8daea" d="m98 175c-3.888 0-3.227-1.468-4.568-5.17l-11.433-37.594 88.022-52.232"/>
-                <path fill="#a9c9dd" d="m98 175c3 0 4.325-1.372 6-3l16-15.558-19.958-12.035"/>
-                <path fill="#fff" d="m100.04 144.41 48.36 35.729c5.519 3.045 9.501 1.468 10.876-5.123l19.685-92.763c2.015-8.08-3.08-11.746-8.36-9.349l-115.59 44.571c-7.89 3.165-7.843 7.567-1.438 9.528l29.663 9.259 68.673-43.325c3.242-1.966 6.218-.91 3.776 1.258"/>
-              </svg>
+            <div className="w-10 h-10 rounded-full overflow-hidden shadow-xs shrink-0 border border-white/30">
+              <img src="/logo-tb.jpg" alt="Telegram" className="w-full h-full object-cover" />
             </div>
 
             <div className="flex flex-col min-w-0 flex-1">
@@ -1250,212 +1254,207 @@ export default function CommunityChat() {
 
       <AnimatePresence>
         {showInfo && (
-          <motion.div 
-            initial={{ opacity: 0, x: '100%' }} 
-            animate={{ opacity: 1, x: 0 }} 
+          <motion.div
+            key="group-info"
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: "spring", stiffness: 350, damping: 30 }}
-            className="fixed inset-0 z-[250] bg-[#f2f3f5] dark:bg-[#17212b] overflow-y-auto flex flex-col items-center select-none"
+            className="fixed inset-0 z-[250] bg-[#f0f0f0] dark:bg-[#17212b] overflow-y-auto flex flex-col select-none"
           >
-            <div className="w-full max-w-[480px] min-h-screen flex flex-col bg-[#f2f3f5] dark:bg-[#17212b] text-[#111] dark:text-white pb-10">
-              <div className="w-full flex items-center justify-between px-3 py-3 sticky top-0 bg-[#f2f3f5]/90 dark:bg-[#17212b]/90 backdrop-blur-md z-10">
+            <div className="w-full max-w-[560px] mx-auto min-h-screen flex flex-col">
+
+              {/* ── Cabeçalho: ← Group Info ── */}
+              <div className="w-full flex items-center justify-between px-2 pt-3 pb-2 bg-white dark:bg-[#1c2733] sticky top-0 z-10 shadow-[0_1px_0_rgba(0,0,0,0.08)]">
                 <button
                   type="button"
                   onClick={() => setShowInfo(false)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-gray-800 dark:text-white hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
-                  aria-label="Voltar ao chat"
+                  className="flex items-center gap-1 text-[#2AABEE] font-medium px-2 py-2 rounded-xl active:bg-[#2AABEE]/10 transition-colors cursor-pointer"
                 >
-                  <ArrowLeft className="w-6 h-6 stroke-[2.2]" />
+                  <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
                 </button>
-
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => showToast("Apenas administradores podem editar o grupo", "info")}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-gray-800 dark:text-white hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer"
-                    aria-label="Editar"
-                  >
-                    <Pencil className="w-5 h-5 stroke-[2]" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => showToast("Opções do grupo", "info")}
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-gray-800 dark:text-white hover:bg-black/5 active:bg-black/10 transition-colors cursor-pointer relative"
-                    aria-label="Mais opções"
-                  >
-                    <MoreVertical className="w-5 h-5 stroke-[2]" />
-                  </button>
-                </div>
+                <h2 className="text-[17px] font-semibold text-[#111] dark:text-white tracking-tight">
+                  Informações do Grupo
+                </h2>
+                <button
+                  type="button"
+                  onClick={() => showToast('Apenas administradores podem editar', 'info')}
+                  className="px-3 py-2 text-[#2AABEE] text-[15px] font-medium active:opacity-60 transition-opacity cursor-pointer"
+                >
+                  Editar
+                </button>
               </div>
 
-              <div className="flex flex-col items-center px-4 pt-1 pb-2">
-                <div className="relative">
-                  <div className="w-[105px] h-[105px] rounded-full bg-gradient-to-tr from-[#1e96c8] to-[#37aee2] flex items-center justify-center shadow-md border-3 border-white dark:border-[#242f3d]">
-                    <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" className="w-[56px] h-[56px]">
-                      <path fill="#c8daea" d="m98 175c-3.888 0-3.227-1.468-4.568-5.17l-11.433-37.594 88.022-52.232"/>
-                      <path fill="#a9c9dd" d="m98 175c3 0 4.325-1.372 6-3l16-15.558-19.958-12.035"/>
-                      <path fill="#fff" d="m100.04 144.41 48.36 35.729c5.519 3.045 9.501 1.468 10.876-5.123l19.685-92.763c2.015-8.08-3.08-11.746-8.36-9.349l-115.59 44.571c-7.89 3.165-7.843 7.567-1.438 9.528l29.663 9.259 68.673-43.325c3.242-1.966 6.218-.91 3.776 1.258"/>
-                    </svg>
-                  </div>
+              {/* ── Foto + Nome + Membros ── */}
+              <div className="flex flex-col items-center bg-white dark:bg-[#1c2733] pt-6 pb-5 px-4">
+                <div
+                  className="w-[90px] h-[90px] rounded-full overflow-hidden shadow-md mb-3 cursor-pointer active:opacity-80"
+                  onClick={() => setZoomedImage('/logo-tb.jpg')}
+                >
+                  <img src="/logo-tb.jpg" alt="Telegram" className="w-full h-full object-cover" />
                 </div>
-
-                <h1 className="text-[20px] font-bold text-[#111] dark:text-white text-center mt-3 leading-snug flex items-center justify-center gap-1.5 px-2">
-                  <span>Telegram Business Oficial</span>
-                  <span className="w-4 h-4 rounded-full bg-[#25D366] flex items-center justify-center shrink-0 shadow-2xs">
-                    <Check className="w-2.5 h-2.5 text-white stroke-[3.5]" />
-                  </span>
+                <h1 className="text-[20px] font-bold text-[#111] dark:text-white text-center leading-tight mb-0.5">
+                  Telegram Business Oficial
                 </h1>
-                
-                <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5 font-normal">
+                <p className="text-[14px] text-gray-500 dark:text-gray-400">
                   54 281 membros
                 </p>
               </div>
 
-              <div className="flex items-center justify-between px-4 mt-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowInfo(false)}
-                  className="flex-1 min-w-0 h-[72px] bg-white dark:bg-[#242f3d] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-                >
-                  <MessageCircle className="w-[22px] h-[22px] text-[#222] dark:text-white stroke-[1.8]" />
-                  <span className="text-[10.5px] font-medium text-gray-700 dark:text-gray-200 truncate px-0.5">
-                    Mensagem
-                  </span>
-                </button>
+              {/* ── Separador ── */}
+              <div className="h-[6px] bg-[#f0f0f0] dark:bg-[#17212b]" />
 
-                <button
-                  type="button"
+              {/* ── Bloco: Link + Notificações ── */}
+              <div className="bg-white dark:bg-[#1c2733]">
+                {/* Link */}
+                <div
+                  className="flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-gray-100 dark:active:bg-[#243040] transition-colors"
                   onClick={() => {
-                    setIsGroupMuted(!isGroupMuted);
-                    showToast(isGroupMuted ? "Notificações ativadas" : "Notificações silenciadas", "info");
-                  }}
-                  className="flex-1 min-w-0 h-[72px] bg-white dark:bg-[#242f3d] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-                >
-                  <Bell className={`w-[22px] h-[22px] ${isGroupMuted ? 'text-[#ff595a]' : 'text-[#222] dark:text-white'} stroke-[1.8]`} />
-                  <span className="text-[10.5px] font-medium text-gray-700 dark:text-gray-200 truncate px-0.5">
-                    {isGroupMuted ? "Silenciado" : "Silenciar"}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => showToast("Não é permitido sair do canal oficial", "error")}
-                  className="flex-1 min-w-0 h-[72px] bg-white dark:bg-[#242f3d] rounded-[18px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent flex flex-col items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
-                >
-                  <LogOut className="w-[22px] h-[22px] text-[#222] dark:text-white stroke-[1.8]" />
-                  <span className="text-[10.5px] font-medium text-gray-700 dark:text-gray-200 truncate px-0.5">
-                    Sair
-                  </span>
-                </button>
-              </div>
-
-              <div className="px-4 mt-3 space-y-2.5">
-                <div 
-                  onClick={() => {
-                    navigator.clipboard.writeText("t.me/TelegramBusinessOficial");
+                    navigator.clipboard.writeText('https://t.me/TelegramBusinessOficial');
                     setIsCopiedLink(true);
-                    showToast("Link copiado para a área de transferência!", "success");
+                    showToast('Link copiado!', 'success');
                     setTimeout(() => setIsCopiedLink(false), 2000);
                   }}
-                  className="bg-white dark:bg-[#242f3d] rounded-[20px] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent flex items-center justify-between cursor-pointer active:bg-gray-50 dark:active:bg-[#2c3848] transition-colors"
                 >
-                  <div className="flex flex-col">
-                    <span className="text-[15px] font-semibold text-[#111] dark:text-white tracking-tight">
-                      t.me/TelegramBusinessOficial
-                    </span>
-                    <span className="text-[12px] text-gray-400 dark:text-gray-400 mt-0.5">
-                      {isCopiedLink ? "Copiado!" : "Link de Convite"}
-                    </span>
+                  <div className="w-[34px] h-[34px] rounded-full bg-[#FF9500] flex items-center justify-center shrink-0">
+                    <QrCode className="w-[18px] h-[18px] text-white stroke-[2]" />
                   </div>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-300">
-                    <QrCode className="w-6 h-6 stroke-[1.8]" />
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[15px] text-[#2AABEE] font-normal leading-tight truncate">
+                      {isCopiedLink ? 'Copiado!' : 'https://t.me/TelegramBusinessOficial'}
+                    </span>
+                    <span className="text-[12px] text-gray-400 mt-0.5">Link</span>
                   </div>
                 </div>
 
-                <div 
-                  onClick={() => showToast("Apenas administradores podem adicionar membros", "info")}
-                  className="bg-white dark:bg-[#242f3d] rounded-[20px] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent flex items-center gap-3.5 cursor-pointer active:bg-gray-50 dark:active:bg-[#2c3848] transition-colors"
-                >
-                  <UserPlus className="w-5 h-5 text-gray-800 dark:text-white stroke-[2]" />
-                  <span className="text-[15px] font-semibold text-[#111] dark:text-white">
-                    Adicionar Membros
+                {/* Divider */}
+                <div className="h-px bg-gray-100 dark:bg-white/8 ml-[60px]" />
+
+                {/* Notificações */}
+                <div className="flex items-center gap-3 px-4 py-3.5">
+                  <div className="w-[34px] h-[34px] rounded-full bg-[#FF3B30] flex items-center justify-center shrink-0">
+                    <Bell className="w-[18px] h-[18px] text-white stroke-[2]" />
+                  </div>
+                  <span className="flex-1 text-[15px] text-[#111] dark:text-white font-normal">
+                    Notificações
                   </span>
-                </div>
-              </div>
-
-              <div className="flex justify-center mt-4 px-4">
-                <div className="bg-[#e4e7eb] dark:bg-[#202b36] p-1 rounded-full flex items-center gap-1 w-full max-w-[240px]">
+                  {/* Switch toggle estilo iOS/Telegram */}
                   <button
                     type="button"
-                    onClick={() => setActiveGroupTab('members')}
-                    className={`flex-1 py-1.5 rounded-full text-[13px] font-semibold transition-all cursor-pointer text-center ${
-                      activeGroupTab === 'members'
-                        ? 'bg-white dark:bg-[#2b5278] text-[#1da664] dark:text-[#4fae78] shadow-xs'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
-                    }`}
+                    onClick={() => {
+                      setIsGroupMuted(!isGroupMuted);
+                      showToast(isGroupMuted ? 'Notificações ativadas' : 'Notificações silenciadas', 'info');
+                    }}
+                    className="relative w-[51px] h-[31px] rounded-full transition-colors duration-200 cursor-pointer focus:outline-none shrink-0"
+                    style={{ backgroundColor: isGroupMuted ? '#E5E5EA' : '#34C759' }}
+                    aria-label="Toggle notificações"
                   >
-                    Membros
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveGroupTab('media')}
-                    className={`flex-1 py-1.5 rounded-full text-[13px] font-semibold transition-all cursor-pointer text-center ${
-                      activeGroupTab === 'media'
-                        ? 'bg-white dark:bg-[#2b5278] text-[#1da664] dark:text-[#4fae78] shadow-xs'
-                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
-                    }`}
-                  >
-                    Mídias
+                    <span
+                      className="absolute top-[2px] w-[27px] h-[27px] bg-white rounded-full shadow-md transition-transform duration-200"
+                      style={{ transform: isGroupMuted ? 'translateX(2px)' : 'translateX(22px)' }}
+                    />
                   </button>
                 </div>
               </div>
 
-              {activeGroupTab === 'members' && (
-                <div className="px-4 mt-3">
-                  <div className="bg-white dark:bg-[#242f3d] rounded-[22px] shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent overflow-hidden divide-y divide-gray-100/80 dark:divide-gray-700/50">
-                    {GROUP_MEMBERS.map((member) => (
-                      <div 
-                        key={member.id}
-                        className="px-4 py-3 flex items-center justify-between hover:bg-gray-50/70 dark:hover:bg-[#202b36] transition-colors"
-                      >
-                        <div className="flex items-center gap-3 min-w-0">
-                          <img 
-                            src={member.avatar} 
-                            alt={member.name}
-                            className="w-11 h-11 rounded-full object-cover shrink-0 bg-gray-100"
+              {/* ── Separador ── */}
+              <div className="h-[6px] bg-[#f0f0f0] dark:bg-[#17212b]" />
+
+              {/* ── Abas: Members / Media / Files / Links ── */}
+              <div className="bg-white dark:bg-[#1c2733] sticky top-[52px] z-[9]">
+                <div className="flex border-b border-gray-200 dark:border-white/10">
+                  {GROUP_TABS.map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveGroupTab(tab.id)}
+                      className={`flex-1 py-3 text-[13px] font-semibold transition-colors cursor-pointer ${
+                        activeGroupTab === tab.id
+                          ? 'text-[#2AABEE] border-b-2 border-[#2AABEE]'
+                          : 'text-gray-400 dark:text-gray-500'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ── Conteúdo das Abas ── */}
+              <div className="flex-1 bg-white dark:bg-[#1c2733]">
+                {activeGroupTab === 'members' && (
+                  <div className="divide-y divide-gray-100 dark:divide-white/8">
+                    {/* Adicionar Membro */}
+                    <div
+                      className="flex items-center gap-3 px-4 py-3 cursor-pointer active:bg-gray-50 dark:active:bg-[#243040] transition-colors"
+                      onClick={() => showToast('Apenas administradores podem adicionar membros', 'info')}
+                    >
+                      <div className="w-[46px] h-[46px] rounded-full bg-[#2AABEE]/15 flex items-center justify-center shrink-0">
+                        <UserPlus className="w-5 h-5 text-[#2AABEE] stroke-[2]" />
+                      </div>
+                      <span className="text-[15px] text-[#2AABEE] font-medium">Adicionar Membro</span>
+                    </div>
+                    {/* Membros fictícios */}
+                    {[
+                      { name: 'Pavel Durov', role: 'Fundador', avatar: '/pavel_durov.jpg' },
+                      { name: 'Telegram Business', role: 'Administrador', avatar: '/logo-tb.jpg' },
+                      { name: 'BotFather', role: 'Bot', avatar: '/BotFather.jpg' },
+                    ].map((member) => (
+                      <div key={member.name} className="flex items-center gap-3 px-4 py-3">
+                        <div className="w-[46px] h-[46px] rounded-full overflow-hidden shrink-0 bg-gray-200">
+                          <img src={member.avatar} alt={member.name} className="w-full h-full object-cover"
+                            onError={(e: any) => { e.target.src = '/logo-tb.jpg'; }}
                           />
-                          <div className="flex flex-col min-w-0">
-                            <span className="text-[14.5px] font-semibold text-[#111] dark:text-white truncate">
-                              {member.name}
-                            </span>
-                            <span className={`text-[12px] leading-tight ${member.isOnline ? 'text-[#25D366] font-medium' : 'text-gray-400 dark:text-gray-400'}`}>
-                              {member.status}
-                            </span>
-                          </div>
                         </div>
-
-                        {member.badge && (
-                          <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full shrink-0 ml-2 ${
-                            member.badgeType === 'admin'
-                              ? 'bg-[#e8f8ef] text-[#22a05d] dark:bg-[#1a382b] dark:text-[#4ade80]'
-                              : 'bg-[#f3e8ff] text-[#9333ea] dark:bg-[#341d4c] dark:text-[#c084fc]'
-                          }`}>
-                            {member.badge}
-                          </span>
-                        )}
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[15px] font-medium text-[#111] dark:text-white truncate">{member.name}</span>
+                          <span className="text-[13px] text-gray-400">{member.role}</span>
+                        </div>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
 
-              {activeGroupTab === 'media' && (
-                <div className="px-4 mt-3">
-                  <div className="bg-white dark:bg-[#242f3d] rounded-[22px] p-6 text-center text-gray-400 dark:text-gray-400 shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/50 dark:border-transparent">
-                    <p className="text-[13.5px]">Nenhuma mídia compartilhada recentemente.</p>
+                {activeGroupTab === 'media' && (
+                  <div className="p-4 text-center text-gray-400 text-[14px] pt-12">
+                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#242f3d] flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    Nenhuma mídia partilhada ainda
                   </div>
-                </div>
-              )}
+                )}
+
+                {activeGroupTab === 'files' && (
+                  <div className="p-4 text-center text-gray-400 text-[14px] pt-12">
+                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-[#242f3d] flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    Nenhum ficheiro partilhado ainda
+                  </div>
+                )}
+
+                {activeGroupTab === 'links' && (
+                  <div
+                    className="flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-gray-50 dark:active:bg-[#243040] transition-colors"
+                    onClick={() => {
+                      navigator.clipboard.writeText('https://t.me/TelegramBusinessOficial');
+                      showToast('Link copiado!', 'success');
+                    }}
+                  >
+                    <div className="w-[46px] h-[46px] rounded-xl bg-[#2AABEE]/15 flex items-center justify-center shrink-0">
+                      <QrCode className="w-5 h-5 text-[#2AABEE] stroke-[2]" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-[15px] text-[#2AABEE] truncate">https://t.me/TelegramBusinessOficial</span>
+                      <span className="text-[12px] text-gray-400 mt-0.5">Link de convite</span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
             </div>
           </motion.div>

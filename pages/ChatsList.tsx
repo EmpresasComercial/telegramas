@@ -17,8 +17,6 @@ import {
   Users
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
-import { openWhatsAppAtendimento } from '../lib/atendimento';
-
 // Selo de verificação oficial da empresa (Telegram Blue)
 const OfficialVerifiedBadge = ({ className = "w-[16px] h-[16px]" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={`shrink-0 inline-block align-middle ml-1 select-none ${className}`}>
@@ -353,15 +351,6 @@ export default function ChatsList() {
 
   const now = new Date();
   const timeStr = now.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' });
-
-  const handleWhatsAppClick = async () => {
-    showToast('Acessando grupo do WhatsApp...', 'info');
-    const res = await openWhatsAppAtendimento();
-    if (!res.success && res.message) {
-      showToast(res.message, 'error');
-    }
-  };
-
   // Lista de conversas com ordenação estrita por data/hora da mensagem mais recente (sem fixação permanente)
   const allConversations = useMemo(() => {
     // 1. Conversas do Sistema / Oficiais
@@ -381,12 +370,8 @@ export default function ChatsList() {
         isSubordinate: false,
         nivel: null,
         avatar: (
-          <div className="w-13 h-13 rounded-full bg-gradient-to-tr from-[#1e96c8] to-[#50a2e9] flex items-center justify-center shadow-xs overflow-hidden">
-            <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" className="w-[26px] h-[26px]">
-              <path fill="#c8daea" d="m98 175c-3.888 0-3.227-1.468-4.568-5.17l-11.433-37.594 88.022-52.232" />
-              <path fill="#a9c9dd" d="m98 175c3 0 4.325-1.372 6-3l16-15.558-19.958-12.035" />
-              <path fill="#fff" d="m100.04 144.41 48.36 35.729c5.519 3.045 9.501 1.468 10.876-5.123l19.685-92.763c2.015-8.08-3.08-11.746-8.36-9.349l-115.59 44.571c-7.89 3.165-7.843 7.567-1.438 9.528l29.663 9.259 68.673-43.325c3.242-1.966 6.218-.91 3.776 1.258" />
-            </svg>
+          <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs shrink-0">
+            <img src="/logo-tb.jpg" alt="Telegram" className="w-full h-full object-cover" />
           </div>
         ),
         onClick: () => navigate('/chat-comunidade')
@@ -469,31 +454,7 @@ export default function ChatsList() {
         ),
         onClick: () => navigate('/retirada')
       },
-      {
-        id: 'whatsapp-bot',
-        folder: 'bots' as ChatFolder,
-        name: 'BotWhatsApp',
-        isVerified: true,
-        tag: 'OFICIAL',
-        lastMessage: '💬 Grupo oficial no WhatsApp para suporte, comissões e provas de pagamento.',
-        senderPrefix: null,
-        time: formatTelegramTime(Date.now() - 1000 * 60 * 60 * 60),
-        timestamp: Date.now() - 1000 * 60 * 60 * 60,
-        isMe: false,
-        actionBtn: null,
-        isSubordinate: false,
-        nivel: null,
-        avatar: (
-          <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs border border-gray-200/80 bg-white">
-            <img 
-              src="/botWhatsap.jpg" 
-              alt="BotWhatsApp" 
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ),
-        onClick: handleWhatsAppClick
-      },
+
       {
         id: 'botfather',
         folder: 'bots' as ChatFolder,
