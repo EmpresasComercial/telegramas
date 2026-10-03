@@ -849,55 +849,51 @@ export default function CommunityChat() {
         }
       }}
     >
-      <header className="w-full bg-[#517da2] dark:bg-[#242f3d] text-white px-3 sm:px-6 py-2 sticky top-0 z-40 flex items-center justify-between shadow-xs select-none">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <button 
-            onClick={() => navigate('/telegramBussiness')} 
-            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer shrink-0"
-            aria-label="Voltar aos chats"
-          >
-            <ChevronLeft className="w-6 h-6 stroke-[2.2]" />
-          </button>
+      <header className="w-full bg-transparent px-3 sm:px-4 py-3 sticky top-0 z-40 flex items-center justify-between select-none pointer-events-none">
+        <button 
+          onClick={() => navigate('/telegramBussiness')} 
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto"
+          aria-label="Voltar aos chats"
+        >
+          <ArrowLeft className="w-6 h-6 stroke-[2]" />
+        </button>
 
-          <div 
-            onClick={() => setShowInfo(true)} 
-            className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer"
-          >
-            <div className="w-10 h-10 rounded-full overflow-hidden shadow-xs shrink-0 border border-white/30">
-              <img src="/logo-tb.jpg" alt="Telegram" className="w-full h-full object-cover" />
-            </div>
-
-            <div className="flex flex-col min-w-0 flex-1">
-              <div className="flex items-center gap-1">
-                <h1 className="text-[15.5px] font-semibold text-white tracking-tight truncate leading-tight">
-                  Telegram Bussiness Grupo
-                </h1>
-                <span className="w-4 h-4 rounded-full bg-[#25D366] flex items-center justify-center shrink-0 shadow-2xs">
-                  <Check className="w-2.5 h-2.5 text-white stroke-[3.5]" />
-                </span>
-              </div>
-              <span className="text-[12px] text-white/80 font-normal leading-tight">
-                2 membros
+        <div 
+          onClick={() => setShowInfo(true)} 
+          className="flex items-center gap-2.5 bg-white dark:bg-[#1c242f] rounded-full p-1.5 pr-4 shadow-[0_2px_8px_rgba(0,0,0,0.12)] mx-2 min-w-0 max-w-[65%] cursor-pointer active:scale-[0.98] transition-transform pointer-events-auto"
+        >
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative">
+            <img src="/logo-tb.jpg" alt="Telegram" className="w-full h-full object-cover" />
+            <span className="absolute bottom-0 right-0 w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
+              <span className="w-2.5 h-2.5 bg-[#25D366] rounded-full flex items-center justify-center">
+                <span className="text-[6px] font-bold text-white leading-none">1$</span>
               </span>
-            </div>
+            </span>
+          </div>
+
+          <div className="flex flex-col min-w-0">
+            <h1 className="text-[15px] font-bold text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
+              Telegram Bussiness Grupo
+            </h1>
+            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
+              2 membros
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
-          <button 
-            onClick={() => setShowInfo(true)} 
-            className="w-9 h-9 rounded-full flex items-center justify-center text-white hover:bg-white/10 active:bg-white/20 transition-colors cursor-pointer"
-            aria-label="Mais informaÃ§Ãµes"
-          >
-            <MoreVertical className="w-5 h-5" />
-          </button>
-        </div>
+        <button 
+          onClick={() => setShowInfo(true)} 
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto"
+          aria-label="Mais informaÃ§Ãµes"
+        >
+          <MoreVertical className="w-[22px] h-[22px]" />
+        </button>
       </header>
 
       <main 
         ref={scrollRef} 
         onScroll={handleScroll}
-        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-2 pb-24 space-y-2.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-2 pb-24 space-y-1.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         {publicMessages.map((m, i) => {
           const isMe = m.uid_emissor === user?.id;
@@ -986,32 +982,40 @@ export default function CommunityChat() {
                     onTouchStart={handleTouchStart}
                     onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
                     className={cn(
-                      "tg-bubble max-w-[82%] px-3.5 py-2 text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(0,0,0,0.06)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none",
-                      isMe ? "bg-[#dcf8c6] dark:bg-[#2b5278] is-me" : "bg-white dark:bg-[#182533] is-other",
+                      "tg-bubble max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#000000] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none",
+                      isMe ? "bg-[#eeffde] dark:bg-[#2b5278] is-me" : "bg-white dark:bg-[#182533] is-other",
                       contextMenu?.message.id === m.id && "brightness-90 scale-[0.985]"
                     )}
                     style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                   >
-                    {/* Ponta de agulha (Speech bubble tail Telegram) */}
+                    {/* Ponta de agulha discreta (Tail) */}
                     {isMe ? (
                       <svg
-                        className="absolute bottom-0 -right-[8px] w-[9px] h-[16px] text-[#dcf8c6] dark:text-[#2b5278] fill-current pointer-events-none"
-                        viewBox="0 0 9 16"
+                        width="9"
+                        height="20"
+                        viewBox="0 0 9 20"
+                        className="absolute pointer-events-none"
+                        style={{ bottom: 0, right: -8, fill: 'currentColor' }}
+                        stroke="none"
+                        color="inherit"
                       >
-                        <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                        <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-[#eeffde] dark:fill-[#2b5278]" />
                       </svg>
                     ) : (
                       <svg
-                        className="absolute bottom-0 -left-[8px] w-[9px] h-[16px] text-white dark:text-[#182533] fill-current pointer-events-none"
-                        viewBox="0 0 9 16"
-                        style={{ transform: 'scaleX(-1)' }}
+                        width="9"
+                        height="20"
+                        viewBox="0 0 9 20"
+                        className="absolute pointer-events-none"
+                        style={{ bottom: 0, left: -8, transform: 'scaleX(-1)', fill: 'currentColor' }}
                       >
-                        <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                        <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-white dark:fill-[#182533]" />
                       </svg>
                     )}
+
                     {!isMe && (
                       <p 
-                        className="text-[13px] font-bold mb-0.5 cursor-pointer truncate"
+                        className="text-[13px] font-bold mb-[2px] cursor-pointer truncate"
                         style={{ color: authorColor }}
                       >
                         {displayName}
@@ -1020,20 +1024,20 @@ export default function CommunityChat() {
 
                     {reply && (
                       <div className={cn(
-                        "rounded-[8px] px-2.5 py-1 mb-1.5 text-[11px] border-l-[3px] bg-black/5 overflow-hidden",
-                        isMe ? "border-[#25D366] text-[#444444]" : "border-[#2b82c9] text-[#555555]"
+                        "rounded-[4px] px-2 py-1 mb-1.5 text-[13px] border-l-[3px] bg-black/5 overflow-hidden",
+                        isMe ? "border-[#4fae4e] text-[#444444]" : "border-[#2b82c9] text-[#555555]"
                       )}>
-                        <p className="font-bold text-[11px] text-[#2b82c9] truncate">{reply.sender}</p>
-                        <p className="truncate italic text-[11px] text-[#666666]">{reply.text || "ðŸ“· Foto"}</p>
+                        <p className="font-medium text-[13px] text-[#2b82c9] truncate leading-tight">{reply.sender}</p>
+                        <p className="truncate text-[13px] text-[#666666] leading-tight mt-0.5">{reply.text || "📷 Foto"}</p>
                       </div>
                     )}
 
                     {parsedData.imagem_url && (
-                      <div className="mb-1.5 -mx-1.5 -mt-0.5 overflow-hidden rounded-[14px]">
+                      <div className="mb-1.5 -mx-[2px] -mt-[2px] overflow-hidden rounded-[8px]">
                         <img
                           src={parsedData.imagem_url}
                           alt="Anexo"
-                          className="w-full h-auto max-h-[260px] object-cover cursor-pointer active:opacity-90 rounded-[14px]"
+                          className="w-full h-auto max-h-[260px] object-cover cursor-pointer active:opacity-90 rounded-[8px]"
                           onClick={(e) => { e.stopPropagation(); setZoomedImage(parsedData.imagem_url); }}
                           onTouchStart={(e) => e.stopPropagation()}
                           onTouchEnd={(e) => e.stopPropagation()}
@@ -1041,37 +1045,39 @@ export default function CommunityChat() {
                       </div>
                     )}
 
-                    <div className="relative">
-                      <p className={cn("text-[14.5px] leading-relaxed break-words whitespace-pre-wrap text-[#202020] font-normal", isEdited ? "pr-20" : "pr-12")}>
+                    {/* Texto e Horário na mesma linha */}
+                    <div className="relative leading-[1.3]">
+                      <span className="text-[16px] whitespace-pre-wrap break-words font-normal">
                         <TranslatedMessage text={m.mensagem} language={language} renderFormatted={renderFormattedMessage} />
-                      </p>
+                      </span>
                       
-                      <div className="absolute right-0 bottom-[-2px] flex items-center gap-1 select-none">
+                      {/* Espaçador invisível para garantir que o texto não sobreponha a hora no final da linha */}
+                      <span className="inline-block h-[1px]" style={{ width: isEdited ? (isMe ? '75px' : '60px') : (isMe ? '56px' : '42px') }}></span>
+
+                      <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[12px]" style={{ color: isMe ? '#55864e' : '#8e8e93' }}>
                         {isEdited && (
-                          <span className={`text-[10px] font-normal select-none ${isMe ? 'text-[#55864e]/85' : 'text-[#8e8e93]'}`}>
-                            editada
-                          </span>
+                          <span className="opacity-80 mr-[2px]">editada</span>
                         )}
-                        <span className={`text-[10.5px] font-normal ${isMe ? 'text-[#55864e]' : 'text-[#8e8e93]'}`}>
+                        <span className="font-normal leading-none mt-[1px]">
                           {formatTime(m.data_registrada)}
                         </span>
                         {isMe && (
-                          <CheckCheck className="w-3.5 h-3.5 text-[#4fae4e] stroke-[2.4]" />
+                          <CheckCheck className="w-[14px] h-[14px] text-[#4fae4e] stroke-[2.5] ml-[2px]" />
                         )}
                       </div>
                     </div>
 
                     {Object.keys(reactions).length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1.5 pt-1 border-t border-black/5">
+                      <div className="flex flex-wrap gap-1 mt-1.5 pt-1.5 border-t border-black/5">
                         {Object.entries(reactions).map(([emoji, users]: [string, any]) => (
                           <button
                             key={emoji}
                             type="button"
                             onClick={() => handleToggleReaction(m.id, emoji)}
-                            className="bg-white/80 border border-black/5 rounded-full px-2 py-0.5 flex items-center gap-1 shadow-2xs hover:bg-white active:scale-95 transition-transform cursor-pointer"
+                            className="bg-white/80 border border-black/5 rounded-full px-2 py-[2px] flex items-center gap-1 shadow-2xs hover:bg-white active:scale-95 transition-transform cursor-pointer"
                           >
-                            <span className="text-[11px]">{emoji}</span>
-                            <span className="text-[10px] font-bold text-[#555555]">{(users as any[]).length}</span>
+                            <span className="text-[12px] leading-none">{emoji}</span>
+                            <span className="text-[11px] font-bold text-[#555555] leading-none">{(users as any[]).length}</span>
                           </button>
                         ))}
                       </div>
@@ -1217,7 +1223,7 @@ export default function CommunityChat() {
                     }
                   }
                 }}
-                placeholder={editingMessage ? "Editar mensagem..." : "Message"}
+                placeholder={editingMessage ? "Editar mensagem..." : "Mensagem"}
                 className="w-full px-2 py-1.5 text-[15px] bg-transparent resize-none outline-none max-h-[100px] text-black placeholder:text-gray-400 font-normal leading-snug"
                 rows={1}
               />

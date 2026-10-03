@@ -433,7 +433,7 @@ export default function PrivateChat() {
       {/* ── ÁREA DE MENSAGENS TELEGRAM (LARGURA TOTAL FLUIDA) ── */}
       <main
         ref={scrollRef}
-        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-4 pb-24 space-y-2.5 relative scroll-smooth"
+        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-4 pb-24 space-y-1.5 relative scroll-smooth"
         onClick={() => contextMenu && closeContextMenu()}
       >
         {isLoading && messages.length === 0 && (
@@ -473,18 +473,25 @@ export default function PrivateChat() {
                 {/* Ponta de agulha — fora do bubble para não ser cortada pelo transform */}
                 {isMe ? (
                   <svg
-                    className="absolute bottom-0 -right-[8px] w-[9px] h-[16px] text-[#dcf8c6] dark:text-[#2b5278] fill-current pointer-events-none z-[1]"
-                    viewBox="0 0 9 16"
+                    width="9"
+                    height="20"
+                    viewBox="0 0 9 20"
+                    className="absolute pointer-events-none z-[1]"
+                    style={{ bottom: 0, right: -8, fill: 'currentColor' }}
+                    stroke="none"
+                    color="inherit"
                   >
-                    <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                    <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-[#eeffde] dark:fill-[#2b5278]" />
                   </svg>
                 ) : (
                   <svg
-                    className="absolute bottom-0 -left-[8px] w-[9px] h-[16px] text-white dark:text-[#182533] fill-current pointer-events-none z-[1]"
-                    viewBox="0 0 9 16"
-                    style={{ transform: 'scaleX(-1)' }}
+                    width="9"
+                    height="20"
+                    viewBox="0 0 9 20"
+                    className="absolute pointer-events-none z-[1]"
+                    style={{ bottom: 0, left: -8, transform: 'scaleX(-1)', fill: 'currentColor' }}
                   >
-                    <path d="M0 16C4.58866 16 7.85994 13.7431 8.87707 9.22918C9.69176 5.61483 8.35626 2.37324 0 0V16Z" />
+                    <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-white dark:fill-[#182533]" />
                   </svg>
                 )}
 
@@ -493,40 +500,40 @@ export default function PrivateChat() {
                   onClick={(e) => { e.stopPropagation(); openContextMenu(e, m, isMe); }}
                   onTouchStart={handleTouchStart}
                   onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
-                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[82%] px-3.5 py-2 text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(0,0,0,0.06)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
+                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
                     isMe
-                      ? 'bg-[#dcf8c6] dark:bg-[#2b5278]'
+                      ? 'bg-[#eeffde] dark:bg-[#2b5278]'
                       : 'bg-white dark:bg-[#182533]'
                   } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
                   style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                 >
 
-
-                  <div className="relative pointer-events-none">
+                  <div className="relative pointer-events-none leading-[1.3]">
                     {!isMe && (
                       <p
-                        className="text-[13px] font-bold mb-0.5 cursor-pointer truncate"
+                        className="text-[13px] font-bold mb-[2px] cursor-pointer truncate"
                         style={{ color: isPavel ? '#2481cc' : contactColor }}
                       >
                         {isPavel ? 'Pavel Durov Fundador' : contactDisplayName}
                       </p>
                     )}
 
-                    <p className="text-[14.5px] leading-relaxed break-words whitespace-pre-wrap text-[#202020] dark:text-[#f3f4f6] font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                    <span className="text-[16px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
                       {m.mensagem}
-                      {/* Spacer invisível inline — dá espaço ao timestamp sem forçar largura mínima */}
-                      <span
-                        aria-hidden="true"
-                        className="inline-block align-bottom pointer-events-none opacity-0 select-none"
-                        style={{ width: isMe ? '54px' : '38px', height: '1px', marginLeft: '4px' }}
-                      />
-                    </p>
+                    </span>
+                    
+                    {/* Spacer invisível inline — dá espaço ao timestamp sem forçar largura mínima */}
+                    <span
+                      aria-hidden="true"
+                      className="inline-block h-[1px]"
+                      style={{ width: isMe ? '52px' : '38px' }}
+                    />
 
-                    <div className="absolute right-0 bottom-[-2px] flex items-center gap-1 select-none">
-                      <span className={`text-[10.5px] font-normal ${isMe ? 'text-[#55864e] dark:text-white/70' : 'text-[#8e8e93] dark:text-[#8e9aa5]'}`}>
+                    <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[12px]">
+                      <span className={`font-normal leading-none mt-[1px] ${isMe ? 'text-[#55864e] dark:text-white/70' : 'text-[#8e8e93] dark:text-[#8e9aa5]'}`}>
                         {formatTime(m.created_at)}
                       </span>
-                      {isMe && <CheckCheck className="w-3.5 h-3.5 text-[#4fae4e] dark:text-[#5288c1] stroke-[2.4]" />}
+                      {isMe && <CheckCheck className="w-[14px] h-[14px] text-[#4fae4e] dark:text-[#5288c1] stroke-[2.5] ml-[2px]" />}
                     </div>
                   </div>
                 </div>
