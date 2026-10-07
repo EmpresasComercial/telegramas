@@ -129,10 +129,10 @@ export default function App() {
       }
     });
 
-    const iconUrl = '/telegram business_logo_icon_167892.webp?v=2';
+    const iconUrl = '/logo-tb.jpg?v=2';
     let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
     if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
-    link.type = 'image/png';
+    link.type = 'image/jpeg';
     link.href = iconUrl;
 
     let appleLink = document.querySelector("link[rel='apple-touch-icon']") as HTMLLinkElement;

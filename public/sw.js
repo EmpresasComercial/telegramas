@@ -9,13 +9,18 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+self.addEventListener('fetch', (event) => {
+  // PWA requirement: The Service Worker must have a fetch event handler.
+  // We just let the browser handle the request normally.
+});
+
 // Escuta eventos de Notificação Push
 self.addEventListener('push', (event) => {
   let data = {
     title: 'Telegram Business',
     body: 'Você tem uma nova notificação na sua conta.',
-    icon: '/telegram business_logo_icon_167892.webp',
-    badge: '/telegram business_logo_icon_167892.webp',
+    icon: '/logo-tb.jpg',
+    badge: '/logo-tb.jpg',
     url: '/perfil',
   };
 
@@ -30,8 +35,8 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body,
-    icon: data.icon || '/telegram business_logo_icon_167892.webp',
-    badge: data.badge || '/telegram business_logo_icon_167892.webp',
+    icon: data.icon || '/logo-tb.jpg',
+    badge: data.badge || '/logo-tb.jpg',
     vibrate: [200, 100, 200, 100, 200],
     tag: data.tag || 'telegram business-notification',
     renotify: true,

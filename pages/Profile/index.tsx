@@ -330,7 +330,7 @@ export default function Profile() {
                     (window as any).deferredPwaPrompt = null;
                   });
                 } else {
-                  showToast("A instalação não está disponível no momento ou o app já está instalado.", "info");
+                  showToast("Instalação automática indisponível. Para instalar, toque no menu do seu navegador (⋮) e selecione 'Adicionar à Tela Inicial' ou 'Instalar Aplicativo'.", "info");
                 }
               }}
             />

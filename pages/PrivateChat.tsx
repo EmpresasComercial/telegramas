@@ -360,7 +360,7 @@ export default function PrivateChat() {
   // ── Render ─────────────────────────────────────────────────────────────
   return (
     <div 
-      className="w-full h-[100dvh] font-sans antialiased text-[#202020] select-none tg-chat-no-select overflow-hidden relative tg-wallpaper transition-colors"
+      className="w-full h-[100dvh] font-sans antialiased text-[#202020] select-none tg-chat-no-select flex flex-col items-stretch overflow-hidden relative tg-wallpaper transition-colors"
       onContextMenu={(e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
         if (target?.tagName !== 'INPUT' && target?.tagName !== 'TEXTAREA') {
@@ -370,60 +370,62 @@ export default function PrivateChat() {
     >
 
       {/* ── HEADER ── */}
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-[#242f3d] px-3 py-2 z-50 flex items-center justify-between select-none" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.15)' }}>
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          <button
-            onClick={() => navigate('/telegramBussiness')}
-            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-[#2481cc] hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer shrink-0"
-            aria-label="Voltar aos chats"
-          >
-            <ChevronLeft className="w-6 h-6 stroke-[2.2]" />
-          </button>
+      <header className="w-full bg-transparent px-3 sm:px-4 py-3 sticky top-0 z-40 flex items-center justify-between select-none pointer-events-none">
+        <button
+          onClick={() => navigate('/telegramBussiness')}
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto"
+          aria-label="Voltar aos chats"
+        >
+          <ChevronLeft className="w-6 h-6 stroke-[2]" />
+        </button>
 
-          <div className="relative shrink-0">
+        <div className="flex items-center gap-2.5 bg-white dark:bg-[#1c242f] rounded-full p-1.5 pr-4 shadow-[0_2px_8px_rgba(0,0,0,0.12)] mx-2 min-w-0 max-w-[65%] pointer-events-auto">
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative">
             {isPavel ? (
               <img
                 src="/pavel_durov.jpg"
                 alt="Pavel Durov"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-full h-full object-cover"
                 onError={(e) => { (e.target as any).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop'; }}
               />
             ) : (
               <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm"
+                className="w-full h-full flex items-center justify-center text-white font-bold text-sm"
                 style={{ backgroundColor: contactColor }}
               >
                 {contactDisplayName.slice(0, 2).toUpperCase() || '?'}
               </div>
             )}
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-[#242f3d]" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-[#1c242f]" />
           </div>
 
-          <div className="flex flex-col min-w-0 flex-1">
+          <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1">
-              <h1 className="text-[15.5px] font-semibold text-[#222] dark:text-white tracking-tight truncate leading-tight">
+              <h1 className="text-[15px] font-bold text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
                 {isPavel ? 'Pavel Durov Fundador' : contactDisplayName}
               </h1>
               {isPavel && (
-                <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0">✓</span>
+                <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5">✓</span>
               )}
             </div>
-            <span className="text-[12px] text-[#6b7280] dark:text-white/60 font-normal leading-tight">
+            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
               {contactLevel ? `online • Subordinado Nível ${contactLevel}` : 'online'}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5 pointer-events-auto">
           <button
             onClick={() => showToast('Iniciando chamada de voz segura...', 'info')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#2481cc] hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer"
+            className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0"
+            aria-label="Chamar"
           >
             <Phone className="w-5 h-5" />
           </button>
           <button
             onClick={() => showToast('Opções do chat Telegram', 'info')}
-            className="w-9 h-9 rounded-full flex items-center justify-center text-[#2481cc] hover:bg-gray-100 active:bg-gray-200 transition-colors cursor-pointer"
+            className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0"
+            aria-label="Mais opções"
           >
             <MoreVertical className="w-5 h-5" />
           </button>
@@ -433,7 +435,7 @@ export default function PrivateChat() {
       {/* ── ÁREA DE MENSAGENS TELEGRAM (LARGURA TOTAL FLUIDA) ── */}
       <main
         ref={scrollRef}
-        className="absolute inset-0 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-[60px] pb-24 space-y-1.5 scroll-smooth"
+        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-2 pb-24 space-y-1.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         onClick={() => contextMenu && closeContextMenu()}
       >
         {isLoading && messages.length === 0 && (

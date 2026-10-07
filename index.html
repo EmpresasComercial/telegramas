@@ -16,6 +16,7 @@
       window.deferredPwaPrompt = null;
       window.addEventListener('beforeinstallprompt', function(e) {
         e.preventDefault();
+        console.log('Event beforeinstallprompt disparado!');
         window.deferredPwaPrompt = e;
       });
     </script>

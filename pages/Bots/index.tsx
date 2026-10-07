@@ -598,8 +598,12 @@ export default function TelegramBotsChat() {
 
   return (
     <div
-      className="w-full h-[100dvh] flex flex-col overflow-hidden select-none"
-      style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI', sans-serif" }}
+      className="w-full h-[100dvh] flex flex-col overflow-hidden select-none relative"
+      style={{
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI', sans-serif",
+        backgroundColor: '#afc8af',
+        backgroundImage: DOODLE_BG
+      }}
     >
       {/* ── MODAL DE COMANDOS ── */}
       {showCommandsModal && (
@@ -636,32 +640,52 @@ export default function TelegramBotsChat() {
         </div>
       )}
 
-      {/* ── HEADER ── */}
-      <header className="w-full bg-white px-3 py-2 shrink-0 z-30 flex items-center gap-3 border-b border-gray-200/70"
-        style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
-        <button onClick={() => navigate(-1)} className="p-1 -ml-1 text-[#1c1c1e] hover:bg-gray-100 active:bg-gray-200 rounded-full transition-colors cursor-pointer shrink-0" aria-label="Voltar">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      {/* ── CABEÇALHO FLUTUANTE ── */}
+      <header className="w-full bg-transparent px-3 py-3 sticky top-0 z-40 flex items-center justify-between select-none pointer-events-none">
+
+        {/* Botão Voltar */}
+        <button
+          onClick={() => navigate(-1)}
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto cursor-pointer"
+          aria-label="Voltar"
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M5 12l7-7M5 12l7 7" />
           </svg>
         </button>
 
-        <div className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer" onClick={() => handleSendMessage("/saldo")}>
-          <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border border-gray-200">
+        {/* Cápsula central — BotFather */}
+        <div
+          className="flex items-center gap-2.5 bg-white dark:bg-[#1c242f] rounded-full p-1.5 pr-4 shadow-[0_2px_8px_rgba(0,0,0,0.12)] mx-2 min-w-0 max-w-[65%] cursor-pointer active:scale-[0.98] transition-transform pointer-events-auto"
+          onClick={() => handleSendMessage("/saldo")}
+        >
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative">
             <img src="/BotFather.jpg" alt="BotFather" className="w-full h-full object-cover" onError={(e) => { (e.currentTarget as HTMLImageElement).src = "/botfather.png"; }} />
+            <span className="absolute bottom-0 right-0 w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
+              <span className="w-2.5 h-2.5 bg-[#3390ec] rounded-full flex items-center justify-center">
+                <svg className="w-[7px] h-[7px] text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                </svg>
+              </span>
+            </span>
           </div>
           <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1">
-              <span className="text-[16px] font-bold text-[#000000] leading-tight">BotFather</span>
-              <svg className="w-[15px] h-[15px] text-[#3390ec] shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-              </svg>
-            </div>
-            <span className="text-[11.5px] text-[#8a8a8e] truncate leading-tight">8,885,239 usuários mensais</span>
+            <h1 className="text-[15px] font-bold text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
+              BotFather
+            </h1>
+            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
+              8,885,239 usuários mensais
+            </span>
           </div>
         </div>
 
-        <button onClick={() => setShowCommandsModal(true)} className="p-1.5 text-[#8a8a8e] hover:bg-gray-100 rounded-full cursor-pointer shrink-0">
-          <MoreVertical className="w-5 h-5" />
+        {/* Botão Menu */}
+        <button
+          onClick={() => setShowCommandsModal(true)}
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto cursor-pointer"
+          aria-label="Mais opções"
+        >
+          <MoreVertical className="w-[22px] h-[22px]" />
         </button>
       </header>
 
@@ -670,7 +694,6 @@ export default function TelegramBotsChat() {
         ref={mainChatRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-2.5 py-3 pb-24 space-y-1 relative select-text"
-        style={{ backgroundColor: "#afc8af", backgroundImage: DOODLE_BG }}
       >
         <div className="flex justify-center my-2 select-none">
           <span className="text-white text-[12px] font-medium px-3.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(74, 100, 74, 0.72)", backdropFilter: "blur(4px)" }}>
