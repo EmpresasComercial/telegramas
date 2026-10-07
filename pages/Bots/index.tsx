@@ -56,7 +56,8 @@ const VALID_COMMANDS = new Set([
   "/bots", "/catalogo", "/catálogo", "/comprar", "/loja", "/produtos", "/robos", "/robôs",
   "/meusbots", "/mybots", "/ativos", "/compras", "/minhascompras",
   "/saldo", "/carteira", "/rendas", "/historico", "/histórico",
-  "/limites", "/limite", "/limpar", "/reset", "/clear"
+  "/limites", "/limite", "/limpar", "/reset", "/clear",
+  "/cupons", "/cupon", "/coupon", "/codigo", "/código"
 ]);
 
 function isRecognizedCommand(text: string): boolean {
@@ -202,6 +203,8 @@ export default function TelegramBotsChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showCommandsModal, setShowCommandsModal] = useState(false);
+  const [awaitingCoupon, setAwaitingCoupon] = useState(false);
+  const [isRedeemingCoupon, setIsRedeemingCoupon] = useState(false);
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const mainChatRef = useRef<HTMLDivElement>(null);
@@ -496,6 +499,61 @@ export default function TelegramBotsChat() {
         return;
       }
 
+      // ── CUPONS ──
+      if (normalized === "cupons" || normalized === "cupon" || normalized === "coupon" || normalized === "codigo" || normalized === "código") {
+        setAwaitingCoupon(true);
+        simulateBotReply(() => ({
+          id: "bot-" + Date.now(), sender: "bot", time: getCurrentTime(), type: "text",
+          text: "🎟️ *Resgatar Cupom*\n\nPor favor, cole ou digite o código do seu cupom:\n\nO código é composto por letras maiúsculas e números.\nExemplo: TGRAM2024"
+        }));
+        return;
+      }
+
+      // ── AGUARDANDO CÓDIGO DE CUPOM ──
+      if (awaitingCoupon) {
+        const code = content.toUpperCase().replace(/[^A-Z0-9]/g, "");
+        if (code.length < 5) {
+          simulateBotReply(() => ({
+            id: "bot-" + Date.now(), sender: "bot", time: getCurrentTime(), type: "text",
+            text: "❌ Código inválido. O código deve ter pelo menos 5 caracteres com letras maiúsculas e números. Tente novamente ou envie /cupons para cancelar."
+          }));
+          return;
+        }
+        setAwaitingCoupon(false);
+        setIsRedeemingCoupon(true);
+        setIsTyping(true);
+        try {
+          const { data, error } = await supabase.rpc('redeem_coupon_mcpn', { p_code: code });
+          if (error) throw error;
+          const result = data as { success: boolean; message: string } | null;
+          setIsTyping(false);
+          if (result && result.success) {
+            showToast(result.message, 'success');
+            await loadData();
+            setMessages((prev) => [...prev, {
+              id: "bot-" + Date.now(), sender: "bot", time: getCurrentTime(), type: "text",
+              text: `✅ ${result.message}\n\nSeu saldo foi atualizado! Envie /saldo para confirmar.`
+            }]);
+          } else {
+            setMessages((prev) => [...prev, {
+              id: "bot-" + Date.now(), sender: "bot", time: getCurrentTime(), type: "text",
+              text: `❌ ${result?.message || 'Erro ao resgatar cupom'}\n\nVerifique o código e tente novamente com /cupons.`
+            }]);
+            showToast(result?.message || 'Erro ao resgatar cupom', 'error');
+          }
+        } catch (err: any) {
+          setIsTyping(false);
+          setMessages((prev) => [...prev, {
+            id: "bot-" + Date.now(), sender: "bot", time: getCurrentTime(), type: "text",
+            text: `❌ ${err.message || 'Erro ao resgatar cupom'}\n\nTente novamente com /cupons.`
+          }]);
+          showToast(err.message || 'Erro ao resgatar cupom', 'error');
+        } finally {
+          setIsRedeemingCoupon(false);
+        }
+        return;
+      }
+
       let cleanQuery = normalized.replace(/^info\s+/i, "").replace(/^bot\s+/i, "").replace(/\s+bot$/i, "").trim();
       if (cleanQuery === "ia" || cleanQuery === "botsdeia" || cleanQuery === "botia") cleanQuery = "ia";
       if (cleanQuery === "father" || cleanQuery === "botfather") cleanQuery = "botfother";
@@ -524,7 +582,7 @@ export default function TelegramBotsChat() {
         text: `Unrecognized command. Say what?`
       }));
     },
-    [inputText, products, purchasedBots, userBalance, simulateBotReply, loadData]
+    [inputText, products, purchasedBots, userBalance, simulateBotReply, loadData, awaitingCoupon]
   );
 
   /* ── Ação de Compra de Bot Direto no Chat ── */
@@ -623,6 +681,7 @@ export default function TelegramBotsChat() {
                 { cmd: "/saldo", label: "Consultar saldo" },
                 { cmd: "/rendas", label: "Rendimentos diários" },
                 { cmd: "/limites", label: "Limites de compra" },
+                { cmd: "/cupons", label: "Resgatar cupom de saldo" },
                 { cmd: "/ajuda", label: "Lista de comandos" },
                 { cmd: "/limpar", label: "Limpar conversa" },
               ].map(({ cmd, label }) => (
