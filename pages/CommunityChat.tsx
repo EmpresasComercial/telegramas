@@ -165,7 +165,7 @@ const formatSenderPhone = (p?: string | null) => {
   if (!p) return 'Contacto';
   const clean = p.replace(/^\+?244\s*/, '').trim();
   if (/^\d{9}$/.test(clean)) {
-    return `+244 ${clean.slice(0, 3)} *** ${clean.slice(6)}`;
+    return `+244 ${clean.slice(0, 3)} ${clean.slice(3, 6)} ${clean.slice(6)}`;
   }
   return p;
 };
@@ -240,7 +240,7 @@ const GROUP_MEMBERS = [
   }
 ];
 
-const COMMUNITY_QUICK_REACTIONS = ['â¤ï¸', 'ðŸ¤·â€â™‚ï¸', 'ðŸ‘', 'ðŸ‘Ž', 'ðŸ”¥', 'ðŸ¥°', 'ðŸŽ‰', 'ðŸ‘', 'ðŸ˜‚', 'ðŸ˜®', 'ðŸ˜¢'];
+const COMMUNITY_QUICK_REACTIONS = ['👍', '❤️', '🔥', '🥰', '👏', '😂'];
 
 type GroupTab = 'members' | 'media' | 'files' | 'links';
 const GROUP_TABS: { id: GroupTab; label: string }[] = [
@@ -273,28 +273,43 @@ export default function CommunityChat() {
   const [reactionMenuId, setReactionMenuId] = useState<number | null>(null);
   const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null);
 
-  // â”€â”€ Context Menu Telegram â”€â”€
+  // ── Context Menu Telegram ──
   const [contextMenu, setContextMenu] = useState<{ message: any; isMe: boolean } | null>(null);
   const [showAllReactions, setShowAllReactions] = useState(false);
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  // ── Long Press Gesture (Pressionar para abrir modal) ───────────────────
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isLongPressTriggeredRef = useRef(false);
+  const pressStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
-  };
+  const startLongPress = (m: any, isMe: boolean, clientX: number, clientY: number) => {
+    isLongPressTriggeredRef.current = false;
+    pressStartPosRef.current = { x: clientX, y: clientY };
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
 
-  const handleTouchEnd = (e: React.TouchEvent, m: any, isMe: boolean) => {
-    if (!touchStartRef.current) return;
-    const touch = e.changedTouches[0];
-    const diffX = Math.abs(touch.clientX - touchStartRef.current.x);
-    const diffY = Math.abs(touch.clientY - touchStartRef.current.y);
-    const duration = Date.now() - touchStartRef.current.time;
-    touchStartRef.current = null;
-
-    if (diffX < 12 && diffY < 12 && duration < 600) {
-      e.preventDefault();
+    longPressTimerRef.current = setTimeout(() => {
+      isLongPressTriggeredRef.current = true;
+      if (typeof window !== 'undefined' && window.navigator && 'vibrate' in window.navigator) {
+        try { window.navigator.vibrate(40); } catch {}
+      }
       setContextMenu({ message: m, isMe });
       setShowAllReactions(false);
+    }, 500);
+  };
+
+  const cancelLongPress = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    pressStartPosRef.current = null;
+  };
+
+  const checkMoveCancel = (clientX: number, clientY: number) => {
+    if (!pressStartPosRef.current) return;
+    const diffX = Math.abs(clientX - pressStartPosRef.current.x);
+    const diffY = Math.abs(clientY - pressStartPosRef.current.y);
+    if (diffX > 10 || diffY > 10) {
+      cancelLongPress();
     }
   };
 
@@ -872,7 +887,7 @@ export default function CommunityChat() {
           </div>
 
           <div className="flex flex-col min-w-0">
-            <h1 className="text-[15px] font-bold text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
+            <h1 className="text-[15px] font-medium text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
               Telegram Bussiness Grupo
             </h1>
             <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
@@ -893,7 +908,7 @@ export default function CommunityChat() {
       <main 
         ref={scrollRef} 
         onScroll={handleScroll}
-        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-2 pb-24 space-y-1.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-4 md:px-6 pt-2 pb-24 space-y-1.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
       >
         {publicMessages.map((m, i) => {
           const isMe = m.uid_emissor === user?.id;
@@ -921,7 +936,7 @@ export default function CommunityChat() {
               <motion.div 
                 initial={{ opacity: 0, y: 3 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`flex items-end gap-1.5 ${isMe ? "justify-end" : "justify-start"} relative group`}
+                className={`flex items-end w-full gap-1.5 ${isMe ? "justify-end" : "justify-start"} relative group`}
               >
                 {!isMe && (
                   <div 
@@ -932,13 +947,46 @@ export default function CommunityChat() {
                   </div>
                 )}
 
-                {/* â”€â”€ Mensagem sÃ³ com imagem (sem balÃ£o) â”€â”€ */}
+                {/* ── Mensagem só com imagem (sem balão) ── */}
                 {parsedData.imagem_url && !m.mensagem?.trim() ? (
                   <div
                     className="relative cursor-pointer rounded-[18px] overflow-hidden shadow-[0_1px_4px_rgba(0,0,0,0.18)] max-w-[72vw] sm:max-w-[320px]"
-                    onClick={(e) => { e.stopPropagation(); setContextMenu({ message: m, isMe }); setShowAllReactions(false); }}
-                    onTouchStart={handleTouchStart}
-                    onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
+                    onTouchStart={(e) => {
+                      const t = e.touches[0];
+                      startLongPress(m, isMe, t.clientX, t.clientY);
+                    }}
+                    onTouchMove={(e) => {
+                      const t = e.touches[0];
+                      checkMoveCancel(t.clientX, t.clientY);
+                    }}
+                    onTouchEnd={cancelLongPress}
+                    onTouchCancel={cancelLongPress}
+                    onMouseDown={(e) => {
+                      if (e.button === 0) {
+                        startLongPress(m, isMe, e.clientX, e.clientY);
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (pressStartPosRef.current) {
+                        checkMoveCancel(e.clientX, e.clientY);
+                      }
+                    }}
+                    onMouseUp={cancelLongPress}
+                    onMouseLeave={cancelLongPress}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      cancelLongPress();
+                      setContextMenu({ message: m, isMe });
+                      setShowAllReactions(false);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isLongPressTriggeredRef.current) {
+                        e.preventDefault();
+                        isLongPressTriggeredRef.current = false;
+                      }
+                    }}
                     style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                   >
                     <img
@@ -958,7 +1006,7 @@ export default function CommunityChat() {
                       <span className="text-[10px] font-normal text-white">{formatTime(m.data_registrada)}</span>
                       {isMe && <CheckCheck className="w-3 h-3 text-white stroke-[2.4]" />}
                     </div>
-                    {/* ReaÃ§Ãµes */}
+                    {/* Reações */}
                     {Object.keys(reactions).length > 0 && (
                       <div className="absolute -bottom-5 left-0 flex flex-wrap gap-1">
                         {Object.entries(reactions).map(([emoji, users]: [string, any]) => (
@@ -976,11 +1024,44 @@ export default function CommunityChat() {
                     )}
                   </div>
                 ) : (
-                  /* â”€â”€ Mensagem normal (texto Â± imagem) â”€â”€ */
+                  /* ── Mensagem normal (texto ± imagem) ── */
                   <div
-                    onClick={(e) => { e.stopPropagation(); setContextMenu({ message: m, isMe }); setShowAllReactions(false); }}
-                    onTouchStart={handleTouchStart}
-                    onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
+                    onTouchStart={(e) => {
+                      const t = e.touches[0];
+                      startLongPress(m, isMe, t.clientX, t.clientY);
+                    }}
+                    onTouchMove={(e) => {
+                      const t = e.touches[0];
+                      checkMoveCancel(t.clientX, t.clientY);
+                    }}
+                    onTouchEnd={cancelLongPress}
+                    onTouchCancel={cancelLongPress}
+                    onMouseDown={(e) => {
+                      if (e.button === 0) {
+                        startLongPress(m, isMe, e.clientX, e.clientY);
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (pressStartPosRef.current) {
+                        checkMoveCancel(e.clientX, e.clientY);
+                      }
+                    }}
+                    onMouseUp={cancelLongPress}
+                    onMouseLeave={cancelLongPress}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      cancelLongPress();
+                      setContextMenu({ message: m, isMe });
+                      setShowAllReactions(false);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isLongPressTriggeredRef.current) {
+                        e.preventDefault();
+                        isLongPressTriggeredRef.current = false;
+                      }
+                    }}
                     className={cn(
                       "tg-bubble max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#000000] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none",
                       isMe ? "bg-[#eeffde] dark:bg-[#2b5278] is-me" : "bg-white dark:bg-[#182533] is-other",
@@ -1015,7 +1096,7 @@ export default function CommunityChat() {
 
                     {!isMe && (
                       <p 
-                        className="text-[13px] font-bold mb-[2px] cursor-pointer truncate"
+                        className="text-[13px] font-medium mb-[2px] cursor-pointer truncate"
                         style={{ color: authorColor }}
                       >
                         {displayName}
@@ -1499,15 +1580,15 @@ export default function CommunityChat() {
               borderBottomRightRadius: '20px',
             }}
           >
-            {/* â”€â”€ Barra de ReaÃ§Ãµes â”€â”€ */}
-            <div className="flex items-center justify-between px-3 py-3 border-b border-gray-100 dark:border-white/8">
-              {(showAllReactions ? COMMUNITY_QUICK_REACTIONS : COMMUNITY_QUICK_REACTIONS.slice(0, 7)).map((emoji) => (
+            {/* ── Barra de Reações ── */}
+            <div className="flex items-center justify-around px-3 py-3 border-b border-gray-100 dark:border-white/8">
+              {COMMUNITY_QUICK_REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => {
                     handleToggleReaction(contextMenu.message.id, emoji);
-                    showToast(`ReaÃ§Ã£o ${emoji} adicionada!`, 'success');
+                    showToast(`Reação ${emoji} adicionada!`, 'success');
                     closeContextMenu();
                   }}
                   className="w-10 h-10 flex items-center justify-center text-[26px] leading-none active:scale-125 transition-transform rounded-full cursor-pointer"
@@ -1517,15 +1598,6 @@ export default function CommunityChat() {
                   {emoji}
                 </button>
               ))}
-              <button
-                type="button"
-                onClick={() => setShowAllReactions(!showAllReactions)}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#3a3a3a] flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-200 active:scale-90 transition-transform cursor-pointer"
-                style={{ touchAction: 'manipulation' }}
-                title="Mais reaÃ§Ãµes"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
 
             {/* â”€â”€ Lista de AÃ§Ãµes Verticais â”€â”€ */}

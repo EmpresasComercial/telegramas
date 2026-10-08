@@ -68,13 +68,18 @@ export default function ChatsList() {
     if (!p) return 'Contacto';
     const clean = p.replace(/^\+?244\s*/, '').trim();
     if (/^\d{9}$/.test(clean)) {
-      return `+244 ${clean.slice(0, 3)} *** ${clean.slice(6)}`;
+      return `+244 ${clean.slice(0, 3)} ${clean.slice(3, 6)} ${clean.slice(6)}`;
     }
     return p;
   };
 
-  const previewText = (text: string, max = 60) =>
-    text && text.length > max ? text.slice(0, max) + '\u2026' : (text || '');
+  const previewText = (text: string, max = 40) => {
+    if (!text) return '';
+    if (text.length <= max) return text;
+    const truncated = text.slice(0, max);
+    const lastSpace = truncated.lastIndexOf(' ');
+    return (lastSpace > 0 ? truncated.slice(0, lastSpace) : truncated) + '...';
+  };
 
   const formatTelegramTime = (dateInput: Date | string | number): string => {
     if (!dateInput) return '';
@@ -381,7 +386,7 @@ export default function ChatsList() {
         folder: 'channels' as ChatFolder,
         name: 'Pavel Durov Fundador',
         isVerified: true,
-        lastMessage: '📢 Novo sistema de monetização por Telegram Stars e Mini Apps lançado oficialmente.',
+        lastMessage: 'Novo sistema de monetização por Telegram Stars e Mini Apps lançado oficialmente.',
         senderPrefix: null,
         time: formatTelegramTime(Date.now() - 1000 * 60 * 60 * 20),
         timestamp: Date.now() - 1000 * 60 * 60 * 20,
@@ -407,10 +412,10 @@ export default function ChatsList() {
       {
         id: 'deposit-bot',
         folder: 'bots' as ChatFolder,
-        name: 'Bot de deposito',
+        name: 'Payments Bot',
         isVerified: true,
         tag: 'BOT',
-        lastMessage: '⚡ Recargas e depósitos automáticos via Multicaixa Express e IBAN.',
+        lastMessage: 'Recargas e depósitos automáticos via Multicaixa Express e IBAN.',
         senderPrefix: null,
         time: formatTelegramTime(Date.now() - 1000 * 60 * 60 * 36),
         timestamp: Date.now() - 1000 * 60 * 60 * 36,
@@ -422,7 +427,7 @@ export default function ChatsList() {
           <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs border border-gray-200/80 bg-white">
             <img 
               src="/logo-tb.jpg" 
-              alt="Bot de deposito" 
+              alt="Payments Bot" 
               className="w-full h-full object-cover"
             />
           </div>
@@ -432,10 +437,10 @@ export default function ChatsList() {
       {
         id: 'withdrawal-bot',
         folder: 'bots' as ChatFolder,
-        name: 'Bot de retirada',
+        name: 'Wallet',
         isVerified: true,
         tag: 'BOT',
-        lastMessage: '🏦 Solicitações de saque e levantamentos rápidos para conta bancária.',
+        lastMessage: 'Solicitações de saque e levantamentos rápidos para conta bancária.',
         senderPrefix: null,
         time: formatTelegramTime(Date.now() - 1000 * 60 * 60 * 48),
         timestamp: Date.now() - 1000 * 60 * 60 * 48,
@@ -447,7 +452,7 @@ export default function ChatsList() {
           <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs border border-gray-200/80 bg-white">
             <img 
               src="/logo-tb.jpg" 
-              alt="Bot de retirada" 
+              alt="Wallet" 
               className="w-full h-full object-cover"
             />
           </div>
@@ -717,7 +722,7 @@ export default function ChatsList() {
                 <div className="flex-1 min-w-0 py-0.5">
                   <div className="flex justify-between items-center mb-0.5">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <h3 className="text-[15.5px] font-semibold text-[#111] dark:text-white truncate leading-tight">
+                      <h3 className="text-[15.5px] font-medium text-[#111] dark:text-white truncate leading-tight">
                         {chat.name}
                       </h3>
                       {chat.isVerified && <OfficialVerifiedBadge />}
@@ -726,17 +731,7 @@ export default function ChatsList() {
                           {chat.tag}
                         </span>
                       )}
-                      {chat.isSubordinate && chat.nivel && (
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full shrink-0 ml-1 ${
-                          chat.nivel === 1
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : chat.nivel === 2
-                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                            : 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
-                        }`}>
-                          {chat.nivel}º Nível
-                        </span>
-                      )}
+
                     </div>
 
                     <div className="flex items-center gap-1 shrink-0 ml-1">
@@ -807,20 +802,10 @@ export default function ChatsList() {
                       <div className="flex-1 min-w-0 py-0.5">
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-1.5 min-w-0 pr-2">
-                            <h3 className="text-[15px] font-semibold text-[#111] dark:text-white truncate leading-tight">
+                            <h3 className="text-[15px] font-medium text-[#111] dark:text-white truncate leading-tight">
                               {contact.nome_exibicao || formatSenderPhone(contact.telefone)}
                             </h3>
-                            {isSub && nv && (
-                              <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full shrink-0 ${
-                                nv === 1
-                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                                  : nv === 2
-                                  ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
-                                  : 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300'
-                              }`}>
-                                {nv}º Nível
-                              </span>
-                            )}
+
                           </div>
                         </div>
 

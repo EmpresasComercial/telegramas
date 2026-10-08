@@ -1124,10 +1124,10 @@ export default function Withdraw() {
           </svg>
         </button>
 
-        {/* Cápsula central — Bot de retirada */}
+        {/* Cápsula central — Wallet */}
         <div className="flex items-center gap-2.5 bg-white dark:bg-[#1c242f] rounded-full p-1.5 pr-4 shadow-[0_2px_8px_rgba(0,0,0,0.12)] mx-2 min-w-0 max-w-[65%] cursor-pointer active:scale-[0.98] transition-transform pointer-events-auto">
           <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative">
-            <img src="/logo-tb.jpg" alt="Bot de retirada" className="w-full h-full object-cover" />
+            <img src="/logo-tb.jpg" alt="Wallet" className="w-full h-full object-cover" />
             <span className="absolute bottom-0 right-0 w-[14px] h-[14px] bg-white rounded-full flex items-center justify-center">
               <span className="w-2.5 h-2.5 bg-[#3390ec] rounded-full flex items-center justify-center">
                 <svg className="w-[7px] h-[7px] text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -1139,7 +1139,7 @@ export default function Withdraw() {
 
           <div className="flex flex-col min-w-0">
             <h1 className="text-[15px] font-bold text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
-              Bot de retirada
+              Wallet
             </h1>
             <span
               onClick={(e) => { e.stopPropagation(); handleSendMessage('/saldo'); }}

@@ -1272,14 +1272,14 @@ export default function Recharge() {
         {/* Info do Bot (cápsula 2) */}
         <div className="flex items-center gap-2.5 bg-white rounded-full p-1.5 pr-4 shadow-[0_2px_8px_rgba(0,0,0,0.12)] mx-2 min-w-0 max-w-[65%] pointer-events-auto">
           <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative">
-            <img src="/logo-tb.jpg" alt="Bot de deposito" className="w-full h-full object-cover" />
+            <img src="/logo-tb.jpg" alt="Payments Bot" className="w-full h-full object-cover" />
             <div className="absolute bottom-0 right-0 w-3 h-3 bg-[#2481cc] rounded-full border-2 border-white" />
           </div>
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1.5">
               <h1 className="text-[15px] font-bold text-black tracking-tight truncate leading-[1.15] mt-0.5">
-                Bot de deposito
+              Payments Bot
               </h1>
               <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5">✓</span>
             </div>
@@ -1471,7 +1471,7 @@ export default function Recharge() {
                     {msg.type === 'welcome' && (
                       <div className="text-[14px] text-gray-950 leading-relaxed font-normal">
                         <p>
-                          Olá! Bem-vindo ao <strong>Bot de deposito</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
+                          Olá! Bem-vindo ao <strong>Payments Bot</strong>, o seu assistente de depósitos e recargas disponível 24/7 para o atender de forma rápida e simples.
                         </p>
                       </div>
                     )}
@@ -1806,7 +1806,7 @@ export default function Recharge() {
                 className="w-1.5 h-1.5 rounded-full bg-[#707579] animate-bounce"
                 style={{ animationDelay: '300ms' }}
               />
-              <span className="text-[11.5px] text-[#707579] ml-1">Bot de deposito está digitando...</span>
+              <span className="text-[11.5px] text-[#707579] ml-1">Payments Bot está digitando...</span>
             </div>
           </div>
         )}

@@ -46,7 +46,7 @@ const STORIES_DATA: StoryItem[] = [
   },
   {
     id: 'story-depositbot',
-    title: 'Bot de deposito',
+    title: 'Payments Bot',
     avatar: '/logo-tb.jpg',
     hasUnread: true,
     slides: [
@@ -55,9 +55,9 @@ const STORIES_DATA: StoryItem[] = [
         image: '/logo-tb.jpg',
         badge: 'DEPOSIT BOT',
         badgeBg: 'bg-[#10b981]',
-        headline: 'Bot de deposito — Recargas Automáticas 💸',
+        headline: 'Payments Bot — Recargas Automáticas 💸',
         subtext: 'Faça recargas e depósitos instantâneos via Multicaixa Express e transferência bancária.',
-        actionText: 'Abrir Bot de deposito',
+        actionText: 'Abrir Payments Bot',
         actionLink: '/recarregar',
         gradient: 'from-[#047857] via-[#065f46] to-[#0f1015]'
       }
@@ -65,7 +65,7 @@ const STORIES_DATA: StoryItem[] = [
   },
   {
     id: 'story-botwithdrawal',
-    title: 'Bot de retirada',
+    title: 'Wallet',
     avatar: '/logo-tb.jpg',
     hasUnread: true,
     slides: [
@@ -74,9 +74,9 @@ const STORIES_DATA: StoryItem[] = [
         image: '/logo-tb.jpg',
         badge: 'WITHDRAWAL BOT',
         badgeBg: 'bg-[#0284c7]',
-        headline: 'Bot de retirada — Retiradas Rápidas 🏦',
+        headline: 'Wallet — Retiradas Rápidas 🏦',
         subtext: 'Solicite levantamentos diretos para sua conta bancária com processamento ágil e seguro.',
-        actionText: 'Abrir Bot de retirada',
+        actionText: 'Abrir Wallet',
         actionLink: '/retirada',
         gradient: 'from-[#0369a1] via-[#075985] to-[#0f1015]'
       }

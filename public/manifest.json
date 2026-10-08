@@ -20,7 +20,7 @@
   "start_url": "/telegramBussiness",
   "scope": "/",
   "background_color": "#F2F2F2",
-  "theme_color": "#2481cc",
+  "theme_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait"
 }

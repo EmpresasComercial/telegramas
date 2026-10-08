@@ -656,7 +656,7 @@ export default function TelegramBotsChat() {
 
   return (
     <div
-      className="w-full h-[100dvh] flex flex-col overflow-hidden select-none relative"
+      className="w-full h-[100dvh] flex flex-col select-none relative"
       style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI', sans-serif",
         backgroundColor: '#afc8af',
@@ -752,7 +752,7 @@ export default function TelegramBotsChat() {
       <main
         ref={mainChatRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-2.5 py-3 pb-24 space-y-1 relative select-text"
+        className="flex-1 overflow-y-auto px-2.5 py-3 pb-4 space-y-1 relative select-text"
       >
         <div className="flex justify-center my-2 select-none">
           <span className="text-white text-[12px] font-medium px-3.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(74, 100, 74, 0.72)", backdropFilter: "blur(4px)" }}>
@@ -915,9 +915,9 @@ export default function TelegramBotsChat() {
         </button>
       )}
 
-      {/* ── FOOTER FLUTUANTE IDÊNTICO AO OFFICIAL CHANNEL ── */}
-      <footer className="fixed bottom-0 left-0 right-0 p-2 pb-3 z-40 flex justify-center bg-transparent pointer-events-none">
-        <div className="w-full max-w-[650px] flex items-center gap-2 pointer-events-auto px-2">
+      {/* ── FOOTER — Input + Botão Enviar ── */}
+      <footer className="shrink-0 bg-transparent p-2 pb-[max(10px,env(safe-area-inset-bottom,10px))] z-40 flex justify-center">
+        <div className="w-full max-w-[650px] flex items-center gap-2 px-2">
           <div className="flex-1 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
             {/* Meus Bots à esquerda */}
             <button

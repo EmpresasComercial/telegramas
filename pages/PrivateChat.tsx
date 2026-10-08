@@ -41,7 +41,7 @@ interface ContextMenu {
 }
 
 // ── Constantes de Emojis Oficiais Telegram ────────────────────────────
-const QUICK_REACTIONS = ['❤️', '🫡', '🤷‍♂️', '👍', '👎', '🔥', '🥰', '🎉', '👏', '😂', '😮', '😢'];
+const QUICK_REACTIONS = ['👍', '❤️', '🔥', '🥰', '👏', '😂'];
 
 // ── Componente Principal ───────────────────────────────────────────────
 export default function PrivateChat() {
@@ -188,9 +188,7 @@ export default function PrivateChat() {
   }, [contextMenu]);
 
   // ── Context Menu Helpers ──────────────────────────────────────────────
-  const openContextMenu = useCallback((e: React.MouseEvent | React.TouchEvent, message: Message, isMe: boolean) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const openContextMenu = useCallback((message: Message, isMe: boolean) => {
     setShowAllReactions(false);
     setContextMenu({ message, x: 0, y: 0, isMe });
   }, []);
@@ -236,25 +234,39 @@ export default function PrivateChat() {
     }
   };
 
-  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+  // ── Long Press Gesture (Pressionar para abrir modal) ───────────────────
+  const longPressTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isLongPressTriggeredRef = useRef(false);
+  const pressStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY, time: Date.now() };
+  const startLongPress = (message: Message, isMe: boolean, clientX: number, clientY: number) => {
+    isLongPressTriggeredRef.current = false;
+    pressStartPosRef.current = { x: clientX, y: clientY };
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+
+    longPressTimerRef.current = setTimeout(() => {
+      isLongPressTriggeredRef.current = true;
+      if (typeof window !== 'undefined' && window.navigator && 'vibrate' in window.navigator) {
+        try { window.navigator.vibrate(40); } catch {}
+      }
+      openContextMenu(message, isMe);
+    }, 500);
   };
 
-  const handleTouchEnd = (e: React.TouchEvent, message: Message, isMe: boolean) => {
-    if (!touchStartRef.current) return;
-    const touch = e.changedTouches[0];
-    const diffX = Math.abs(touch.clientX - touchStartRef.current.x);
-    const diffY = Math.abs(touch.clientY - touchStartRef.current.y);
-    const duration = Date.now() - touchStartRef.current.time;
-    touchStartRef.current = null;
+  const cancelLongPress = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    pressStartPosRef.current = null;
+  };
 
-    // Se o dedo moveu menos de 12px e durou menos de 600ms, é um toque/tap genuíno
-    if (diffX < 12 && diffY < 12 && duration < 600) {
-      e.preventDefault();
-      openContextMenu(e, message, isMe);
+  const checkMoveCancel = (clientX: number, clientY: number) => {
+    if (!pressStartPosRef.current) return;
+    const diffX = Math.abs(clientX - pressStartPosRef.current.x);
+    const diffY = Math.abs(clientY - pressStartPosRef.current.y);
+    if (diffX > 10 || diffY > 10) {
+      cancelLongPress();
     }
   };
 
@@ -339,6 +351,26 @@ export default function PrivateChat() {
   const formatTime = (ts: string) =>
     ts ? new Date(ts).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }) : '';
 
+  const formatDateLabel = (dStr: string) => {
+    if (!dStr) return "Hoje";
+    const d = new Date(dStr);
+    const now = new Date();
+    const diff = now.getTime() - d.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    if (days === 0) return "Hoje";
+    if (days === 1) return "Ontem";
+    return d.toLocaleDateString("pt-PT", { day: "numeric", month: "long" });
+  };
+
+  const formatPhoneClean = (val: string) => {
+    if (!val) return 'Contacto';
+    const clean = val.replace(/^\+?244\s*/, '').trim();
+    if (/^\d{9}$/.test(clean)) {
+      return `+244 ${clean.slice(0, 3)} ${clean.slice(3, 6)} ${clean.slice(6)}`;
+    }
+    return val;
+  };
+
   const getUserColor = (str: string) => {
     const colors = ['#229ED9', '#E56555', '#8E44AD', '#27AE60', '#D35400', '#16A085', '#C0392B', '#2980B9'];
     let hash = 0;
@@ -401,8 +433,8 @@ export default function PrivateChat() {
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1">
-              <h1 className="text-[15px] font-bold text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
-                {isPavel ? 'Pavel Durov Fundador' : contactDisplayName}
+              <h1 className="text-[15px] font-medium text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
+                {isPavel ? 'Pavel Durov Fundador' : formatPhoneClean(contactDisplayName)}
               </h1>
               {isPavel && (
                 <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5">✓</span>
@@ -435,7 +467,7 @@ export default function PrivateChat() {
       {/* ── ÁREA DE MENSAGENS TELEGRAM (LARGURA TOTAL FLUIDA) ── */}
       <main
         ref={scrollRef}
-        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-6 md:px-10 lg:px-16 pt-2 pb-24 space-y-1.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        className="w-full flex-1 overflow-y-auto no-scrollbar px-3 sm:px-4 md:px-6 pt-2 pb-24 space-y-1.5 relative scroll-smooth [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         onClick={() => contextMenu && closeContextMenu()}
       >
         {isLoading && messages.length === 0 && (
@@ -450,91 +482,142 @@ export default function PrivateChat() {
           </div>
         </div>
 
-        {messages.map((m) => {
+        {messages.map((m, i) => {
           // Primary: remetente_id matches session user
           // Fallback: destinatario_id matches the contact (means I sent it)
           const isMe =
             m.remetente_id === user?.id ||
             (m.destinatario_id === contactId && m.remetente_id !== contactId);
+          const showDate = i === 0 || formatDateLabel(m.created_at) !== formatDateLabel(messages[i - 1].created_at);
+
           return (
-            <div
-              key={m.id}
-              className={`flex items-end gap-1.5 ${isMe ? 'justify-end' : 'justify-start'} relative`}
-            >
-              <div className="relative">
-                {/* Reação existente */}
-                {m.reaction && (
+            <React.Fragment key={m.id}>
+              {showDate && (
+                <div className="flex justify-center my-3">
+                  <span className="text-[12px] font-medium text-white bg-black/35 backdrop-blur-xs rounded-full px-3.5 py-0.5 shadow-2xs">
+                    {formatDateLabel(m.created_at)}
+                  </span>
+                </div>
+              )}
+
+              <div
+                className={`flex items-end w-full ${isMe ? 'justify-end' : 'justify-start'} relative`}
+              >
+                <div className="relative">
+                  {/* Reação existente */}
+                  {m.reaction && (
+                    <div
+                      className={`absolute -bottom-3 ${isMe ? 'left-0' : 'right-0'} z-10 text-[16px] leading-none select-none`}
+                      style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }}
+                    >
+                      {m.reaction}
+                    </div>
+                  )}
+
+                  {/* Balão da mensagem com Long Press (Pressionar) */}
                   <div
-                    className={`absolute -bottom-3 ${isMe ? 'left-0' : 'right-0'} z-10 text-[16px] leading-none select-none`}
-                    style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }}
+                    onTouchStart={(e) => {
+                      const t = e.touches[0];
+                      startLongPress(m, isMe, t.clientX, t.clientY);
+                    }}
+                    onTouchMove={(e) => {
+                      const t = e.touches[0];
+                      checkMoveCancel(t.clientX, t.clientY);
+                    }}
+                    onTouchEnd={cancelLongPress}
+                    onTouchCancel={cancelLongPress}
+                    onMouseDown={(e) => {
+                      if (e.button === 0) {
+                        startLongPress(m, isMe, e.clientX, e.clientY);
+                      }
+                    }}
+                    onMouseMove={(e) => {
+                      if (pressStartPosRef.current) {
+                        checkMoveCancel(e.clientX, e.clientY);
+                      }
+                    }}
+                    onMouseUp={cancelLongPress}
+                    onMouseLeave={cancelLongPress}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      cancelLongPress();
+                      openContextMenu(m, isMe);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (isLongPressTriggeredRef.current) {
+                        e.preventDefault();
+                        isLongPressTriggeredRef.current = false;
+                      }
+                    }}
+                    className={`tg-bubble max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#000000] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
+                      isMe
+                        ? 'bg-[#eeffde] dark:bg-[#2b5278] is-me'
+                        : 'bg-white dark:bg-[#182533] is-other'
+                    } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
+                    style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                   >
-                    {m.reaction}
-                  </div>
-                )}
-
-                {/* Ponta de agulha — fora do bubble para não ser cortada pelo transform */}
-                {isMe ? (
-                  <svg
-                    width="11"
-                    height="20"
-                    viewBox="0 0 11 20"
-                    className="absolute pointer-events-none z-[1]"
-                    style={{ bottom: 0, right: -9, fill: 'white' }}
-                  >
-                    <path d="M1 17V0H0V20C2 20 5 18 7 14C9 10 10 6 11 0H10C9 5 7 10 5 14C3 17 2 18 1 17Z" />
-                  </svg>
-                ) : (
-                  <svg
-                    width="11"
-                    height="20"
-                    viewBox="0 0 11 20"
-                    className="absolute pointer-events-none z-[1]"
-                    style={{ bottom: 0, left: -9, fill: 'white' }}
-                  >
-                    <path d="M10 17V0H11V20C9 20 6 18 4 14C2 10 1 6 0 0H1C2 5 4 10 6 14C8 17 9 18 10 17Z" />
-                  </svg>
-                )}
-
-                {/* Balão da mensagem com detecção de toque instantânea */}
-                <div
-                  onClick={(e) => { e.stopPropagation(); openContextMenu(e, m, isMe); }}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={(e) => handleTouchEnd(e, m, isMe)}
-                  className={`tg-bubble ${isMe ? 'is-me' : 'is-other'} max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#202020] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none bg-white dark:bg-[#182533] ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
-                  style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
-                >
-
-                  <div className="relative pointer-events-none leading-[1.3]">
-                    {!isMe && (
-                      <p
-                        className="text-[13px] font-bold mb-[2px] cursor-pointer truncate"
-                        style={{ color: isPavel ? '#2481cc' : contactColor }}
+                    {/* Ponta de agulha discreta (Tail) */}
+                    {isMe ? (
+                      <svg
+                        width="9"
+                        height="20"
+                        viewBox="0 0 9 20"
+                        className="absolute pointer-events-none"
+                        style={{ bottom: 0, right: -8, fill: 'currentColor' }}
+                        stroke="none"
+                        color="inherit"
                       >
-                        {isPavel ? 'Pavel Durov Fundador' : contactDisplayName}
-                      </p>
+                        <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-[#eeffde] dark:fill-[#2b5278]" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="9"
+                        height="20"
+                        viewBox="0 0 9 20"
+                        className="absolute pointer-events-none"
+                        style={{ bottom: 0, left: -8, transform: 'scaleX(-1)', fill: 'currentColor' }}
+                      >
+                        <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-white dark:fill-[#182533]" />
+                      </svg>
                     )}
 
-                    <span className="text-[14px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                      {m.mensagem}
-                    </span>
-                    
-                    {/* Spacer invisível inline — dá espaço ao timestamp sem forçar largura mínima */}
-                    <span
-                      aria-hidden="true"
-                      className="inline-block h-[1px]"
-                      style={{ width: isMe ? '56px' : '38px' }}
-                    />
+                    <div className="relative pointer-events-none leading-[1.3]">
+                      {!isMe && (
+                        <p
+                          className="text-[13px] font-medium mb-[2px] cursor-pointer truncate"
+                          style={{ color: isPavel ? '#2481cc' : contactColor }}
+                        >
+                          {isPavel ? 'Pavel Durov Fundador' : formatPhoneClean(contactDisplayName)}
+                        </p>
+                      )}
 
-                    <div className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[11px]">
-                      <span className="font-normal leading-none mt-[1px] text-[#8e8e93] dark:text-[#8e9aa5]">
-                        {formatTime(m.created_at)}
+                      <span className="text-[16px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                        {m.mensagem}
                       </span>
-                      {isMe && <CheckCheck className="w-[13px] h-[13px] text-[#4fae4e] dark:text-[#5288c1] stroke-[2.5] ml-[1px]" />}
+                      
+                      {/* Spacer invisível inline — dá espaço ao timestamp sem forçar largura mínima */}
+                      <span
+                        aria-hidden="true"
+                        className="inline-block h-[1px]"
+                        style={{ width: isMe ? '56px' : '42px' }}
+                      />
+
+                      <div 
+                        className="absolute bottom-[-1px] right-0 flex items-center gap-[2px] select-none text-[12px]"
+                        style={{ color: isMe ? '#55864e' : '#8e8e93' }}
+                      >
+                        <span className="font-normal leading-none mt-[1px]">
+                          {formatTime(m.created_at)}
+                        </span>
+                        {isMe && <CheckCheck className="w-[14px] h-[14px] text-[#4fae4e] stroke-[2.5] ml-[2px]" />}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </React.Fragment>
           );
         })}
 
@@ -559,28 +642,19 @@ export default function PrivateChat() {
             }}
           >
             {/* ── Barra Flutuante de Reações Telegram ── */}
-            <div className="bg-white dark:bg-[#2b2b2b] rounded-2xl shadow-xl px-2.5 py-2 flex items-center justify-between border border-gray-100 dark:border-white/10">
-              {(showAllReactions ? QUICK_REACTIONS : QUICK_REACTIONS.slice(0, 7)).map((emoji) => (
+            <div className="bg-white dark:bg-[#2b2b2b] rounded-2xl shadow-xl px-3 py-2 flex items-center justify-around border border-gray-100 dark:border-white/10">
+              {QUICK_REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => handleReaction(emoji)}
-                  className="w-9 h-9 flex items-center justify-center text-[24px] leading-none active:scale-130 transition-transform hover:scale-110 rounded-full select-none cursor-pointer"
+                  className="w-10 h-10 flex items-center justify-center text-[25px] leading-none active:scale-130 transition-transform hover:scale-115 rounded-full select-none cursor-pointer"
                   style={{ touchAction: 'manipulation' }}
                   title={`Reagir com ${emoji}`}
                 >
                   {emoji}
                 </button>
               ))}
-              <button
-                type="button"
-                onClick={() => setShowAllReactions(!showAllReactions)}
-                className="w-7 h-7 rounded-full bg-gray-100 dark:bg-[#3a3a3a] flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 active:scale-90 transition-transform cursor-pointer"
-                style={{ touchAction: 'manipulation' }}
-                title="Mais reações"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
 
             {/* ── Lista de Ações Essenciais ── */}
@@ -600,7 +674,7 @@ export default function PrivateChat() {
                       />
                       <div>
                         <span
-                          className="text-[15px] font-semibold block leading-tight text-gray-900 dark:text-gray-100"
+                          className="text-[15px] font-medium block leading-tight text-gray-900 dark:text-gray-100"
                           style={{ color: action.color === '#e53e3e' ? '#e53e3e' : undefined }}
                         >
                           {action.label}
@@ -622,7 +696,7 @@ export default function PrivateChat() {
             <button
               type="button"
               onClick={closeContextMenu}
-              className="w-full bg-white dark:bg-[#2b2b2b] rounded-2xl shadow-lg py-3 text-[15.5px] font-semibold text-[#2481cc] hover:bg-gray-50 dark:hover:bg-[#333] active:scale-[0.99] transition-all cursor-pointer border border-gray-100 dark:border-white/10 select-none text-center"
+              className="w-full bg-white dark:bg-[#2b2b2b] rounded-2xl shadow-lg py-3 text-[15.5px] font-medium text-[#2481cc] hover:bg-gray-50 dark:hover:bg-[#333] active:scale-[0.99] transition-all cursor-pointer border border-gray-100 dark:border-white/10 select-none text-center"
               style={{ touchAction: 'manipulation' }}
             >
               Cancelar

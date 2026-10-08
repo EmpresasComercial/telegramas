@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { MessageSquare, Users, Bot, Settings, Edit3 } from 'lucide-react';
+import { MessageCircle, Users, Bot, Settings } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 export default function Navbar() {
@@ -12,26 +12,26 @@ export default function Navbar() {
       name: 'Chats',
       path: '/telegramBussiness',
       aliasPaths: ['/telegramBussiness', '/telegramBusiness', '/telegram-business'],
-      icon: <MessageSquare className="w-[22px] h-[22px]" strokeWidth={2} />,
+      icon: (isActive: boolean) => <MessageCircle className={`w-[24px] h-[24px] transition-colors ${isActive ? 'fill-[#2481cc] stroke-[#2481cc]' : 'fill-transparent'}`} strokeWidth={2} />,
       badge: 3
     },
     {
       name: 'Contatos',
       path: '/contactos',
       aliasPaths: ['/contactos', '/convite'],
-      icon: <Users className="w-[22px] h-[22px]" strokeWidth={2} />
+      icon: (isActive: boolean) => <Users className={`w-[24px] h-[24px] transition-colors ${isActive ? 'fill-[#2481cc] stroke-[#2481cc]' : 'fill-transparent'}`} strokeWidth={2} />
     },
     {
       name: 'Bots & Pay',
       path: '/bot-pay',
       aliasPaths: ['/bot-pay', '/operacoes'],
-      icon: <Bot className="w-[22px] h-[22px]" strokeWidth={2} />
+      icon: (isActive: boolean) => <Bot className={`w-[24px] h-[24px] transition-colors ${isActive ? 'fill-[#2481cc] stroke-[#2481cc]' : 'fill-transparent'}`} strokeWidth={2} />
     },
     {
       name: 'Definições',
       path: '/definicoes',
       aliasPaths: ['/definicoes', '/perfil', '/settings', '/configuracoes-conta'],
-      icon: <Settings className="w-[22px] h-[22px]" strokeWidth={2} />
+      icon: (isActive: boolean) => <Settings className={`w-[24px] h-[24px] transition-colors ${isActive ? 'fill-[#2481cc] stroke-[#2481cc]' : 'fill-transparent'}`} strokeWidth={2} />
     }
   ];
 
@@ -44,16 +44,19 @@ export default function Navbar() {
       {showFab && (
         <button
           onClick={() => navigate('/chat-comunidade')}
-          className="fixed bottom-[72px] right-4 sm:right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-tr from-[#1e96c8] to-[#50a2e9] text-white flex items-center justify-center shadow-[0_4px_16px_rgba(36,129,204,0.45)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
+          className="fixed bottom-[72px] right-4 sm:right-6 z-40 w-14 h-14 rounded-full bg-[#50a8eb] dark:bg-[#50a8eb] text-white flex items-center justify-center shadow-[0_4px_10px_rgba(80,168,235,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
           title="Nova Mensagem"
           aria-label="Nova Mensagem"
         >
-          <Edit3 className="w-6 h-6 stroke-[2.2]" />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19.0498 7.41504L16.5847 4.94998C16.3894 4.75471 16.0728 4.75471 15.8776 4.94998L14.4124 6.41517L17.5847 9.58742L19.0498 8.1222C19.2451 7.92694 19.2451 7.61036 19.0498 7.41504Z" />
+            <path d="M16.8776 10.2945L13.7053 7.12228L5.12235 15.7052C4.9818 15.8458 4.88764 16.0279 4.85244 16.2274L4.0152 20.9841C3.96783 21.2533 4.19472 21.4802 4.46393 21.4328L9.22055 20.5956C9.42014 20.5604 9.6022 20.4662 9.74275 20.3257L16.8776 10.2945Z" />
+          </svg>
         </button>
       )}
 
       {/* ── BARRA DE NAVEGAÇÃO INFERIOR OFICIAL DO TELEGRAM (TRANSPARENTE FULL-WIDTH) ── */}
-      <nav className="fixed bottom-0 left-0 right-0 w-full z-50 h-[58px] bg-transparent backdrop-blur-md border-t border-black/5 dark:border-white/10 flex items-center justify-around px-4 select-none">
+      <nav className="fixed bottom-0 left-0 right-0 w-full z-50 h-[56px] bg-white dark:bg-[#1c242f] border-t border-black/5 dark:border-[#000000]/30 flex items-center justify-around px-2 select-none shadow-[0_-1px_3px_rgba(0,0,0,0.02)]">
         {navItems.map((item) => {
           const isActive = item.aliasPaths.some(p => location.pathname === p || (p !== '/home' && location.pathname.startsWith(p)));
 
@@ -68,10 +71,10 @@ export default function Navbar() {
                   : "text-[#707579] dark:text-[#8e9aa5] hover:text-[#2481cc]"
               )}
             >
-              <div className="relative flex items-center justify-center">
-                {item.icon}
+              <div className="relative flex items-center justify-center mt-1">
+                {typeof item.icon === 'function' ? item.icon(isActive) : item.icon}
                 {item.badge && (
-                  <span className="absolute -top-1 -right-2 bg-[#2481cc] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full leading-tight shadow-xs">
+                  <span className="absolute -top-1 -right-2 bg-[#3390ec] text-white text-[11px] font-bold px-[5px] py-[1px] rounded-full leading-none shadow-[0_0_0_2px_#ffffff] dark:shadow-[0_0_0_2px_#1c242f]">
                     {item.badge}
                   </span>
                 )}
@@ -82,11 +85,6 @@ export default function Navbar() {
               )}>
                 {item.name}
               </span>
-
-              {/* Indicador sutil de aba ativa */}
-              {isActive && (
-                <div className="absolute top-0 w-8 h-[2px] bg-[#2481cc] rounded-full" />
-              )}
             </NavLink>
           );
         })}
