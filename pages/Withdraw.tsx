@@ -934,7 +934,18 @@ export default function Withdraw() {
 
         setIsTyping(false);
 
-        const intentData = (!rpcErr && rawRpc && rawRpc.response) ? rawRpc : null;
+        // O Supabase SDK pode retornar JSONB como objeto direto, ou aninhado numa chave
+        let intentData: any = null;
+        if (!rpcErr && rawRpc) {
+          if (Array.isArray(rawRpc) && rawRpc.length > 0) {
+            const first = rawRpc[0];
+            intentData = first.classify_withdraw_message ?? first;
+          } else if (typeof rawRpc === 'object') {
+            // Pode vir direto como {category, response, action} ou aninhado
+            intentData = (rawRpc as any).classify_withdraw_message ?? rawRpc;
+          }
+          if (!intentData?.response) intentData = null;
+        }
 
         if (intentData) {
           const { category, response, action } = intentData;
