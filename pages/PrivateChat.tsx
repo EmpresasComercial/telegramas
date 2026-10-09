@@ -223,11 +223,21 @@ export default function PrivateChat() {
     const now = Date.now();
     if (now - lastTypingBroadcastRef.current > 1800 && typingChannelRef.current) {
       lastTypingBroadcastRef.current = now;
+      // Broadcast no canal da conversa (para o PrivateChat aberto do contato)
       typingChannelRef.current.send({
         type: 'broadcast',
         event: 'typing',
-        payload: { userId: user?.id }
+        payload: { userId: user?.id, targetId: contactId }
       });
+      // Broadcast no canal global (para o ChatsList do contato)
+      try {
+        const globalChannel = supabase.channel('chatslist_typing_global');
+        globalChannel.send({
+          type: 'broadcast',
+          event: 'typing',
+          payload: { userId: user?.id, targetId: contactId }
+        });
+      } catch {}
     }
   };
 
@@ -716,8 +726,8 @@ export default function PrivateChat() {
 
         {/* Indicador de digitando no chat */}
         {isContactTyping && (
-          <div className="flex items-end w-full justify-end relative animate-in fade-in duration-200">
-            <div className="bg-white dark:bg-[#182533] rounded-[16px] rounded-br-none px-3 py-2 shadow-[0_1px_2px_rgba(16,35,47,0.15)] flex items-center gap-1.5">
+          <div className="flex items-end w-full justify-start relative animate-in fade-in duration-200 px-1">
+            <div className="bg-white dark:bg-[#182533] rounded-[16px] rounded-bl-none px-3 py-2 shadow-[0_1px_2px_rgba(16,35,47,0.15)] flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:0ms]" />
               <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:150ms]" />
               <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:300ms]" />

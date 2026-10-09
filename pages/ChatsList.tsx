@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -38,6 +38,10 @@ export default function ChatsList() {
   const user = session?.user;
   const { isUserOnline } = usePresence();
   const { showToast } = useToast();
+
+  // typingUsers: Map<contactId, true> — contatos que estão digitando agora
+  const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
+  const typingTimers = useRef<Record<string, NodeJS.Timeout>>({});
 
   const outletContext = useOutletContext<{ openAutoMessages?: () => void }>();
 
@@ -353,6 +357,44 @@ export default function ChatsList() {
       supabase.removeChannel(contactChannel);
       window.removeEventListener('online', handleSync);
       window.removeEventListener('app:sync-data', handleSync);
+    };
+  }, [user]);
+
+  // ── Escuta "digitando..." de todos os contatos via Supabase Broadcast ──
+  useEffect(() => {
+    if (!user) return;
+
+    // Cada conversa privada usa canal "typing_{sorted_pair}".
+    // Aqui inscrevemos um canal wildcard por padrão do Supabase não existe,
+    // então usamos um canal global de presença de typing que cada contato escreve.
+    const channel = supabase.channel('chatslist_typing_global')
+      .on('broadcast', { event: 'typing' }, (payload: any) => {
+        const senderId: string = payload?.payload?.userId;
+        const targetId: string = payload?.payload?.targetId;
+        // Só processa se o evento é direcionado ao utilizador atual
+        if (!senderId || targetId !== user.id) return;
+
+        setTypingUsers(prev => ({ ...prev, [senderId]: true }));
+
+        // Limpa o timer anterior para este remetente
+        if (typingTimers.current[senderId]) {
+          clearTimeout(typingTimers.current[senderId]);
+        }
+        // Auto-remove após 3s sem novo evento
+        typingTimers.current[senderId] = setTimeout(() => {
+          setTypingUsers(prev => {
+            const next = { ...prev };
+            delete next[senderId];
+            return next;
+          });
+        }, 3000);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+      // Limpa todos os timers pendentes
+      Object.values(typingTimers.current).forEach(t => clearTimeout(t));
     };
   }, [user]);
 
@@ -793,12 +835,25 @@ export default function ChatsList() {
                   </div>
 
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-[13.5px] text-[#707579] dark:text-[#9eaab6] truncate leading-snug overflow-hidden whitespace-nowrap">
-                      {chat.senderPrefix && (
-                        <span className="text-[#2481cc] font-medium">{chat.senderPrefix}</span>
-                      )}
-                      {previewText(chat.lastMessage || '')}
-                    </p>
+                    {(() => {
+                      // Extrai o contactId real do chat (ex: 'contact-uuid' -> 'uuid')
+                      const rawId = chat.id.startsWith('contact-') ? chat.id.replace('contact-', '') : null;
+                      const isTyping = rawId ? Boolean(typingUsers[rawId]) : false;
+                      return (
+                        <p className="text-[13.5px] truncate leading-snug overflow-hidden whitespace-nowrap">
+                          {isTyping ? (
+                            <span className="text-[#4dcd5e] font-medium italic">digitando...</span>
+                          ) : (
+                            <span className="text-[#707579] dark:text-[#9eaab6]">
+                              {chat.senderPrefix && (
+                                <span className="text-[#2481cc] font-medium">{chat.senderPrefix}</span>
+                              )}
+                              {previewText(chat.lastMessage || '')}
+                            </span>
+                          )}
+                        </p>
+                      );
+                    })()}
                     {chat.actionBtn}
                   </div>
                 </div>
@@ -858,7 +913,9 @@ export default function ChatsList() {
                         </div>
 
                         <p className="text-[13px] leading-snug mt-[1px] truncate">
-                          {isOnline ? (
+                          {typingUsers[contact.id] ? (
+                            <span className="text-[#4dcd5e] font-medium italic">digitando...</span>
+                          ) : isOnline ? (
                             <span className="text-[#4dcd5e] font-medium">online</span>
                           ) : (
                             <span className="text-[#707579] dark:text-[#9eaab6]">
