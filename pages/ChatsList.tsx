@@ -194,8 +194,6 @@ export default function ChatsList() {
       })
       .subscribe();
 
-    const poll = setInterval(fetchCommunityLastMessage, 5000);
-
     const handleSync = () => {
       fetchCommunityLastMessage();
     };
@@ -204,7 +202,6 @@ export default function ChatsList() {
 
     return () => {
       supabase.removeChannel(commChannel);
-      clearInterval(poll);
       window.removeEventListener('online', handleSync);
       window.removeEventListener('app:sync-data', handleSync);
     };
@@ -269,7 +266,8 @@ export default function ChatsList() {
             .from('sys_t110')
             .select('*')
             .or(`remetente_id.eq.${user.id},destinatario_id.eq.${user.id}`)
-            .order('created_at', { ascending: false });
+            .order('created_at', { ascending: false })
+            .limit(100);
 
           if (lastMsgs && lastMsgs.length > 0) {
             // Se houver mensagens com usuários não listados na equipe, buscar dados em sys_t500
@@ -339,10 +337,13 @@ export default function ChatsList() {
     fetchContacts();
 
     const contactChannel = supabase.channel('chatslist_contacts_sync')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'sys_t110' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sys_t110', filter: `destinatario_id=eq.${user.id}` }, () => {
         fetchContacts();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'equipe_mcpn' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sys_t110', filter: `remetente_id=eq.${user.id}` }, () => {
+        fetchContacts();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'equipe_mcpn', filter: `usuario_id=eq.${user.id}` }, () => {
         fetchContacts();
       })
       .subscribe();
@@ -367,7 +368,9 @@ export default function ChatsList() {
     // Cada conversa privada usa canal "typing_{sorted_pair}".
     // Aqui inscrevemos um canal wildcard por padrão do Supabase não existe,
     // então usamos um canal global de presença de typing que cada contato escreve.
-    const channel = supabase.channel('chatslist_typing_global')
+    const channel = supabase.channel('chatslist_typing_global', {
+      config: { broadcast: { ack: false } }
+    })
       .on('broadcast', { event: 'typing' }, (payload: any) => {
         const senderId: string = payload?.payload?.userId;
         const targetId: string = payload?.payload?.targetId;

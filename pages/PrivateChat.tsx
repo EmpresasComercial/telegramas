@@ -176,9 +176,16 @@ export default function PrivateChat() {
 
   useEffect(() => {
     fetchMessages(true);
-    const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') fetchMessages(false);
-    }, 3500);
+    
+    // Configura o Realtime para atualizar as mensagens sem polling constante (DDoS no banco)
+    const chatChannel = supabase.channel(`sys_t110_sync_${user?.id}_${contactId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sys_t110', filter: `destinatario_id=eq.${user?.id}` }, () => {
+        fetchMessages(false);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sys_t110', filter: `remetente_id=eq.${user?.id}` }, () => {
+        fetchMessages(false);
+      })
+      .subscribe();
 
     const handleSync = () => {
       fetchMessages(false);
@@ -187,7 +194,7 @@ export default function PrivateChat() {
     window.addEventListener('app:sync-data', handleSync);
 
     return () => {
-      clearInterval(interval);
+      supabase.removeChannel(chatChannel);
       window.removeEventListener('online', handleSync);
       window.removeEventListener('app:sync-data', handleSync);
     };
@@ -197,7 +204,9 @@ export default function PrivateChat() {
   useEffect(() => {
     if (!user || !contactId) return;
     const pairId = [user.id, contactId].sort().join('_');
-    const channel = supabase.channel(`typing_${pairId}`);
+    const channel = supabase.channel(`typing_${pairId}`, {
+      config: { broadcast: { ack: false } }
+    });
 
     channel
       .on('broadcast', { event: 'typing' }, (payload: any) => {

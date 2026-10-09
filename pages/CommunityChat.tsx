@@ -490,11 +490,6 @@ export default function CommunityChat() {
     } catch {}
 
     fetchMessages(true);
-    pollingRef.current = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        fetchMessages(false);
-      }
-    }, 6000);
 
     const handleSync = () => {
       fetchMessages(false);
@@ -503,7 +498,6 @@ export default function CommunityChat() {
     window.addEventListener('app:sync-data', handleSync);
 
     return () => { 
-      if (pollingRef.current) clearInterval(pollingRef.current); 
       window.removeEventListener('online', handleSync);
       window.removeEventListener('app:sync-data', handleSync);
     };
@@ -1275,6 +1269,16 @@ export default function CommunityChat() {
             </React.Fragment>
           );
         })}
+        {/* Indicador de digitando no chat */}
+        {typingUsers.size > 0 && (
+          <div className="flex items-end w-full justify-start relative animate-in fade-in duration-200 px-1">
+            <div className="bg-white dark:bg-[#182533] rounded-[16px] rounded-bl-none px-3 py-2 shadow-[0_1px_2px_rgba(16,35,47,0.15)] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:0ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:150ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:300ms]" />
+            </div>
+          </div>
+        )}
       </main>
 
       <AnimatePresence>
