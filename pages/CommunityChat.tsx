@@ -263,6 +263,11 @@ export default function CommunityChat() {
   const [isSending, setIsSending] = useState(false);
   const [replyTo, setReplyTo] = useState<any>(null);
   const [editingMessage, setEditingMessage] = useState<any | null>(null);
+  
+  const [typingUsers, setTypingUsers] = useState<Map<string, string>>(new Map());
+  const typingTimeoutsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const lastTypingBroadcastRef = useRef<number>(0);
+  const typingChannelRef = useRef<any>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const [showInfo, setShowInfo] = useState(false);
@@ -507,6 +512,31 @@ export default function CommunityChat() {
   useEffect(() => {
     if (!user) return;
     const channel = supabase.channel("tg_community_chat_realtime")
+      .on("broadcast", { event: "typing" }, (payload: any) => {
+        const { userId, name } = payload.payload || {};
+        if (!userId || userId === user.id) return;
+        
+        setTypingUsers(prev => {
+          const newMap = new Map(prev);
+          newMap.set(userId, name || "Membro");
+          return newMap;
+        });
+        
+        if (typingTimeoutsRef.current.has(userId)) {
+          clearTimeout(typingTimeoutsRef.current.get(userId)!);
+        }
+        
+        const timeoutId = setTimeout(() => {
+          setTypingUsers(prev => {
+            const newMap = new Map(prev);
+            newMap.delete(userId);
+            return newMap;
+          });
+          typingTimeoutsRef.current.delete(userId);
+        }, 3000);
+        
+        typingTimeoutsRef.current.set(userId, timeoutId);
+      })
       .on("postgres_changes", { event: "*", schema: "public", table: "chat_gruop" }, async (payload) => {
         if (payload.eventType === "DELETE") {
           setPublicMessages(prev => prev.filter(m => m.id !== payload.old.id));
@@ -562,8 +592,40 @@ export default function CommunityChat() {
           }
         }
       }).subscribe();
-    return () => { supabase.removeChannel(channel); };
+      
+    typingChannelRef.current = channel;
+
+    return () => { 
+      supabase.removeChannel(channel); 
+      // Limpa os timers
+      Array.from(typingTimeoutsRef.current.values()).forEach(clearTimeout);
+      typingTimeoutsRef.current.clear();
+    };
   }, [user]);
+
+  const sendTypingBroadcast = () => {
+    if (!user) return;
+    const now = Date.now();
+    if (now - lastTypingBroadcastRef.current > 1800 && typingChannelRef.current) {
+      lastTypingBroadcastRef.current = now;
+      typingChannelRef.current.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: {
+          userId: user.id,
+          name: phoneCache[user.id] || user.phone || "Membro"
+        }
+      });
+      // Opcional: Emite globalmente tambÃ©m
+      try {
+        supabase.channel('chatslist_typing_global').send({
+          type: 'broadcast',
+          event: 'typing',
+          payload: { userId: user.id, targetId: 'community' }
+        });
+      } catch (e) {}
+    }
+  };
 
   const validateMessage = (text: string) => {
     if (text.length > 2000) return "A mensagem Ã© muito longa.";
@@ -920,7 +982,13 @@ export default function CommunityChat() {
               Telegram Bussiness Grupo
             </h1>
             <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
-              2 membros
+              {typingUsers.size > 0 ? (
+                <span className="text-[#2481cc] font-medium italic">
+                  {Array.from(typingUsers.values()).join(', ')} digitando...
+                </span>
+              ) : (
+                "2 membros"
+              )}
             </span>
           </div>
         </div>
@@ -1318,6 +1386,7 @@ export default function CommunityChat() {
                   setPublicInput(e.target.value);
                   e.target.style.height = "auto";
                   e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`;
+                  sendTypingBroadcast();
                 }}
                 onKeyDown={(e) => { 
                   if (e.key === 'Enter' && !e.shiftKey) { 
