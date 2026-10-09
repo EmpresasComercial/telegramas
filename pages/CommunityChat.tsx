@@ -512,7 +512,11 @@ export default function CommunityChat() {
   useEffect(() => {
     if (!user) return;
 
-    const typingChannel = supabase.channel("typing_community_chat")
+    const typingChannel = supabase.channel("typing_community_chat", {
+      config: {
+        broadcast: { ack: false }
+      }
+    })
       .on("broadcast", { event: "typing" }, (payload: any) => {
         const { userId, name } = payload.payload || {};
         if (!userId || userId === user.id) return;
