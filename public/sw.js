@@ -1,7 +1,23 @@
-// Service Worker para Telegram Business - Push Notifications
-const CACHE_NAME = 'telegram-business-cache-v2';
+// Service Worker para Telegram Business - Push Notifications & Offline Support
+const CACHE_NAME = 'telegram-business-shell-v3';
+
+// Assets fundamentais para o App abrir offline
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/logo-tb.jpg',
+  '/favicon.ico'
+];
 
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS).catch((err) => {
+        console.debug('Erro ao pré-cachear assets:', err);
+      });
+    })
+  );
   self.skipWaiting();
 });
 
@@ -17,9 +33,49 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// Intercepta requisições para permitir abertura 100% offline
 self.addEventListener('fetch', (event) => {
-  // PWA requirement: The Service Worker must have a fetch event handler.
-  // We just let the browser handle the request normally.
+  const req = event.request;
+  const url = new URL(req.url);
+
+  // Não intercepta chamadas de API externas ou do Supabase (essas usam a rede / offline handling do app)
+  if (url.origin !== self.location.origin) {
+    return;
+  }
+
+  // Requisição de navegação de páginas (HTML)
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req)
+        .then((response) => {
+          const cloned = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, cloned));
+          return response;
+        })
+        .catch(async () => {
+          // Sem internet: entrega o index.html em cache para o SPA carregar e abrir normalmente
+          const cached = await caches.match(req);
+          if (cached) return cached;
+          return caches.match('/index.html');
+        })
+    );
+    return;
+  }
+
+  // Arquivos estáticos locais (JS, CSS, Imagens, Fontes): Cache com fallback para rede
+  event.respondWith(
+    caches.match(req).then((cachedResponse) => {
+      const fetchPromise = fetch(req).then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, responseToCache));
+        }
+        return networkResponse;
+      }).catch(() => cachedResponse);
+
+      return cachedResponse || fetchPromise;
+    })
+  );
 });
 
 // Escuta eventos de Notificação Push

@@ -9,6 +9,7 @@ import Layout from './components/Layout';
 import { ToastProvider } from './components/Toast';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { PresenceProvider } from './contexts/PresenceContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ConnectivityOverlay } from './components/ConnectivityOverlay';
 import { registerServiceWorker, subscribeToPushNotifications, clearAppBadge } from './lib/pushNotifications';
@@ -151,9 +152,10 @@ export default function App() {
         <BrowserRouter>
           <ToastProvider>
             <AuthProvider>
-              <ConnectivityOverlay />
-              <GlobalLoadingIndicator />
-              <Suspense fallback={<PageSkeleton />}>
+              <PresenceProvider>
+                <ConnectivityOverlay />
+                <GlobalLoadingIndicator />
+                <Suspense fallback={<PageSkeleton />}>
                 <Routes>
                   <Route path="/"         element={<RootRedirect />} />
                   <Route path="/t"        element={<Messager />} />
@@ -211,6 +213,7 @@ export default function App() {
                   <Route path="*" element={<Navigate to="/login" replace />} />
                 </Routes>
               </Suspense>
+              </PresenceProvider>
             </AuthProvider>
           </ToastProvider>
         </BrowserRouter>

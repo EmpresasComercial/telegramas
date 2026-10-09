@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { usePresence } from '../contexts/PresenceContext';
 import { 
   ChevronLeft, 
   Send, 
@@ -54,13 +55,31 @@ export default function PrivateChat() {
   const { session } = useAuth();
   const user = session?.user;
   const { showToast } = useToast();
+  const { isUserOnline } = usePresence();
+  const contactIsOnline = isUserOnline(contactId);
 
   const [contactDisplayName, setContactDisplayName] = useState(rawContactPhone);
   const localKey = user && contactId ? `private_chat_${user.id}_${contactId}` : null;
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (localKey) {
+      try {
+        const cached = localStorage.getItem(localKey);
+        if (cached) return JSON.parse(cached);
+      } catch {}
+    }
+    return [];
+  });
   const [inputText, setInputText] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    if (localKey) {
+      try {
+        const cached = localStorage.getItem(localKey);
+        if (cached && JSON.parse(cached).length > 0) return false;
+      } catch {}
+    }
+    return true;
+  });
   const [isSending, setIsSending] = useState(false);
   const [showQuickHints, setShowQuickHints] = useState(false);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
@@ -68,6 +87,12 @@ export default function PrivateChat() {
   // Context Menu state
   const [contextMenu, setContextMenu] = useState<ContextMenu | null>(null);
   const [showAllReactions, setShowAllReactions] = useState(false);
+
+  // ── Indicador de Digitando em Tempo Real (Supabase Broadcast) ──
+  const [isContactTyping, setIsContactTyping] = useState(false);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTypingBroadcastRef = useRef<number>(0);
+  const typingChannelRef = useRef<any>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -120,6 +145,11 @@ export default function PrivateChat() {
         .limit(150);
 
       if (!error && data) {
+        if (localKey) {
+          try {
+            localStorage.setItem(localKey, JSON.stringify(data));
+          } catch {}
+        }
         setMessages(prev => {
           const withoutTemp = prev.filter(m => {
             if (typeof m.id === 'string' && m.id.startsWith('local_')) {
@@ -145,15 +175,61 @@ export default function PrivateChat() {
   };
 
   useEffect(() => {
-    if (localKey) {
-      try { localStorage.removeItem(localKey); } catch {}
-    }
     fetchMessages(true);
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') fetchMessages(false);
     }, 3500);
-    return () => clearInterval(interval);
+
+    const handleSync = () => {
+      fetchMessages(false);
+    };
+    window.addEventListener('online', handleSync);
+    window.addEventListener('app:sync-data', handleSync);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('online', handleSync);
+      window.removeEventListener('app:sync-data', handleSync);
+    };
   }, [user, contactId]);
+
+  // ── Escuta e Envio do Status "Digitando..." via Supabase Realtime Broadcast ──
+  useEffect(() => {
+    if (!user || !contactId) return;
+    const pairId = [user.id, contactId].sort().join('_');
+    const channel = supabase.channel(`typing_${pairId}`);
+
+    channel
+      .on('broadcast', { event: 'typing' }, (payload: any) => {
+        if (payload?.payload?.userId === contactId) {
+          setIsContactTyping(true);
+          if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+          typingTimeoutRef.current = setTimeout(() => {
+            setIsContactTyping(false);
+          }, 3000);
+        }
+      })
+      .subscribe();
+
+    typingChannelRef.current = channel;
+
+    return () => {
+      if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, contactId]);
+
+  const sendTypingBroadcast = () => {
+    const now = Date.now();
+    if (now - lastTypingBroadcastRef.current > 1800 && typingChannelRef.current) {
+      lastTypingBroadcastRef.current = now;
+      typingChannelRef.current.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: { userId: user?.id }
+      });
+    }
+  };
 
   // Busca telefone do contacto
   useEffect(() => {
@@ -295,7 +371,9 @@ export default function PrivateChat() {
     scrollToBottom();
 
     if (contactId.startsWith('pavel') || contactId.includes('suporte')) {
+      setIsContactTyping(true);
       setTimeout(() => {
+        setIsContactTyping(false);
         const autoReply: Message = {
           id: `auto_${Date.now()}`,
           remetente_id: contactId,
@@ -428,7 +506,9 @@ export default function PrivateChat() {
                 {contactDisplayName.slice(0, 2).toUpperCase() || '?'}
               </div>
             )}
-            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-[#1c242f]" />
+            {contactIsOnline && (
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-[#1c242f]" />
+            )}
           </div>
 
           <div className="flex flex-col min-w-0">
@@ -440,9 +520,22 @@ export default function PrivateChat() {
                 <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5">✓</span>
               )}
             </div>
-            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
-              {contactLevel ? `online • Subordinado Nível ${contactLevel}` : 'online'}
-            </span>
+            {isContactTyping ? (
+              <span className="text-[12.5px] text-[#2481cc] font-medium leading-[1.15] mt-0.5 truncate flex items-center gap-1">
+                digitando
+                <span className="inline-flex items-center gap-[2px]">
+                  <span className="w-1 h-1 bg-[#2481cc] rounded-full animate-bounce [animation-delay:0ms]" />
+                  <span className="w-1 h-1 bg-[#2481cc] rounded-full animate-bounce [animation-delay:150ms]" />
+                  <span className="w-1 h-1 bg-[#2481cc] rounded-full animate-bounce [animation-delay:300ms]" />
+                </span>
+              </span>
+            ) : (
+              <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
+                {contactIsOnline
+                  ? (contactLevel ? `online • Subordinado Nível ${contactLevel}` : 'online')
+                  : 'offline'}
+              </span>
+            )}
           </div>
         </div>
 
@@ -501,13 +594,13 @@ export default function PrivateChat() {
               )}
 
               <div
-                className={`flex items-end w-full ${isMe ? 'justify-end' : 'justify-start'} relative`}
+                className={`flex items-end w-full ${isMe ? 'justify-start' : 'justify-end'} relative`}
               >
                 <div className="relative">
                   {/* Reação existente */}
                   {m.reaction && (
                     <div
-                      className={`absolute -bottom-3 ${isMe ? 'left-0' : 'right-0'} z-10 text-[16px] leading-none select-none`}
+                      className={`absolute -bottom-3 ${isMe ? 'right-0' : 'left-0'} z-10 text-[16px] leading-none select-none`}
                       style={{ filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))' }}
                     >
                       {m.reaction}
@@ -553,8 +646,8 @@ export default function PrivateChat() {
                     }}
                     className={`tg-bubble max-w-[85%] px-[10px] pt-[6px] pb-[6px] text-[#000000] dark:text-[#f3f4f6] shadow-[0_1px_2px_rgba(16,35,47,0.15)] relative cursor-pointer active:brightness-95 active:scale-[0.985] transition-all select-none ${
                       isMe
-                        ? 'bg-[#eeffde] dark:bg-[#2b5278] is-me'
-                        : 'bg-white dark:bg-[#182533] is-other'
+                        ? 'bg-[#eeffde] dark:bg-[#2b5278] rounded-[16px] rounded-bl-none'
+                        : 'bg-white dark:bg-[#182533] rounded-[16px] rounded-br-none'
                     } ${contextMenu?.message.id === m.id ? 'brightness-90 scale-[0.985]' : ''}`}
                     style={{ touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}
                   >
@@ -565,7 +658,7 @@ export default function PrivateChat() {
                         height="20"
                         viewBox="0 0 9 20"
                         className="absolute pointer-events-none"
-                        style={{ bottom: 0, right: -8, fill: 'currentColor' }}
+                        style={{ bottom: 0, left: -8, transform: 'scaleX(-1)', fill: 'currentColor' }}
                         stroke="none"
                         color="inherit"
                       >
@@ -577,7 +670,7 @@ export default function PrivateChat() {
                         height="20"
                         viewBox="0 0 9 20"
                         className="absolute pointer-events-none"
-                        style={{ bottom: 0, left: -8, transform: 'scaleX(-1)', fill: 'currentColor' }}
+                        style={{ bottom: 0, right: -8, fill: 'currentColor' }}
                       >
                         <path d="M0 20H9C4.5 20 1 16 0 8V20Z" className="fill-white dark:fill-[#182533]" />
                       </svg>
@@ -620,6 +713,17 @@ export default function PrivateChat() {
             </React.Fragment>
           );
         })}
+
+        {/* Indicador de digitando no chat */}
+        {isContactTyping && (
+          <div className="flex items-end w-full justify-end relative animate-in fade-in duration-200">
+            <div className="bg-white dark:bg-[#182533] rounded-[16px] rounded-br-none px-3 py-2 shadow-[0_1px_2px_rgba(16,35,47,0.15)] flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:0ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:150ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#707579] dark:bg-[#8e9aa5] animate-bounce [animation-delay:300ms]" />
+            </div>
+          </div>
+        )}
 
         {/* Espaço extra para reações no final */}
         <div className="h-2" />
@@ -770,6 +874,7 @@ export default function PrivateChat() {
               onChange={(e) => {
                 const val = e.target.value;
                 setInputText(val);
+                sendTypingBroadcast();
                 if (val.startsWith('/')) setShowQuickHints(true);
                 else if (showQuickHints) setShowQuickHints(false);
                 e.target.style.height = 'auto';

@@ -1568,11 +1568,11 @@ export default function Withdraw() {
       )}
 
       {/* ── FOOTER FLUTUANTE IDÊNTICO AO OFFICIAL CHANNEL ── */}
-      <footer className="fixed bottom-0 left-0 right-0 p-2 pb-3 z-40 flex justify-center bg-transparent pointer-events-none">
-        <div className="w-full max-w-[650px] flex items-center gap-2 pointer-events-auto px-2">
+      <footer className="fixed bottom-0 left-0 right-0 p-2 pb-[max(12px,env(safe-area-inset-bottom,12px))] z-40 flex justify-center bg-transparent pointer-events-none">
+        <div className="w-full max-w-[650px] flex items-center gap-1.5 sm:gap-2 pointer-events-auto px-1 sm:px-2">
 
           {/* Cápsula branca flutuante sobre o wallpaper */}
-          <div className="flex-1 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
+          <div className="flex-1 min-w-0 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-2.5 sm:px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
 
             {/* Campo de texto */}
             <input
@@ -1596,13 +1596,13 @@ export default function Withdraw() {
                   ? 'Novo valor ou Sim/Não...'
                   : 'Mensagem...'
               }
-              className="flex-1 min-w-0 px-1 py-1 text-[15px] bg-transparent outline-none text-black dark:text-white placeholder:text-[#8e8e93] dark:placeholder:text-gray-400 font-normal leading-snug"
+              className="flex-1 min-w-0 w-0 px-1 py-1 text-[14.5px] sm:text-[15px] bg-transparent outline-none text-black dark:text-white placeholder:text-[#8e8e93] dark:placeholder:text-gray-400 font-normal leading-snug"
             />
 
             {/* Botão Ajuda à direita dentro da cápsula */}
             <button
               onClick={() => handleSendMessage('/ajuda')}
-              className="text-[#2481cc] text-[13.5px] font-semibold shrink-0 cursor-pointer hover:underline ml-2 active:scale-95 transition-transform"
+              className="text-[#2481cc] text-[12.5px] sm:text-[13.5px] font-semibold shrink-0 cursor-pointer hover:underline ml-1.5 sm:ml-2 active:scale-95 transition-transform"
             >
               Ajuda
             </button>
@@ -1611,7 +1611,7 @@ export default function Withdraw() {
           {/* Botão circular azul Telegram */}
           <button
             onClick={() => handleSendMessage()}
-            className="w-[48px] h-[48px] rounded-full text-white bg-[#2481cc] hover:bg-[#1f72b5] flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_2px_8px_rgba(36,129,204,0.4)] cursor-pointer"
+            className="w-[46px] h-[46px] sm:w-[48px] sm:h-[48px] rounded-full text-white bg-[#2481cc] hover:bg-[#1f72b5] flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_2px_8px_rgba(36,129,204,0.4)] cursor-pointer"
             aria-label="Enviar"
           >
             <Send className="w-5 h-5 ml-0.5" />

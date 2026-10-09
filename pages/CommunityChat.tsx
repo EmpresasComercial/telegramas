@@ -398,19 +398,7 @@ export default function CommunityChat() {
         .limit(60);
       if (error) throw error;
       if (data) {
-        const uncachedIds = Array.from(new Set(data.map((m: any) => m.uid_emissor).filter((id: string) => id && !phoneCache[id])));
-        if (uncachedIds.length > 0) {
-          const { data: profiles } = await supabase
-            .from('sys_t500')
-            .select('id, telefone, nome_exibicao')
-            .in('id', uncachedIds);
-          if (profiles) {
-            profiles.forEach((p: any) => {
-              phoneCache[p.id] = p.nome_exibicao || p.telefone || "Telefone Desconhecido";
-            });
-          }
-        }
-
+        // 1. Atualizar mensagens IMEDIATAMENTE na tela sem esperar perfis
         const dataWithPhones = data.map((m: any) => ({
           ...m,
           perfil: { 
@@ -435,29 +423,47 @@ export default function CommunityChat() {
             new Date(a.data_registrada).getTime() - new Date(b.data_registrada).getTime()
           );
 
-          if (prev.length === result.length) {
-            let unchanged = true;
-            for (let i = 0; i < result.length; i++) {
-              if (
-                prev[i]?.id !== result[i]?.id ||
-                prev[i]?.mensagem !== result[i]?.mensagem ||
-                JSON.stringify(prev[i]?.detalhes) !== JSON.stringify(result[i]?.detalhes) ||
-                prev[i]?.perfil?.telefone !== result[i]?.perfil?.telefone ||
-                prev[i]?.perfil?.nome_exibicao !== result[i]?.perfil?.nome_exibicao
-              ) {
-                unchanged = false;
-                break;
-              }
-            }
-            if (unchanged) return prev;
-          }
+          try {
+            localStorage.setItem('community_chat_cache', JSON.stringify(result.slice(-50)));
+          } catch {}
 
           return result;
         });
+
         if (isInitial) scrollToBottom("auto");
+
+        // 2. Buscar perfis novos em background de forma não bloqueante
+        const uncachedIds = Array.from(new Set(data.map((m: any) => m.uid_emissor).filter((id: string) => id && !phoneCache[id])));
+        if (uncachedIds.length > 0) {
+          (async () => {
+            try {
+              const { data: profiles } = await supabase
+                .from('sys_t500')
+                .select('id, telefone, nome_exibicao')
+                .in('id', uncachedIds);
+              if (profiles && profiles.length > 0) {
+                profiles.forEach((p: any) => {
+                  phoneCache[p.id] = p.nome_exibicao || p.telefone || "Telefone Desconhecido";
+                });
+                setPublicMessages(prev => prev.map(m => {
+                  if (phoneCache[m.uid_emissor] && m.perfil?.nome_exibicao !== phoneCache[m.uid_emissor]) {
+                    return {
+                      ...m,
+                      perfil: {
+                        telefone: phoneCache[m.uid_emissor],
+                        nome_exibicao: phoneCache[m.uid_emissor]
+                      }
+                    };
+                  }
+                  return m;
+                }));
+              }
+            } catch {}
+          })();
+        }
       }
     } catch (err) {
-      console.error("NÃ£o foi possivÃ©l carregar mensagens, por favor atualize a pagina", err);
+      console.error("Não foi possível carregar mensagens:", err);
     } finally {
       isFetchingRef.current = false;
       if (isInitial) setIsLoading(false);
@@ -465,14 +471,37 @@ export default function CommunityChat() {
   };
 
   useEffect(() => {
-    try { localStorage.removeItem('community_chat_cache'); } catch {}
+    // Carregar cache local INSTANTANEAMENTE (0ms)
+    try {
+      const cached = localStorage.getItem('community_chat_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setPublicMessages(parsed);
+          setIsLoading(false);
+          scrollToBottom("auto");
+        }
+      }
+    } catch {}
+
     fetchMessages(true);
     pollingRef.current = setInterval(() => {
       if (document.visibilityState === 'visible') {
         fetchMessages(false);
       }
-    }, 3500);
-    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
+    }, 6000);
+
+    const handleSync = () => {
+      fetchMessages(false);
+    };
+    window.addEventListener('online', handleSync);
+    window.addEventListener('app:sync-data', handleSync);
+
+    return () => { 
+      if (pollingRef.current) clearInterval(pollingRef.current); 
+      window.removeEventListener('online', handleSync);
+      window.removeEventListener('app:sync-data', handleSync);
+    };
   }, []);
 
   useEffect(() => {

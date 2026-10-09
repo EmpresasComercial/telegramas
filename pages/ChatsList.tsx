@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { usePresence } from '../contexts/PresenceContext';
 import { 
   Search, 
   CheckCheck, 
@@ -35,12 +36,30 @@ export default function ChatsList() {
   const navigate = useNavigate();
   const { session } = useAuth();
   const user = session?.user;
+  const { isUserOnline } = usePresence();
   const { showToast } = useToast();
 
   const outletContext = useOutletContext<{ openAutoMessages?: () => void }>();
 
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const CACHE_KEY_CONTACTS = user ? `tg_cache_contacts_${user.id}` : 'tg_cache_contacts';
+  const CACHE_KEY_COMM_LAST = 'tg_cache_community_last_msg';
+
+  const [contacts, setContacts] = useState<any[]>(() => {
+    try {
+      const cached = localStorage.getItem(user ? `tg_cache_contacts_${user.id}` : 'tg_cache_contacts');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [isLoading, setIsLoading] = useState(() => {
+    try {
+      const cached = localStorage.getItem(user ? `tg_cache_contacts_${user.id}` : 'tg_cache_contacts');
+      return !(cached && JSON.parse(cached).length > 0);
+    } catch {
+      return true;
+    }
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [communityLastMessage, setCommunityLastMessage] = useState<{
@@ -49,12 +68,18 @@ export default function ChatsList() {
     time: string;
     isMe: boolean;
     timestamp: number;
-  }>({
-    text: "Bem-vindo à comunidade oficial de negócios e automações!",
-    sender: "Equipe Telegram",
-    time: "Hoje",
-    isMe: false,
-    timestamp: Date.now() - 1000 * 60 * 15
+  }>(() => {
+    try {
+      const cached = localStorage.getItem(CACHE_KEY_COMM_LAST);
+      if (cached) return JSON.parse(cached);
+    } catch {}
+    return {
+      text: "Bem-vindo à comunidade oficial de negócios e automações!",
+      sender: "Equipe Telegram",
+      time: "Hoje",
+      isMe: false,
+      timestamp: Date.now() - 1000 * 60 * 15
+    };
   });
   
   // Abas oficiais conforme especificação da Fase 1:
@@ -140,13 +165,17 @@ export default function ChatsList() {
           const text = latestMsg.mensagem || (parsedData.imagem_url ? "📷 Foto" : "Mensagem");
           const msgTimestamp = new Date(latestMsg.data_registrada).getTime();
 
-          setCommunityLastMessage({
+          const newMsg = {
             text,
             sender: senderLabel,
             time: formatTelegramTime(msgTimestamp),
             isMe: user ? latestMsg.uid_emissor === user.id : false,
             timestamp: msgTimestamp
-          });
+          };
+          setCommunityLastMessage(newMsg);
+          try {
+            localStorage.setItem(CACHE_KEY_COMM_LAST, JSON.stringify(newMsg));
+          } catch {}
         }
       } catch (err) {
         console.error('Erro ao carregar última mensagem da comunidade:', err);
@@ -163,9 +192,17 @@ export default function ChatsList() {
 
     const poll = setInterval(fetchCommunityLastMessage, 5000);
 
+    const handleSync = () => {
+      fetchCommunityLastMessage();
+    };
+    window.addEventListener('online', handleSync);
+    window.addEventListener('app:sync-data', handleSync);
+
     return () => {
       supabase.removeChannel(commChannel);
       clearInterval(poll);
+      window.removeEventListener('online', handleSync);
+      window.removeEventListener('app:sync-data', handleSync);
     };
   }, [user]);
 
@@ -285,6 +322,9 @@ export default function ChatsList() {
         });
 
         setContacts(sorted);
+        try {
+          localStorage.setItem(CACHE_KEY_CONTACTS, JSON.stringify(sorted));
+        } catch {}
       } catch (e) {
         console.error('Erro ao carregar contactos:', e);
       } finally {
@@ -303,8 +343,16 @@ export default function ChatsList() {
       })
       .subscribe();
 
+    const handleSync = () => {
+      fetchContacts();
+    };
+    window.addEventListener('online', handleSync);
+    window.addEventListener('app:sync-data', handleSync);
+
     return () => {
       supabase.removeChannel(contactChannel);
+      window.removeEventListener('online', handleSync);
+      window.removeEventListener('app:sync-data', handleSync);
     };
   }, [user]);
 
@@ -771,7 +819,7 @@ export default function ChatsList() {
                   const label = (contact.telefone || '').replace(/\D/g, '').slice(-2) || '?';
                   const isSub = Boolean(contact.isSubordinate);
                   const nv = contact.nivel;
-                  const isOnline = isSub && nv === 1;
+                  const isOnline = isUserOnline(contact.id);
 
                   return (
                     <div

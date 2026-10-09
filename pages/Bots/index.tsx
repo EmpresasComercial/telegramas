@@ -656,7 +656,7 @@ export default function TelegramBotsChat() {
 
   return (
     <div
-      className="w-full h-[100dvh] flex flex-col select-none relative"
+      className="w-full h-[100dvh] flex flex-col overflow-hidden select-none relative"
       style={{
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Roboto', 'Segoe UI', sans-serif",
         backgroundColor: '#afc8af',
@@ -752,7 +752,7 @@ export default function TelegramBotsChat() {
       <main
         ref={mainChatRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-2.5 py-3 pb-4 space-y-1 relative select-text"
+        className="flex-1 overflow-y-auto px-2.5 py-3 pb-24 space-y-1 relative select-text"
       >
         <div className="flex justify-center my-2 select-none">
           <span className="text-white text-[12px] font-medium px-3.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(74, 100, 74, 0.72)", backdropFilter: "blur(4px)" }}>
@@ -915,14 +915,14 @@ export default function TelegramBotsChat() {
         </button>
       )}
 
-      {/* ── FOOTER — Input + Botão Enviar ── */}
-      <footer className="shrink-0 bg-transparent p-2 pb-[max(10px,env(safe-area-inset-bottom,10px))] z-40 flex justify-center">
-        <div className="w-full max-w-[650px] flex items-center gap-2 px-2">
-          <div className="flex-1 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
+      {/* ── FOOTER FLUTUANTE — Input + Botão Enviar ── */}
+      <footer className="fixed bottom-0 left-0 right-0 p-2 pb-[max(12px,env(safe-area-inset-bottom,12px))] z-40 flex justify-center bg-transparent pointer-events-none">
+        <div className="w-full max-w-[650px] flex items-center gap-1.5 sm:gap-2 pointer-events-auto px-1 sm:px-2">
+          <div className="flex-1 min-w-0 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-2.5 sm:px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
             {/* Meus Bots à esquerda */}
             <button
               onClick={() => handleSendMessage("/meusbots")}
-              className="text-[#2481cc] text-[13px] font-semibold shrink-0 cursor-pointer hover:underline mr-2 active:scale-95 transition-transform whitespace-nowrap"
+              className="text-[#2481cc] text-[12.5px] sm:text-[13px] font-semibold shrink-0 cursor-pointer hover:underline mr-1.5 sm:mr-2 active:scale-95 transition-transform whitespace-nowrap"
             >
               Meus Bots
             </button>
@@ -937,19 +937,19 @@ export default function TelegramBotsChat() {
                 }
               }}
               placeholder="Mensagem"
-              className="flex-1 min-w-0 px-1 py-1 text-[15px] bg-transparent outline-none text-black dark:text-white placeholder:text-[#8e8e93] font-normal leading-snug"
+              className="flex-1 min-w-0 w-0 px-1 py-1 text-[14.5px] sm:text-[15px] bg-transparent outline-none text-black dark:text-white placeholder:text-[#8e8e93] font-normal leading-snug"
             />
             {/* Ajuda à direita */}
             <button
               onClick={() => handleSendMessage("/ajuda")}
-              className="text-[#2481cc] text-[13.5px] font-semibold shrink-0 cursor-pointer hover:underline ml-2 active:scale-95 transition-transform"
+              className="text-[#2481cc] text-[12.5px] sm:text-[13.5px] font-semibold shrink-0 cursor-pointer hover:underline ml-1.5 sm:ml-2 active:scale-95 transition-transform whitespace-nowrap"
             >
               Ajuda
             </button>
           </div>
           <button
             onClick={() => handleSendMessage()}
-            className="w-[48px] h-[48px] rounded-full text-white bg-[#2481cc] hover:bg-[#1f72b5] flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_2px_8px_rgba(36,129,204,0.4)] cursor-pointer"
+            className="w-[46px] h-[46px] sm:w-[48px] sm:h-[48px] rounded-full text-white bg-[#2481cc] hover:bg-[#1f72b5] flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_2px_8px_rgba(36,129,204,0.4)] cursor-pointer"
             aria-label="Enviar"
           >
             <Send className="w-5 h-5 ml-0.5" />
