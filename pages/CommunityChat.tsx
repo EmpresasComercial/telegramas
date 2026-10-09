@@ -511,7 +511,8 @@ export default function CommunityChat() {
 
   useEffect(() => {
     if (!user) return;
-    const channel = supabase.channel("tg_community_chat_realtime")
+
+    const typingChannel = supabase.channel("typing_community_chat")
       .on("broadcast", { event: "typing" }, (payload: any) => {
         const { userId, name } = payload.payload || {};
         if (!userId || userId === user.id) return;
@@ -537,6 +538,9 @@ export default function CommunityChat() {
         
         typingTimeoutsRef.current.set(userId, timeoutId);
       })
+      .subscribe();
+
+    const channel = supabase.channel("tg_community_chat_realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "chat_gruop" }, async (payload) => {
         if (payload.eventType === "DELETE") {
           setPublicMessages(prev => prev.filter(m => m.id !== payload.old.id));
@@ -593,10 +597,11 @@ export default function CommunityChat() {
         }
       }).subscribe();
       
-    typingChannelRef.current = channel;
+    typingChannelRef.current = typingChannel;
 
     return () => { 
       supabase.removeChannel(channel); 
+      supabase.removeChannel(typingChannel);
       // Limpa os timers
       Array.from(typingTimeoutsRef.current.values()).forEach(clearTimeout);
       typingTimeoutsRef.current.clear();
