@@ -11,11 +11,15 @@ import {
   Send,
   X,
   Loader2,
-  Upload
+  Upload,
+  ZoomIn
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+
+// URL da Edge Function (não acessa banco diretamente)
+const EDGE_FN_URL = 'https://ptvmqurxtciyqxdpsuen.supabase.co/functions/v1/canal-proofs';
 
 interface ChannelPost {
   id: string;
@@ -93,48 +97,6 @@ export const calculateProofMetrics = (createdAtMs: number, postId: string = '') 
   return { views, likes, love, fire };
 };
 
-const INITIAL_POSTS: ChannelPost[] = [
-  {
-    id: 'post-1',
-    content: `para criar campanhas, atividades, parcerias e novas oportunidades dentro da plataforma.\n\nQueremos que empresas, criadores, parceiros e utilizadores possam fazer parte desse crescimento.\n\nESTA É A MANEIRA DA ASIARAY MÍDIA.`,
-    time: '14:44',
-    views: '1',
-    reactions: [
-      { emoji: '❤️', count: 1, userReacted: true }
-    ]
-  },
-  {
-    id: 'post-2',
-    forwardedFrom: {
-      name: 'Channel Asiaray Angola - Gestão...',
-      avatar: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=80&h=80&fit=crop'
-    },
-    image: '/tutorial_retirada.png',
-    title: 'Como fazer uma retirada?',
-    content: `Clique em "Retirar", digite o valor desejado, escolha AOA ou USDT e clique em "Confirmar".`,
-    time: '14:44',
-    views: '1',
-    reactions: [
-      { emoji: '❤️', count: 1, userReacted: true }
-    ]
-  },
-  {
-    id: 'post-3',
-    forwardedFrom: {
-      name: 'Pavel Durov',
-      avatar: '/pavel_durov.jpg'
-    },
-    title: '🌟 Lançamento Oficial do Sistema Telegram Stars!',
-    content: `Temos o prazer de anunciar o lançamento do novo sistema Telegram Stars na nossa aplicação!\n\nAgora você pode adquirir pacotes de Estrelas digitais para ativação rápida de Bots e serviços na plataforma, com liquidação instantânea.\n\nAcesse a seção de Estrelas no topo da página ou pelo menu lateral para conferir todos os benefícios!`,
-    time: '15:10',
-    views: '12.8K',
-    reactions: [
-      { emoji: '🔥', count: 42, userReacted: false },
-      { emoji: '👍', count: 89, userReacted: true }
-    ]
-  }
-];
-
 // Utilitário leve de compressão de imagem via Canvas nativo
 const compressImage = async (file: File): Promise<string> => {
   return new Promise((resolve) => {
@@ -190,12 +152,15 @@ export default function pavelDurov() {
   const { showToast } = useToast();
   const { session } = useAuth();
 
-  const [posts, setPosts] = useState<ChannelPost[]>(INITIAL_POSTS);
+  const [posts, setPosts] = useState<ChannelPost[]>([]);
   const [inputText, setInputText] = useState('');
   const [isMuted, setIsMuted] = useState(false);
   const [subscribersCount] = useState('1 inscrito');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fullscreen image viewer
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   // Ticker para atualizar dinamicamente visualizações e reações em tempo real
   const [, setTick] = useState(0);
@@ -204,6 +169,15 @@ export default function pavelDurov() {
       setTick(t => t + 1);
     }, 10000); // 10 segundos
     return () => clearInterval(timer);
+  }, []);
+
+  // Fechar fullscreen com tecla ESC
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFullscreenImage(null);
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
   }, []);
 
   // Estados para anexo e envio de Prova de Retirada
@@ -239,55 +213,63 @@ export default function pavelDurov() {
       console.warn('Erro ao ler posts locais:', e);
     }
 
+    // Carrega provas via Edge Function (não acessa o banco diretamente)
     const fetchSupabaseProofs = async () => {
       try {
-        const { data, error } = await supabase
-          .from('social_proofs_mcpn')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(20);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
 
-        if (!error && data && Array.isArray(data)) {
-          const dbPosts: ChannelPost[] = data
-            .filter((row: any) => row.conteudo?.imagem_url || row.imagem_url)
-            .map((row: any) => {
-              const val = Number(row.valor || 0);
-              const valStr = val > 0 ? `${val.toLocaleString('pt-AO')} Kz` : '';
-              const comment = row.conteudo?.comentario || row.comentario || '';
-              const img = row.conteudo?.imagem_url || row.imagem_url;
-              const date = row.created_at ? new Date(row.created_at) : new Date();
+        const res = await fetch(`${EDGE_FN_URL}?action=list`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-              return {
-                id: `sp-${row.id}`,
-                isProof: true,
-                createdAt: date.getTime(),
-                forwardedFrom: {
-                  name: `Prova de Retirada • Membro ***${String(row.user_id || '').substring(0, 4)}`,
-                  avatar: '/botRetirada.jpg'
-                },
-                title: valStr ? `💸 Retirada Concluída: ${valStr}` : '💸 Retirada Concluída',
-                amount: valStr,
-                content: (comment ? `${comment}\n\n` : '') + '✅ Comprovativo autenticado na plataforma.',
-                image: img,
-                time: date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
-                views: '1',
-                reactions: [
-                  { emoji: '👍', count: 0, userReacted: false },
-                  { emoji: '❤️', count: 0, userReacted: false },
-                  { emoji: '🔥', count: 0, userReacted: false }
-                ]
-              };
-            });
-
-          setPosts(() => deduplicatePosts([...INITIAL_POSTS, ...localSaved, ...dbPosts]));
+        if (!res.ok) {
+          console.warn('Edge function erro:', res.status);
+          return;
         }
+
+        const json = await res.json();
+        const rows = json?.data;
+        if (!Array.isArray(rows)) return;
+
+        const dbPosts: ChannelPost[] = rows
+          .filter((row: any) => row.imagem_url)
+          .map((row: any) => {
+            const date = row.created_at ? new Date(row.created_at) : new Date();
+            return {
+              id: `sp-${row.id}`,
+              isProof: true,
+              createdAt: date.getTime(),
+              forwardedFrom: {
+                name: row.userLabel || '***???',
+                avatar: '/botRetirada.jpg'
+              },
+              title: row.valorStr ? `💸 Retirada Concluída: ${row.valorStr}` : '💸 Retirada Concluída',
+              amount: row.valorStr || '',
+              content: (row.comentario || '').trim(),
+              image: row.imagem_url,
+              time: date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
+              views: '1',
+              reactions: [
+                { emoji: '👍', count: 0, userReacted: false },
+                { emoji: '❤️', count: 0, userReacted: false },
+                { emoji: '🔥', count: 0, userReacted: false }
+              ]
+            };
+          });
+
+        setPosts(() => deduplicatePosts([...localSaved, ...dbPosts]));
       } catch (err) {
-        console.warn('Erro ao carregar comprovativos do Supabase:', err);
+        console.warn('Erro ao carregar provas via edge function:', err);
       }
     };
 
     if (localSaved.length > 0) {
-      setPosts(() => deduplicatePosts([...INITIAL_POSTS, ...localSaved]));
+      setPosts(() => deduplicatePosts(localSaved));
     }
 
     fetchSupabaseProofs();
@@ -312,12 +294,12 @@ export default function pavelDurov() {
             isProof: true,
             createdAt: new Date(row.created_at || Date.now()).getTime(),
             forwardedFrom: {
-              name: `Prova de Retirada • Membro ***${String(row.user_id || '').substring(0, 4)}`,
+              name: `***${String(row.user_id || '').substring(0, 4)}`,
               avatar: '/botRetirada.jpg'
             },
             title: valStr ? `💸 Retirada Concluída: ${valStr}` : '💸 Retirada Concluída',
             amount: valStr,
-            content: (comment ? `${comment}\n\n` : '') + '✅ Comprovativo autenticado na plataforma.',
+            content: comment.trim(),
             image: img,
             time: new Date(row.created_at || Date.now()).toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }),
             views: '1',
@@ -455,7 +437,7 @@ export default function pavelDurov() {
     try {
       let finalImageUrl = previewImage;
 
-      // Tentar salvar no bucket provas-sociais se disponível
+      // 1. Upload da imagem para o bucket de storage (storage permanece direto)
       try {
         const fileExt = 'jpg';
         const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -471,29 +453,27 @@ export default function pavelDurov() {
         console.warn('Upload bucket fallback para base64:', uploadErr);
       }
 
-      // Persistir na base de dados Supabase via inserção direta ou RPC
+      // 2. Inserção via Edge Function (não acessa banco diretamente)
       let realId: string | null = null;
-      if (session?.user) {
-        try {
-          const { data: insertedData } = await supabase
-            .from('social_proofs_mcpn')
-            .insert({
-              user_id: session.user.id,
-              valor: Number(cleanAmount),
-              status: 'aprovado',
-              conteudo: {
-                comentario: proofComment.trim(),
-                imagem_url: finalImageUrl
-              }
-            })
-            .select('id')
-            .single();
-
-          if (insertedData?.id) {
-            realId = insertedData.id;
-          }
-        } catch (insertErr) {
-          console.warn('Insert social_proofs_mcpn fallback:', insertErr);
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (currentSession?.access_token) {
+        const res = await fetch(`${EDGE_FN_URL}?action=insert`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${currentSession.access_token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            valor: Number(cleanAmount),
+            comentario: proofComment.trim(),
+            imagem_url: finalImageUrl,
+          }),
+        });
+        const json = await res.json();
+        if (res.ok && json?.data?.id) {
+          realId = json.data.id;
+        } else {
+          throw new Error(json?.error || 'Erro ao guardar comprovativo');
         }
       }
 
@@ -524,12 +504,12 @@ export default function pavelDurov() {
         isProof: true,
         createdAt: now.getTime(),
         forwardedFrom: {
-          name: `Prova de Retirada • ${userPhoneMasked}`,
+          name: userPhoneMasked,
           avatar: '/botRetirada.jpg'
         },
         title: `💸 Retirada Concluída: ${Number(cleanAmount).toLocaleString('pt-AO')} Kz`,
         amount: `${Number(cleanAmount).toLocaleString('pt-AO')} Kz`,
-        content: (proofComment.trim() ? `${proofComment.trim()}\n\n` : '') + '✅ Comprovativo de retirada recebida com sucesso.',
+        content: proofComment.trim(),
         image: finalImageUrl,
         time: timeStr,
         views: '1',
@@ -589,38 +569,38 @@ export default function pavelDurov() {
         onChange={handleImageSelected}
       />
 
-      {/* ── HEADER IDÊNTICO AO TELEGRAM REAL ── */}
-      <header className="w-full bg-white dark:bg-[#242f3d] text-gray-900 dark:text-white px-2 py-2 sticky top-0 z-40 flex items-center justify-between shadow-xs select-none border-b border-gray-200/60 dark:border-[#17212b]">
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <button
-            type="button"
-            onClick={() => navigate('/telegramBussiness')}
-            className="w-10 h-10 -ml-1 rounded-full flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 active:bg-gray-200 dark:active:bg-white/20 transition-colors cursor-pointer shrink-0"
-            aria-label="Voltar"
-          >
-            <ArrowLeft className="w-6 h-6 stroke-[2.2]" />
-          </button>
+      {/* ── HEADER FLOATING PILL (IDÊNTICO AO GRUPOCHAT / PRIVATECHAT) ── */}
+      <header className="w-full bg-transparent px-3 sm:px-4 py-3 sticky top-0 z-40 flex items-center justify-between select-none pointer-events-none">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto cursor-pointer"
+          aria-label="Voltar"
+        >
+          <ArrowLeft className="w-6 h-6 stroke-[2]" />
+        </button>
 
-          {/* Avatar Pavel Durov */}
-          <div className="relative shrink-0">
-            <div className="w-11 h-11 rounded-full overflow-hidden shadow-xs bg-[#2481cc]/20 border border-white/40">
-              <img
-                src="/pavel_durov.jpg"
-                alt="Pavel Durov"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as any).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
-                }}
-              />
-            </div>
+        <div className="flex items-center gap-2.5 bg-white dark:bg-[#1c242f] rounded-full p-1.5 pr-4 shadow-[0_2px_8px_rgba(0,0,0,0.12)] mx-2 min-w-0 max-w-[65%] pointer-events-auto">
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
+            <img
+              src="/pavel_durov.jpg"
+              alt="Pavel Durov"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as any).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
+              }}
+            />
           </div>
-
-          <div className="flex flex-col min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <h1 className="text-[16px] font-bold text-[#111827] dark:text-white tracking-tight truncate leading-tight">
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1">
+              <h1 className="text-[15px] font-medium text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
                 Pavel Durov
               </h1>
-              <svg viewBox="0 0 24 24" className="w-[17px] h-[17px] shrink-0 inline-block align-middle select-none">
+              <svg 
+                viewBox="0 0 24 24" 
+                style={{ width: '16px', height: '16px', minWidth: '16px', minHeight: '16px' }}
+                className="w-4 h-4 shrink-0 inline-block align-middle select-none"
+              >
                 <path
                   fill="#2481cc"
                   d="M10.26 2.45c.87-.6 2.05-.6 2.92 0l1.24.86c.4.28.88.42 1.37.4l1.51-.06c1.06-.04 1.98.63 2.23 1.66l.36 1.47c.12.48.38.9.76 1.21l1.17.97c.83.69 1.09 1.84.62 2.8l-.66 1.36c-.21.44-.27.94-.17 1.43l.31 1.48c.22 1.04-.37 2.07-1.41 2.47l-1.46.56c-.47.18-.86.51-1.12.94l-.79 1.3c-.56.92-1.68 1.32-2.7.98l-1.44-.48c-.46-.15-.96-.14-1.42.03l-1.43.52c-1.02.37-2.15-.01-2.73-.91l-.81-1.28c-.26-.42-.66-.74-1.13-.91l-1.47-.53c-1.05-.38-1.67-1.4-1.47-2.45l.28-1.49c.09-.48.05-.98-.14-1.43l-.63-1.38c-.45-.97-.16-2.11.69-2.78l1.19-.94c.39-.3.66-.72.79-1.19l.39-1.46c.27-1.02 1.21-1.67 2.26-1.6l1.51.09c.49.03.97-.1 1.38-.37l1.23-.88z"
@@ -631,26 +611,23 @@ export default function pavelDurov() {
                 />
               </svg>
             </div>
-            <span className="text-[12px] text-gray-500 dark:text-gray-400 font-normal leading-tight">
+            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
               Fundador • {subscribersCount}
             </span>
           </div>
         </div>
 
-        {/* Três pontinhos verticais */}
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => showToast('Canal Oficial Verificado por Telegram Corp.', 'info')}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 active:bg-gray-200 dark:active:bg-white/20 transition-colors cursor-pointer"
-            aria-label="Mais opções"
-          >
-            <MoreVertical className="w-5 h-5" />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => showToast('Canal Oficial Verificado por Telegram Corp.', 'info')}
+          className="w-11 h-11 rounded-full bg-white dark:bg-[#1c242f] shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center justify-center text-black dark:text-white hover:bg-gray-50 active:scale-95 transition-transform shrink-0 pointer-events-auto cursor-pointer"
+          aria-label="Mais opções"
+        >
+          <MoreVertical className="w-5 h-5 stroke-[2]" />
+        </button>
       </header>
 
-      {/* ── FEED DE POSTAGENS DO CANAL (BALÕES NATIVOS) ── */}
+      {/* ── FEED DE POSTAGENS DO CANAL (BALÕES NATIVOS FLATS) ── */}
       <main
         ref={scrollRef}
         className="w-full max-w-[650px] flex-1 overflow-y-auto no-scrollbar px-3 pt-3 pb-24 space-y-3 relative"
@@ -694,20 +671,17 @@ export default function pavelDurov() {
           return (
             <div key={post.id} className="flex items-end justify-start gap-2 relative">
               
-              {/* Balão Branco do Post Telegram */}
-              <div className="max-w-[88%] sm:max-w-[82%] bg-white dark:bg-[#182533] rounded-[16px] rounded-tl-[4px] px-3.5 pt-3 pb-2 shadow-[0_1px_2px_rgba(0,0,0,0.08)] border border-black/5 dark:border-white/5 relative">
+              {/* Balão Branco do Post Telegram (FLAT - COMPACTO E SEM CONTAINER NA IMAGEM) */}
+              <div className="max-w-[88%] sm:max-w-[82%] bg-white dark:bg-[#182533] rounded-[16px] rounded-tl-[4px] px-3.5 pt-3 pb-2 border border-[#e4e4e4] dark:border-[#1e2c3a] relative">
                 
-                {/* Cabeçalho de Encaminhado */}
+                {/* 1. Nome/Número do Membro */}
                 {post.forwardedFrom && (
-                  <div className="mb-2">
-                    <span className="text-[12px] font-normal text-[#e67e22] dark:text-[#f39c12] block leading-tight">
-                      Encaminhado de
-                    </span>
-                    <div className="flex items-center gap-1.5 mt-0.5">
+                  <div className="mb-1.5">
+                    <div className="flex items-center gap-1.5">
                       {post.forwardedFrom.avatar ? (
                         <img 
                           src={post.forwardedFrom.avatar} 
-                          alt="Avatar do Canal"
+                          alt="Avatar do Membro"
                           className="w-5 h-5 rounded-full object-cover shrink-0 border border-orange-200"
                           onError={(e) => {
                             (e.target as any).src = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=80&h=80&fit=crop";
@@ -715,40 +689,40 @@ export default function pavelDurov() {
                         />
                       ) : (
                         <div className="w-5 h-5 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center">
-                          📢
+                          👤
                         </div>
                       )}
                       <span className="text-[13.5px] font-bold text-[#e67e22] dark:text-[#f39c12] truncate">
-                        {post.forwardedFrom.name}
+                        {post.forwardedFrom.name.replace(/^Prova de Retirada •\s*/i, '').replace(/^Membro\s*/i, '').trim()}
                       </span>
                     </div>
                   </div>
                 )}
 
-                {/* Imagem do Post sem corte (exibe o comprovativo completo) */}
+                {/* 2. Imagem em cima — clique abre fullscreen */}
                 {post.image && (
-                  <div className="mb-2.5 -mx-1.5 rounded-[12px] overflow-hidden border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-[#101921] flex items-center justify-center">
+                  <div
+                    className="relative group cursor-zoom-in"
+                    onClick={() => setFullscreenImage(post.image!)}
+                    title="Toque para ampliar"
+                  >
                     <img
                       src={post.image}
-                      alt={post.title || "Comprovativo completo"}
-                      className="w-full h-auto max-h-[550px] object-contain block mx-auto rounded-[12px]"
+                      alt={post.title || "Comprovativo"}
+                      className="w-full h-auto max-h-[550px] object-contain block my-2 rounded-[12px] select-none transition-opacity group-active:opacity-80"
                       onError={(e) => {
                         (e.target as any).src = "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=350&fit=crop";
                       }}
                     />
+                    <div className="absolute top-3 right-3 bg-black/40 rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                      <ZoomIn className="w-4 h-4 text-white" />
+                    </div>
                   </div>
                 )}
 
-                {/* Valor do Saque destacado na cor VERDE */}
-                {post.amount && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950/60 text-[#16a34a] dark:text-[#22c55e] font-black text-[15px] mb-1.5 border border-emerald-200 dark:border-emerald-800/60 shadow-xs">
-                    <span>+ {post.amount}</span>
-                  </div>
-                )}
-
-                {/* Título do Post (com valor em verde quando presente) */}
+                {/* 3. Título de valor em baixo (ex: Retirada Concluída: 20.000 Kz) */}
                 {post.title && (
-                  <h2 className="text-[15.5px] font-bold mb-1 leading-snug">
+                  <h2 className="text-[15px] font-bold mt-2 mb-1 leading-snug">
                     {post.title.includes(':') ? (
                       <>
                         <span className="text-[#111827] dark:text-white">
@@ -764,15 +738,15 @@ export default function pavelDurov() {
                   </h2>
                 )}
 
-                {/* Conteúdo do Post sem aspas */}
-                <p className="text-[14.5px] text-[#111827] dark:text-[#f3f4f6] leading-relaxed break-words whitespace-pre-line font-normal pr-14">
-                  {post.content}
-                </p>
+                {/* 4. Descrição / Comentário em baixo */}
+                {post.content && (
+                  <p className="text-[14px] text-[#111827] dark:text-[#f3f4f6] leading-relaxed break-words whitespace-pre-line font-normal mb-1 pr-2">
+                    {post.content}
+                  </p>
+                )}
 
-                {/* Rodapé da Mensagem: Reações no canto esquerdo + Visualizações e Hora no canto direito */}
+                {/* 5. Rodapé da Mensagem (Reações + Visualizações e Hora) */}
                 <div className="flex items-center justify-between mt-2 pt-1">
-                  
-                  {/* Pílulas de Reação (ex: 👍 1.000, ❤️ 700, 🔥 275) */}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {displayReactions.map((r) => (
                       <button
@@ -791,7 +765,6 @@ export default function pavelDurov() {
                     ))}
                   </div>
 
-                  {/* Visualizações e Horário Telegram */}
                   <div className="flex items-center gap-1 text-[11px] text-[#8e8e93] dark:text-[#8e9aa5] select-none ml-auto shrink-0 pl-2">
                     <Eye className="w-3.5 h-3.5" />
                     <span>{displayViews}</span>
@@ -800,11 +773,11 @@ export default function pavelDurov() {
                 </div>
               </div>
 
-              {/* Botão de Encaminhar Rápido (Quick Share) flutuando ao lado do balão */}
+              {/* Botão de Encaminhar Rápido (FLAT) */}
               <button
                 type="button"
                 onClick={() => handleForwardPost(post)}
-                className="w-8 h-8 rounded-full bg-white/70 dark:bg-[#242f3d]/70 backdrop-blur-xs hover:bg-white dark:hover:bg-[#242f3d] flex items-center justify-center text-[#2481cc] shadow-xs active:scale-90 transition-transform cursor-pointer shrink-0 mb-1"
+                className="w-8 h-8 rounded-full bg-white dark:bg-[#242f3d] border border-[#e4e4e4] dark:border-[#1e2c3a] flex items-center justify-center text-[#2481cc] active:scale-90 transition-transform cursor-pointer shrink-0 mb-1"
                 title="Encaminhar post"
                 aria-label="Encaminhar post"
               >
@@ -815,24 +788,12 @@ export default function pavelDurov() {
         })}
       </main>
 
-      {/* ── BARRA INFERIOR FLUTUANTE IDÊNTICA AO TELEGRAM (SOBRE O WALLPAPER) ── */}
+      {/* ── BARRA INFERIOR FLUTUANTE FLAT (A JUSTADA PARA TELAS MÓVEIS / SEM CORTAR) ── */}
       <footer className="fixed bottom-0 left-0 right-0 p-2 pb-3 z-40 flex justify-center bg-transparent pointer-events-none">
         <div className="w-full max-w-[650px] flex items-center gap-2 pointer-events-auto px-2">
           
-          {/* Pílula flutuante branca Telegram: [ 📎  Partilhe provas de retirada       🔔 ] */}
-          <div className="flex-1 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
-            
-            {/* Clipe de Anexo na Esquerda (idêntico ao layout do Telegram) */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="text-[#707579] dark:text-[#9eaab6] hover:text-[#2481cc] p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-90 transition-all cursor-pointer shrink-0 mr-1"
-              title="Anexar comprovativo de retirada"
-            >
-              <Paperclip className="w-5 h-5 -rotate-45" />
-            </button>
-
-            {/* Campo "Partilhe provas de retirada" */}
+          {/* Pílula de Input: Texto à esquerda + Clipe de Anexo & Notificação à direita */}
+          <div className="flex-1 bg-white dark:bg-[#182533] rounded-full flex items-center px-3 py-1.5 min-h-[46px] border border-[#e4e4e4] dark:border-[#1e2c3a] transition-colors min-w-0">
             <input
               type="text"
               value={inputText}
@@ -841,17 +802,27 @@ export default function pavelDurov() {
                 if (e.key === 'Enter') handleSendBroadcast();
               }}
               placeholder="Partilhe provas de retirada"
-              className="flex-1 min-w-0 px-1 py-1 text-[15px] bg-transparent outline-none text-black dark:text-white placeholder:text-[#8e8e93] dark:placeholder:text-gray-400 font-normal leading-snug"
+              className="flex-1 min-w-0 px-1 py-1 text-[14.5px] bg-transparent outline-none text-black dark:text-white placeholder:text-[#8e8e93] dark:placeholder:text-gray-400 font-normal leading-snug"
             />
 
-            {/* Sino de Notificação na Direita */}
+            {/* Ícone de Anexo (📎) ao lado da Notificação (🔔) */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-[#707579] dark:text-[#9eaab6] hover:text-[#2481cc] p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-90 transition-all cursor-pointer shrink-0 ml-1"
+              title="Anexar comprovativo de retirada"
+            >
+              <Paperclip className="w-5 h-5 -rotate-45" />
+            </button>
+
+            {/* Sino de Notificação (🔔) */}
             <button
               type="button"
               onClick={() => {
                 setIsMuted(!isMuted);
                 showToast(isMuted ? 'Notificações ativadas' : 'Canal silenciado', 'info');
               }}
-              className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-90 transition-all cursor-pointer shrink-0 ml-1 ${
+              className={`p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 active:scale-90 transition-all cursor-pointer shrink-0 ml-0.5 ${
                 isMuted ? 'text-[#e53e3e]' : 'text-[#707579] dark:text-[#9eaab6] hover:text-[#2481cc]'
               }`}
               title={isMuted ? "Canal silencioso" : "Canal com som"}
@@ -860,7 +831,7 @@ export default function pavelDurov() {
             </button>
           </div>
 
-          {/* Botão Circular Azul Telegram (Enviar quando tem texto ou disparar anexo de comprovativo) */}
+          {/* Botão Circular Azul Telegram: ÍCONE DE ENVIAR (SEND) SEMPRE */}
           <button
             type="button"
             onClick={() => {
@@ -870,14 +841,10 @@ export default function pavelDurov() {
                 fileInputRef.current?.click();
               }
             }}
-            className="w-[48px] h-[48px] rounded-full text-white bg-[#2481cc] hover:bg-[#1f72b5] flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_2px_8px_rgba(36,129,204,0.4)] cursor-pointer"
+            className="w-[46px] h-[46px] sm:w-[48px] sm:h-[48px] rounded-full text-white bg-[#2481cc] hover:bg-[#1f72b5] flex items-center justify-center active:scale-90 transition-transform shrink-0 cursor-pointer"
             title={inputText.trim() ? "Enviar mensagem" : "Partilhar prova de retirada"}
           >
-            {inputText.trim() ? (
-              <Send className="w-5 h-5 text-white ml-0.5" />
-            ) : (
-              <Paperclip className="w-5 h-5 text-white -rotate-45" />
-            )}
+            <Send className="w-5 h-5 text-white ml-0.5" />
           </button>
         </div>
       </footer>
@@ -1001,6 +968,39 @@ export default function pavelDurov() {
 
             </form>
           </div>
+        </div>
+      )}
+
+      {/* ── FULLSCREEN DE IMAGEM (clique fora ou toque para fechar) ── */}
+      {fullscreenImage && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center cursor-zoom-out"
+          onClick={() => setFullscreenImage(null)}
+        >
+          {/* Botão de fechar */}
+          <button
+            type="button"
+            onClick={() => setFullscreenImage(null)}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
+            aria-label="Fechar imagem"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <img
+            src={fullscreenImage}
+            alt="Comprovativo ampliado"
+            className="max-w-full max-h-full object-contain rounded-lg select-none"
+            style={{ maxHeight: '95dvh', maxWidth: '95dvw' }}
+            onClick={(e) => e.stopPropagation()}
+            onError={(e) => {
+              (e.target as any).src = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=350&fit=crop';
+            }}
+          />
+
+          <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/50 text-[12px] select-none pointer-events-none">
+            Toque fora da imagem para fechar
+          </p>
         </div>
       )}
 
