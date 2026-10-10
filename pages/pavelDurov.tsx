@@ -121,7 +121,7 @@ const INITIAL_POSTS: ChannelPost[] = [
   {
     id: 'post-3',
     forwardedFrom: {
-      name: 'Pavel Durov Fundador',
+      name: 'Pavel Durov',
       avatar: '/pavel_durov.jpg'
     },
     title: '🌟 Lançamento Oficial do Sistema Telegram Stars!',
@@ -185,7 +185,7 @@ const deduplicatePosts = (postList: ChannelPost[]): ChannelPost[] => {
   return result;
 };
 
-export default function OfficialChannel() {
+export default function pavelDurov() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { session } = useAuth();
@@ -601,12 +601,12 @@ export default function OfficialChannel() {
             <ArrowLeft className="w-6 h-6 stroke-[2.2]" />
           </button>
 
-          {/* Avatar Pavel Durov Fundador */}
+          {/* Avatar Pavel Durov */}
           <div className="relative shrink-0">
             <div className="w-11 h-11 rounded-full overflow-hidden shadow-xs bg-[#2481cc]/20 border border-white/40">
               <img
                 src="/pavel_durov.jpg"
-                alt="Pavel Durov Fundador"
+                alt="Pavel Durov"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   (e.target as any).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
@@ -618,7 +618,7 @@ export default function OfficialChannel() {
           <div className="flex flex-col min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <h1 className="text-[16px] font-bold text-[#111827] dark:text-white tracking-tight truncate leading-tight">
-                Pavel Durov Fundador
+                Pavel Durov
               </h1>
               <svg viewBox="0 0 24 24" className="w-[17px] h-[17px] shrink-0 inline-block align-middle select-none">
                 <path
@@ -632,7 +632,7 @@ export default function OfficialChannel() {
               </svg>
             </div>
             <span className="text-[12px] text-gray-500 dark:text-gray-400 font-normal leading-tight">
-              {subscribersCount}
+              Fundador • {subscribersCount}
             </span>
           </div>
         </div>

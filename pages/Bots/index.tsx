@@ -6,7 +6,8 @@ import {
   Loader2,
   Clock,
   ChevronDown,
-  X
+  X,
+  Zap
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useToast } from "../../components/Toast";
@@ -203,6 +204,14 @@ export default function TelegramBotsChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showScrollDown, setShowScrollDown] = useState(false);
   const [showCommandsModal, setShowCommandsModal] = useState(false);
+
+  const quickReplies = [
+    { shortcut: "/bots", text: "Ver catálogo completo de robôs de rendimento" },
+    { shortcut: "/meusbots", text: "Consultar robôs ativos e ganhos diários" },
+    { shortcut: "/saldo", text: "Ver saldo em conta e lucros acumulados" },
+    { shortcut: "/cupons", text: "Resgatar código promocional ou cupom" },
+    { shortcut: "/ajuda", text: "Instruções de ativação e suporte do BotFather" },
+  ];
   const [awaitingCoupon, setAwaitingCoupon] = useState(false);
   const [isRedeemingCoupon, setIsRedeemingCoupon] = useState(false);
 
@@ -915,10 +924,56 @@ export default function TelegramBotsChat() {
         </button>
       )}
 
+      {/* ── QUICK HINTS (RESPOSTAS RÁPIDAS / COMANDOS) ── */}
+      {showCommandsModal && (
+        <div className="fixed bottom-[65px] left-0 right-0 flex justify-center px-2 sm:px-6 z-40 animate-in slide-in-from-bottom-2">
+          <div className="w-full max-w-[650px] bg-white dark:bg-[#182533] rounded-xl shadow-xl border border-gray-200 dark:border-gray-800 p-2 space-y-1">
+            <div className="flex items-center justify-between px-2 py-1 text-[11.5px] font-semibold text-[#2481cc] uppercase">
+              <span className="flex items-center gap-1">
+                <Zap className="w-3.5 h-3.5" /> Comandos Rápidos (BotFather)
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowCommandsModal(false)}
+                className="text-gray-400 hover:text-black dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            {quickReplies.map((qr) => (
+              <button
+                key={qr.shortcut}
+                type="button"
+                onClick={() => {
+                  setShowCommandsModal(false);
+                  handleSendMessage(qr.shortcut);
+                }}
+                className="w-full text-left px-2.5 py-1.5 hover:bg-gray-100 dark:hover:bg-[#242f3d] rounded-lg transition-colors flex items-center justify-between text-xs cursor-pointer"
+              >
+                <span className="font-mono font-bold text-[#2481cc]">{qr.shortcut}</span>
+                <span className="text-gray-600 dark:text-gray-300 truncate max-w-[70%]">{qr.text}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── FOOTER FLUTUANTE — Input + Botão Enviar ── */}
       <footer className="fixed bottom-0 left-0 right-0 p-2 pb-[max(12px,env(safe-area-inset-bottom,12px))] z-40 flex justify-center bg-transparent pointer-events-none">
         <div className="w-full max-w-[650px] flex items-center gap-1.5 sm:gap-2 pointer-events-auto px-1 sm:px-2">
           <div className="flex-1 min-w-0 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-2.5 sm:px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
+            {/* ⚡ Comandos Rápidos */}
+            <button
+              type="button"
+              onClick={() => setShowCommandsModal(!showCommandsModal)}
+              className={`p-1.5 rounded-full transition-all cursor-pointer shrink-0 mr-1 ${
+                showCommandsModal ? "text-[#2481cc] bg-[#2481cc]/15" : "text-[#707579] hover:text-[#2481cc]"
+              }`}
+              title="Comandos Rápidos"
+            >
+              <Zap className="w-5 h-5" />
+            </button>
+
             {/* Meus Bots à esquerda */}
             <button
               onClick={() => handleSendMessage("/meusbots")}

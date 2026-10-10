@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
-import AutoMessagesModal from './AutoMessagesModal';
-
 export default function Layout() {
   const location = useLocation();
 
@@ -19,25 +17,18 @@ export default function Layout() {
 
   const isChatRoom = location.pathname.startsWith('/chat/') || 
                      location.pathname === '/chat-comunidade' || 
-                     location.pathname === '/comunidade-chat';
+                     location.pathname === '/comunidade-chat' ||
+                     location.pathname === '/grupochat';
 
   const showNavbar = !isChatRoom && mainTabPaths.includes(location.pathname);
 
-  const [isAutoMessagesOpen, setIsAutoMessagesOpen] = useState(false);
-
   return (
     <div className="min-h-[100dvh] bg-white dark:bg-[#17212b] font-sans text-[#111827] dark:text-[#f3f4f6] antialiased">
-      {/* Modal Global de Mensagens Automáticas */}
-      <AutoMessagesModal
-        isOpen={isAutoMessagesOpen}
-        onClose={() => setIsAutoMessagesOpen(false)}
-      />
-
       {/* ── SHELL FULL-WIDTH 100% SEM LIMITES OU BORDAS LATERAIS ── */}
       <div className="w-full min-h-[100dvh] bg-white dark:bg-[#17212b] flex flex-col relative">
         <main className={showNavbar ? 'pb-[60px] flex-1 flex flex-col w-full' : 'flex-1 flex flex-col w-full'}>
           <Outlet context={{ 
-            openAutoMessages: () => setIsAutoMessagesOpen(true)
+            openAutoMessages: () => {}
           }} />
         </main>
 

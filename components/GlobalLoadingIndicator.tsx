@@ -16,8 +16,11 @@ export const GlobalLoadingIndicator: React.FC = () => {
       '/telegram-business',
       '/comunidade-chat',
       '/chat-comunidade',
+      '/grupochat',
       '/canais',
-      '/canal-oficial'
+      '/canal-oficial',
+      '/pavelDurov',
+      '/pavel-durov'
     ].includes(location.pathname);
 
   if (isChatPage) {

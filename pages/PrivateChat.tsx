@@ -33,6 +33,11 @@ interface Message {
   lida: boolean;
   created_at: string;
   reaction?: string;
+  detalhes?: {
+    imagem_url?: string;
+    tipo_midia?: string;
+    [key: string]: any;
+  };
 }
 
 interface ContextMenu {
@@ -83,7 +88,6 @@ export default function PrivateChat() {
     return true;
   });
   const [isSending, setIsSending] = useState(false);
-  const [showQuickHints, setShowQuickHints] = useState(false);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
 
   // Context Menu state
@@ -99,14 +103,26 @@ export default function PrivateChat() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // ── Quick Replies ─────────────────────────────────────────────────────
-  const quickReplies = [
-    { shortcut: '/ola', text: 'Olá! Como posso ser útil hoje no Telegram Business?' },
-    { shortcut: '/estrelas', text: 'Você pode adquirir e resgatar Telegram Stars na aba Stars e Carteira com liquidação instantânea.' },
-    { shortcut: '/suporte', text: 'Nosso atendimento oficial está disponível 24 horas por dia, 7 dias por semana.' },
-    { shortcut: '/plano', text: 'Consulte os bots de rendimento e ferramentas VIP na aba Bots & Planos.' },
-  ];
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Tamanho máximo: 5MB.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setImagePreview(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
 
   const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     requestAnimationFrame(() => {
@@ -369,12 +385,14 @@ export default function PrivateChat() {
 
   // ── Send Message ──────────────────────────────────────────────────────
   const handleSend = async (overrideText?: string) => {
-    const textToSend = overrideText || inputText;
-    if (!textToSend.trim() || !user || !contactId || isSending) return;
+    const textToSend = overrideText !== undefined ? overrideText : inputText;
+    if ((!textToSend.trim() && !imagePreview) || !user || !contactId || isSending) return;
 
     const msg = textToSend.trim();
+    const imageToSend = imagePreview;
+
     setInputText('');
-    setShowQuickHints(false);
+    setImagePreview(null);
     setReplyTo(null);
     if (inputRef.current) inputRef.current.style.height = 'auto';
 
@@ -385,7 +403,8 @@ export default function PrivateChat() {
       destinatario_id: contactId,
       mensagem: msg,
       lida: false,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      detalhes: imageToSend ? { imagem_url: imageToSend, tipo_midia: 'imagem' } : undefined
     };
 
     setMessages(prev => [...prev, newMsg]);
@@ -423,7 +442,10 @@ export default function PrivateChat() {
         remetente_id: user.id,
         destinatario_id: contactId,
         mensagem: msg,
-        detalhes: { lida: false }
+        detalhes: {
+          lida: false,
+          ...(imageToSend ? { imagem_url: imageToSend, tipo_midia: 'imagem' } : {})
+        }
       };
       console.log('[PrivateChat] Enviando para sys_t110:', payload);
       const { data: inserted, error } = await (supabase as any)
@@ -535,7 +557,7 @@ export default function PrivateChat() {
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1">
               <h1 className="text-[15px] font-medium text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
-                {isPavel ? 'Pavel Durov Fundador' : formatPhoneClean(contactDisplayName)}
+                {isPavel ? 'Pavel Durov' : formatPhoneClean(contactDisplayName)}
               </h1>
               {isPavel && (
                 <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5">✓</span>
@@ -557,7 +579,9 @@ export default function PrivateChat() {
               </span>
             ) : (
               <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
-                {contactIsOnline
+                {isPavel
+                  ? 'Fundador'
+                  : contactIsOnline
                   ? (contactLevel ? `online • Subordinado Nível ${contactLevel}` : 'online')
                   : 'offline'}
               </span>
@@ -702,19 +726,36 @@ export default function PrivateChat() {
                       </svg>
                     )}
 
+                    {/* Imagem anexada */}
+                    {m.detalhes?.imagem_url && (
+                      <div className="mb-1 rounded-[14px] overflow-hidden pointer-events-auto">
+                        <img
+                          src={m.detalhes.imagem_url}
+                          alt="Foto"
+                          className="w-full max-h-[320px] object-cover rounded-[14px] cursor-pointer hover:opacity-95 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setZoomedImage(m.detalhes?.imagem_url || null);
+                          }}
+                        />
+                      </div>
+                    )}
+
                     <div className="relative pointer-events-none leading-[1.3]">
                       {!isMe && (
                         <p
                           className="text-[13px] font-medium mb-[2px] cursor-pointer truncate"
                           style={{ color: isPavel ? '#2481cc' : contactColor }}
                         >
-                          {isPavel ? 'Pavel Durov Fundador' : formatPhoneClean(contactDisplayName)}
+                          {isPavel ? 'Pavel Durov' : formatPhoneClean(contactDisplayName)}
                         </p>
                       )}
 
-                      <span className="text-[16px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
-                        {m.mensagem}
-                      </span>
+                      {m.mensagem && (
+                        <span className="text-[16px] whitespace-pre-wrap break-words font-normal" style={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
+                          {m.mensagem}
+                        </span>
+                      )}
                       
                       {/* Spacer invisível inline — dá espaço ao timestamp sem forçar largura mínima */}
                       <span
@@ -851,28 +892,6 @@ export default function PrivateChat() {
         </div>
       )}
 
-      {/* ── QUICK HINTS ── */}
-      {showQuickHints && (
-        <div className="fixed bottom-[65px] left-0 right-0 flex justify-center px-2 sm:px-6 z-40 animate-in slide-in-from-bottom-2">
-          <div className="w-full max-w-[1000px] bg-white dark:bg-[#17212b] rounded-xl shadow-xl border border-gray-200 dark:border-gray-800 p-2 space-y-1">
-            <div className="flex items-center justify-between px-2 py-1 text-[11.5px] font-semibold text-[#2481cc] uppercase">
-              <span className="flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Respostas Rápidas (Telegram Business)</span>
-              <button onClick={() => setShowQuickHints(false)} className="text-gray-400 hover:text-black dark:hover:text-white">✕</button>
-            </div>
-            {quickReplies.map((qr) => (
-              <button
-                key={qr.shortcut}
-                onClick={() => handleSend(qr.text)}
-                className="w-full text-left px-2.5 py-1.5 hover:bg-gray-100 dark:hover:bg-[#242f3d] rounded-lg transition-colors flex items-center justify-between text-xs"
-              >
-                <span className="font-mono font-bold text-[#2481cc]">{qr.shortcut}</span>
-                <span className="text-gray-600 dark:text-gray-300 truncate max-w-[70%]">{qr.text}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* ── BARRA DE MENSAGEM FLUTUANTE ── */}
       <div
         className="fixed bottom-0 left-0 right-0 z-40 flex justify-center"
@@ -888,11 +907,26 @@ export default function PrivateChat() {
           <div className="flex-1 bg-white dark:bg-[#202b36] rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.18)] flex items-center px-3.5 py-1 min-h-[46px]">
             <button
               type="button"
-              onClick={() => setShowQuickHints(!showQuickHints)}
+              onClick={() => inputRef.current?.focus()}
               className="text-[#707579] hover:text-[#2481cc] p-1 active:scale-90 transition-transform shrink-0"
             >
               <Smile className="w-5 h-5" />
             </button>
+
+            {/* Thumbnail da imagem selecionada */}
+            {imagePreview && (
+              <div className="relative mr-2 ml-1 shrink-0">
+                <img src={imagePreview} alt="preview" className="w-8 h-8 object-cover rounded-lg border border-gray-200 shadow-xs" />
+                <button 
+                  type="button" 
+                  onClick={() => setImagePreview(null)} 
+                  className="absolute -top-1 -right-1 bg-black/70 text-white rounded-full p-0.5 hover:bg-black cursor-pointer"
+                  title="Remover imagem"
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </div>
+            )}
 
             <textarea
               ref={inputRef}
@@ -901,8 +935,6 @@ export default function PrivateChat() {
                 const val = e.target.value;
                 setInputText(val);
                 sendTypingBroadcast();
-                if (val.startsWith('/')) setShowQuickHints(true);
-                else if (showQuickHints) setShowQuickHints(false);
                 e.target.style.height = 'auto';
                 e.target.style.height = `${Math.min(e.target.scrollHeight, 100)}px`;
               }}
@@ -914,10 +946,19 @@ export default function PrivateChat() {
               rows={1}
             />
 
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageSelect}
+              accept="image/*"
+              className="hidden"
+            />
+
             <button
               type="button"
-              onClick={() => showToast('Selecione uma imagem ou documento', 'info')}
-              className="text-[#707579] hover:text-[#2481cc] p-1 active:scale-90 transition-transform shrink-0"
+              onClick={() => fileInputRef.current?.click()}
+              className="text-[#707579] hover:text-[#2481cc] p-1 active:scale-90 transition-transform shrink-0 cursor-pointer"
+              title="Anexar foto"
             >
               <Paperclip className="w-5 h-5" />
             </button>
@@ -927,15 +968,35 @@ export default function PrivateChat() {
           <button
             type="button"
             onClick={() => handleSend()}
-            disabled={!inputText.trim()}
+            disabled={!inputText.trim() && !imagePreview}
             className={`w-[46px] h-[46px] rounded-full text-white flex items-center justify-center active:scale-90 transition-transform shrink-0 shadow-[0_4px_16px_rgba(36,129,204,0.45)] ${
-              inputText.trim() ? 'bg-[#2481cc] hover:bg-[#1f72b5] cursor-pointer' : 'bg-[#2481cc] cursor-pointer'
+              (inputText.trim() || imagePreview) ? 'bg-[#2481cc] hover:bg-[#1f72b5] cursor-pointer' : 'bg-[#2481cc] cursor-pointer'
             }`}
           >
-            {inputText.trim() ? <Send className="w-5 h-5 text-white ml-0.5" /> : <Mic className="w-5 h-5 text-white" />}
+            {(inputText.trim() || imagePreview) ? <Send className="w-5 h-5 text-white ml-0.5" /> : <Mic className="w-5 h-5 text-white" />}
           </button>
         </div>
       </div>
+
+      {/* ── Modal de Zoom da Imagem (Visualização Completa) ── */}
+      {zoomedImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4 animate-in fade-in duration-150"
+          onClick={() => setZoomedImage(null)}
+        >
+          <div className="relative max-w-full max-h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <img src={zoomedImage} className="max-w-full max-h-[85vh] object-contain rounded-[12px] shadow-2xl" alt="Zoom" />
+            <button 
+              type="button"
+              onClick={() => setZoomedImage(null)}
+              className="absolute top-2 right-2 w-10 h-10 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center cursor-pointer transition-colors"
+              title="Fechar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Animações CSS injetadas ── */}
       <style>{`

@@ -479,7 +479,7 @@ export default function ChatsList() {
       {
         id: 'pavel-durov',
         folder: 'channels' as ChatFolder,
-        name: 'Pavel Durov Fundador',
+        name: 'Pavel Durov',
         isVerified: true,
         lastMessage: 'Novo sistema de monetização por Telegram Stars e Mini Apps lançado oficialmente.',
         senderPrefix: null,
@@ -494,7 +494,7 @@ export default function ChatsList() {
           <div className="w-13 h-13 rounded-full overflow-hidden shadow-xs bg-[#2481cc]/20 border border-white/40">
             <img
               src="/pavel_durov.jpg"
-              alt="Pavel Durov Fundador"
+              alt="Pavel Durov"
               className="w-full h-full object-cover"
               onError={(e) => {
                 (e.target as any).src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop';
@@ -600,18 +600,17 @@ export default function ChatsList() {
         const label = (c.telefone || '').replace(/\D/g, '').slice(-2) || '?';
         const isSub = Boolean(c.isSubordinate);
         const nv = c.nivel;
-        const isOnline = isSub && nv === 1;
         const ts = c.lastMessageTimestamp ? Number(c.lastMessageTimestamp) : Date.now();
 
         return {
           id: `contact-${c.id}`,
+          contactId: c.id,
           folder: 'all' as ChatFolder,
           name: c.nome_exibicao || formatSenderPhone(c.telefone),
           isVerified: false,
           tag: null,
           isSubordinate: isSub,
           nivel: nv,
-          isOnline,
           lastMessage: c.lastMessage,
           senderPrefix: null,
           time: formatTelegramTime(ts),
@@ -813,66 +812,81 @@ export default function ChatsList() {
         ) : (
           <>
             {/* 1. Lista de conversas ativas ordenadas por recência */}
-            {filteredChats.map((chat) => (
-              <div
-                key={chat.id}
-                onClick={chat.onClick}
-                className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-[#202b36] active:bg-gray-100 dark:active:bg-[#242f3d] transition-colors cursor-pointer border-b border-gray-100/80 dark:border-[#202b36]"
-              >
-                <div className="relative shrink-0">
-                  {chat.avatar}
-                </div>
+            {filteredChats.map((chat) => {
+              const rawId = chat.id.startsWith('contact-') ? chat.id.replace('contact-', '') : null;
+              const isOnline = rawId ? isUserOnline(rawId) : false;
+              const isSub = Boolean(chat.isSubordinate);
+              const nv = chat.nivel;
 
-                <div className="flex-1 min-w-0 py-0.5">
-                  <div className="flex justify-between items-center mb-0.5">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <h3 className="text-[15.5px] font-medium text-[#111] dark:text-white truncate leading-tight">
-                        {chat.name}
-                      </h3>
-                      {chat.isVerified && <OfficialVerifiedBadge />}
-                      {chat.tag && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-sm bg-[#2481cc] text-white">
-                          {chat.tag}
+              return (
+                <div
+                  key={chat.id}
+                  onClick={chat.onClick}
+                  className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 dark:hover:bg-[#202b36] active:bg-gray-100 dark:active:bg-[#242f3d] transition-colors cursor-pointer border-b border-gray-100/80 dark:border-[#202b36]"
+                >
+                  <div className="relative shrink-0">
+                    {chat.avatar}
+                    {isOnline && (
+                      <span
+                        className={`absolute ${isSub && nv ? 'top-0 right-0' : 'bottom-0 right-0'} w-3.5 h-3.5 bg-[#10b981] rounded-full border-2 border-white dark:border-[#17212b] shadow-xs z-10`}
+                        title="Online agora"
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0 py-0.5">
+                    <div className="flex justify-between items-center mb-0.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <h3 className="text-[15.5px] font-medium text-[#111] dark:text-white truncate leading-tight">
+                          {chat.name}
+                        </h3>
+                        {chat.isVerified && <OfficialVerifiedBadge />}
+                        {chat.tag && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-sm bg-[#2481cc] text-white">
+                            {chat.tag}
+                          </span>
+                        )}
+                        {isOnline && (
+                          <span className="text-[10.5px] font-medium px-1.5 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] shrink-0">
+                            online
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-1 shrink-0 ml-1">
+                        {chat.isMe && (
+                          <CheckCheck className="w-4 h-4 text-[#2481cc] stroke-[2.5]" />
+                        )}
+                        <span className="text-[12px] text-[#707579] dark:text-[#9eaab6]">
+                          {chat.time}
                         </span>
-                      )}
-
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0 ml-1">
-                      {chat.isMe && (
-                        <CheckCheck className="w-4 h-4 text-[#2481cc] stroke-[2.5]" />
-                      )}
-                      <span className="text-[12px] text-[#707579] dark:text-[#9eaab6]">
-                        {chat.time}
-                      </span>
+                    <div className="flex items-center justify-between gap-2">
+                      {(() => {
+                        const isTyping = rawId ? Boolean(typingUsers[rawId]) : false;
+                        return (
+                          <p className="text-[13.5px] truncate leading-snug overflow-hidden whitespace-nowrap">
+                            {isTyping ? (
+                              <span className="text-[#4dcd5e] font-medium italic">digitando...</span>
+                            ) : (
+                              <span className="text-[#707579] dark:text-[#9eaab6]">
+                                {chat.senderPrefix && (
+                                  <span className="text-[#2481cc] font-medium">{chat.senderPrefix}</span>
+                                )}
+                                {previewText(chat.lastMessage || '')}
+                              </span>
+                            )}
+                          </p>
+                        );
+                      })()}
+                      {chat.actionBtn}
                     </div>
-                  </div>
-
-                  <div className="flex items-center justify-between gap-2">
-                    {(() => {
-                      // Extrai o contactId real do chat (ex: 'contact-uuid' -> 'uuid')
-                      const rawId = chat.id.startsWith('contact-') ? chat.id.replace('contact-', '') : null;
-                      const isTyping = rawId ? Boolean(typingUsers[rawId]) : false;
-                      return (
-                        <p className="text-[13.5px] truncate leading-snug overflow-hidden whitespace-nowrap">
-                          {isTyping ? (
-                            <span className="text-[#4dcd5e] font-medium italic">digitando...</span>
-                          ) : (
-                            <span className="text-[#707579] dark:text-[#9eaab6]">
-                              {chat.senderPrefix && (
-                                <span className="text-[#2481cc] font-medium">{chat.senderPrefix}</span>
-                              )}
-                              {previewText(chat.lastMessage || '')}
-                            </span>
-                          )}
-                        </p>
-                      );
-                    })()}
-                    {chat.actionBtn}
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {/* 2. Seção de contatos (sem conversas recentes iniciadas) */}
             {activeFilter === 'all' && idleContacts.length > 0 && (
@@ -904,6 +918,13 @@ export default function ChatsList() {
                           {label}
                         </div>
 
+                        {isOnline && (
+                          <span
+                            className={`absolute ${isSub && nv ? 'top-0 right-0' : 'bottom-0 right-0'} w-3.5 h-3.5 bg-[#10b981] rounded-full border-2 border-white dark:border-[#17212b] shadow-xs z-10`}
+                            title="Online agora"
+                          />
+                        )}
+
                         {isSub && nv && (
                           <div
                             className={`absolute bottom-0 right-0 w-[18px] h-[18px] rounded-full border-2 border-white dark:border-[#17212b] flex items-center justify-center text-[10px] font-bold text-white shadow-xs ${
@@ -922,7 +943,11 @@ export default function ChatsList() {
                             <h3 className="text-[15px] font-medium text-[#111] dark:text-white truncate leading-tight">
                               {contact.nome_exibicao || formatSenderPhone(contact.telefone)}
                             </h3>
-
+                            {isOnline && (
+                              <span className="text-[10.5px] font-medium px-1.5 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] shrink-0">
+                                online
+                              </span>
+                            )}
                           </div>
                         </div>
 

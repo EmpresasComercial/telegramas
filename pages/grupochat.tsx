@@ -252,7 +252,7 @@ const GROUP_TABS: { id: GroupTab; label: string }[] = [
   { id: 'links', label: 'Links' },
 ];
 
-export default function CommunityChat() {
+export default function grupochat() {
   const navigate = useNavigate();
   const { session } = useAuth();
   const user = session?.user;

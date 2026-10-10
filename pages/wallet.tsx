@@ -15,7 +15,8 @@ import {
   RotateCcw,
   CheckCircle2,
   XCircle,
-  ArrowDownLeft
+  ArrowDownLeft,
+  Zap
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
 import { supabase } from '../lib/supabase';
@@ -241,7 +242,7 @@ function getCurrentDay(): string {
   return days[new Date().getDay()];
 }
 
-export default function Withdraw() {
+export default function wallet() {
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -266,6 +267,16 @@ export default function Withdraw() {
   const [showMenuDropdown, setShowMenuDropdown] = useState(false);
   const [lastIntent, setLastIntent] = useState<string | null>(null);
   const [lastBotResponse, setLastBotResponse] = useState<string | null>(null);
+  const [showQuickHints, setShowQuickHints] = useState(false);
+
+  const quickReplies = [
+    { shortcut: '/retirar', text: 'Solicitar levantamento para conta bancária' },
+    { shortcut: '/saldo', text: 'Consultar saldo disponível para retirada' },
+    { shortcut: '/banco', text: 'Ver dados bancários e IBAN cadastrado' },
+    { shortcut: '/taxa', text: 'Ver taxas e limites de saque (10%)' },
+    { shortcut: '/historico', text: 'Histórico de retiradas e levantamentos' },
+    { shortcut: '/ajuda', text: 'Horários e instruções da Wallet' },
+  ];
 
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const mainChatRef = useRef<HTMLDivElement>(null);
@@ -1567,12 +1578,58 @@ export default function Withdraw() {
         </button>
       )}
 
+      {/* ── QUICK HINTS (RESPOSTAS RÁPIDAS / COMANDOS) ── */}
+      {showQuickHints && (
+        <div className="fixed bottom-[65px] left-0 right-0 flex justify-center px-2 sm:px-6 z-40 animate-in slide-in-from-bottom-2">
+          <div className="w-full max-w-[650px] bg-white dark:bg-[#182533] rounded-xl shadow-xl border border-gray-200 dark:border-gray-800 p-2 space-y-1">
+            <div className="flex items-center justify-between px-2 py-1 text-[11.5px] font-semibold text-[#2481cc] uppercase">
+              <span className="flex items-center gap-1">
+                <Zap className="w-3.5 h-3.5" /> Comandos Rápidos (Wallet Bot)
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowQuickHints(false)}
+                className="text-gray-400 hover:text-black dark:hover:text-white"
+              >
+                ✕
+              </button>
+            </div>
+            {quickReplies.map((qr) => (
+              <button
+                key={qr.shortcut}
+                type="button"
+                onClick={() => {
+                  setShowQuickHints(false);
+                  handleSendMessage(qr.shortcut);
+                }}
+                className="w-full text-left px-2.5 py-1.5 hover:bg-gray-100 dark:hover:bg-[#242f3d] rounded-lg transition-colors flex items-center justify-between text-xs cursor-pointer"
+              >
+                <span className="font-mono font-bold text-[#2481cc]">{qr.shortcut}</span>
+                <span className="text-gray-600 dark:text-gray-300 truncate max-w-[70%]">{qr.text}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── FOOTER FLUTUANTE IDÊNTICO AO OFFICIAL CHANNEL ── */}
       <footer className="fixed bottom-0 left-0 right-0 p-2 pb-[max(12px,env(safe-area-inset-bottom,12px))] z-40 flex justify-center bg-transparent pointer-events-none">
         <div className="w-full max-w-[650px] flex items-center gap-1.5 sm:gap-2 pointer-events-auto px-1 sm:px-2">
 
           {/* Cápsula branca flutuante sobre o wallpaper */}
           <div className="flex-1 min-w-0 bg-white dark:bg-[#182533] rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.12)] flex items-center px-2.5 sm:px-3 py-1.5 min-h-[48px] border border-black/5 dark:border-white/10 transition-colors">
+
+            {/* ⚡ Comandos Rápidos */}
+            <button
+              type="button"
+              onClick={() => setShowQuickHints(!showQuickHints)}
+              className={`p-1.5 rounded-full transition-all cursor-pointer shrink-0 mr-1 ${
+                showQuickHints ? 'text-[#2481cc] bg-[#2481cc]/15' : 'text-[#707579] dark:text-[#9eaab6] hover:text-[#2481cc]'
+              }`}
+              title="Comandos Rápidos"
+            >
+              <Zap className="w-5 h-5" />
+            </button>
 
             {/* Campo de texto */}
             <input
