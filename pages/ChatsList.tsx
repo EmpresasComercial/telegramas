@@ -18,6 +18,7 @@ import {
   Users
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 // Selo de verificação oficial da empresa (Telegram Blue)
 const OfficialVerifiedBadge = ({ className = "w-[16px] h-[16px]" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" className={`shrink-0 inline-block align-middle ml-1 select-none ${className}`}>
@@ -38,6 +39,7 @@ export default function ChatsList() {
   const user = session?.user;
   const { isUserOnline } = usePresence();
   const { showToast } = useToast();
+  const { statusText } = useNetworkStatus();
 
   // typingUsers: Map<contactId, true> — contatos que estão digitando agora
   const [typingUsers, setTypingUsers] = useState<Record<string, boolean>>({});
@@ -724,9 +726,18 @@ export default function ChatsList() {
             </>
           ) : (
             <div className="flex-1 flex items-center pl-2">
-              <h1 className="text-[22px] font-bold tracking-tight text-[#2481cc] dark:text-[#6ab3f3]">
-                Telegram
-              </h1>
+              {statusText ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 text-[#2481cc] dark:text-[#6ab3f3] animate-spin shrink-0" />
+                  <h1 className="text-[17.5px] font-semibold tracking-tight text-[#2481cc] dark:text-[#6ab3f3]">
+                    {statusText}
+                  </h1>
+                </div>
+              ) : (
+                <h1 className="text-[22px] font-bold tracking-tight text-[#2481cc] dark:text-[#6ab3f3]">
+                  Telegram
+                </h1>
+              )}
             </div>
           )}
 

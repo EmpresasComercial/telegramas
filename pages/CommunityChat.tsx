@@ -28,8 +28,10 @@ import {
   Reply,
   Copy,
   Trash2,
-  ChevronRight
+  ChevronRight,
+  Loader2
 } from 'lucide-react';
+import { useNetworkStatus } from "../hooks/useNetworkStatus";
 
 const FORBIDDEN_WORDS = Array.from(new Set([
   "burla", "burlas", "fraude", "fraudes", "scam", "scams", "golpe", "golpes", 
@@ -256,6 +258,7 @@ export default function CommunityChat() {
   const user = session?.user;
   const { showToast } = useToast();
   const { language } = useLanguage();
+  const { statusText } = useNetworkStatus();
 
   const [publicMessages, setPublicMessages] = useState<any[]>([]);
   const [, setIsLoading] = useState(true);
@@ -984,8 +987,13 @@ export default function CommunityChat() {
             <h1 className="text-[15px] font-medium text-black dark:text-white tracking-tight truncate leading-[1.15] mt-0.5">
               Telegram Bussiness Grupo
             </h1>
-            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate">
-              {typingUsers.size > 0 ? (
+            <span className="text-[12.5px] text-[#707579] dark:text-[#8e9aa5] font-normal leading-[1.15] mt-0.5 truncate flex items-center gap-1">
+              {statusText ? (
+                <>
+                  <Loader2 className="w-3 h-3 text-[#2481cc] animate-spin shrink-0" />
+                  <span className="text-[#2481cc] font-medium">{statusText}</span>
+                </>
+              ) : typingUsers.size > 0 ? (
                 <span className="text-[#2481cc] font-medium italic">
                   {Array.from(typingUsers.values()).join(', ')} digitando...
                 </span>

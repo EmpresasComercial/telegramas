@@ -22,6 +22,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { useToast } from '../components/Toast';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
 
 // ── Tipos ──────────────────────────────────────────────────────────────
 interface Message {
@@ -56,6 +57,7 @@ export default function PrivateChat() {
   const user = session?.user;
   const { showToast } = useToast();
   const { isUserOnline } = usePresence();
+  const { statusText } = useNetworkStatus();
   const contactIsOnline = isUserOnline(contactId);
 
   const [contactDisplayName, setContactDisplayName] = useState(rawContactPhone);
@@ -525,7 +527,7 @@ export default function PrivateChat() {
                 {contactDisplayName.slice(0, 2).toUpperCase() || '?'}
               </div>
             )}
-            {contactIsOnline && (
+            {contactIsOnline && !statusText && (
               <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-[#1c242f]" />
             )}
           </div>
@@ -539,7 +541,12 @@ export default function PrivateChat() {
                 <span className="w-3.5 h-3.5 rounded-full bg-[#2481cc] text-white flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5">✓</span>
               )}
             </div>
-            {isContactTyping ? (
+            {statusText ? (
+              <span className="text-[12.5px] text-[#2481cc] font-medium leading-[1.15] mt-0.5 truncate flex items-center gap-1">
+                <Loader2 className="w-3 h-3 animate-spin shrink-0" />
+                {statusText}
+              </span>
+            ) : isContactTyping ? (
               <span className="text-[12.5px] text-[#2481cc] font-medium leading-[1.15] mt-0.5 truncate flex items-center gap-1">
                 digitando
                 <span className="inline-flex items-center gap-[2px]">
